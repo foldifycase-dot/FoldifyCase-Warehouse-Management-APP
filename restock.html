@@ -1594,7 +1594,7 @@ window.addEventListener('load', function(){
 </body></html>`;
 
   try{
-    const fromEmail=document.getElementById('fromEmail')?.value||'warehouse@foldifycase.com.au';
+    const fromEmail=document.getElementById('fromEmail')?.value||'<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="abdccad9cec3c4ded8ceebcdc4c7cfc2cdd2c8cad8ce85c8c4c685cade">[email&#160;protected]</a>';
     const payload={
       to:[order.supplierEmail],
       from_name:'FoldifyCase Warehouse',
@@ -1842,7 +1842,7 @@ async function emailWarehouse(orderId){
     return;
   }
 
-  const fromEmail=document.getElementById('fromEmail')?.value||'warehouse@foldifycase.com.au';
+  const fromEmail=document.getElementById('fromEmail')?.value||'<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c3b4a2b1a6abacb6b0a683a5acafa7aaa5baa0a2b0a6eda0acaeeda2b6">[email&#160;protected]</a>';
   const fromName=document.getElementById('fromName')?.value||'FoldifyCase';
   const totalQty=order.lines.reduce((s,l)=>s+l.qty,0);
   const shipLabel=order.ship==='air'?'✈ Air — Express':'⛵ Sea — Standard';
@@ -1956,7 +1956,7 @@ async function emailWarehouse(orderId){
 </table>
 </td></tr></table>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Receive email settings from parent combined app
 window.addEventListener('message', function(e){
   if(!e.data || e.data.type !== 'FC_EMAIL_SETTINGS') return;
@@ -3425,45 +3425,29 @@ startLoad();
 </script>
 
 <script>
-// Receive email settings from parent combined app
-window.addEventListener('message', function(e){
-  if(!e.data || e.data.type !== 'FC_EMAIL_SETTINGS') return;
+window.addEventListener('message',function(e){
+  if(!e.data||e.data.type!=='FC_EMAIL_SETTINGS')return;
   try{
     if(e.data.usWarehouseEmail){
-      localStorage.setItem('fc_email_us_warehouse', e.data.usWarehouseEmail);
-      // Update the usWarehouseEmail input if visible
-      var usInput = document.getElementById('usWarehouseEmail');
-      if(usInput && !usInput.value) usInput.value = e.data.usWarehouseEmail;
+      localStorage.setItem('fc_email_us_warehouse',e.data.usWarehouseEmail);
+      var a=document.getElementById('usWarehouseEmail');if(a&&!a.value)a.value=e.data.usWarehouseEmail;
     }
     if(e.data.supplierEmail){
-      localStorage.setItem('fc_email_supplier', e.data.supplierEmail);
-      // Pre-fill default supplier email fields
-      var spInput = document.getElementById('defaultSupplierEmail');
-      if(spInput && !spInput.value) spInput.value = e.data.supplierEmail;
-      var spInput2 = document.getElementById('supplierEmail');
-      if(spInput2 && !spInput2.value) spInput2.value = e.data.supplierEmail;
-      // Also update the localStorage key the restock app uses
-      localStorage.setItem('fc_default_supplier_email', e.data.supplierEmail);
+      localStorage.setItem('fc_email_supplier',e.data.supplierEmail);
+      localStorage.setItem('fc_default_supplier_email',e.data.supplierEmail);
+      var b=document.getElementById('defaultSupplierEmail');if(b&&!b.value)b.value=e.data.supplierEmail;
+      var c=document.getElementById('supplierEmail');if(c&&!c.value)c.value=e.data.supplierEmail;
     }
-    console.log('[FC] Email settings synced from parent:', e.data);
-  }catch(err){ console.warn('[FC] Email sync error:', err); }
+  }catch(x){}
 });
-// On load: apply any previously saved settings
-window.addEventListener('load', function(){
+window.addEventListener('load',function(){
   try{
-    const usEmail = localStorage.getItem('fc_email_us_warehouse');
-    const supEmail = localStorage.getItem('fc_email_supplier') || localStorage.getItem('fc_default_supplier_email');
-    if(usEmail){
-      var usInput = document.getElementById('usWarehouseEmail');
-      if(usInput && !usInput.value) usInput.value = usEmail;
-    }
-    if(supEmail){
-      var spInput = document.getElementById('defaultSupplierEmail');
-      if(spInput && !spInput.value) spInput.value = supEmail;
-    }
-  }catch(e){}
+    var u=localStorage.getItem('fc_email_us_warehouse');
+    var s=localStorage.getItem('fc_email_supplier')||localStorage.getItem('fc_default_supplier_email');
+    if(u){var a=document.getElementById('usWarehouseEmail');if(a&&!a.value)a.value=u;}
+    if(s){var b=document.getElementById('defaultSupplierEmail');if(b&&!b.value)b.value=s;}
+  }catch(x){}
 });
 </script>
-
 </body>
 </html>

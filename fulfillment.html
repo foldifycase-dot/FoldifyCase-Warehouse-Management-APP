@@ -1100,31 +1100,22 @@ function uploadLabelPDF(btn, orderId, orderName) {
 </script>
 
 <script>
-// Receive email settings from parent combined app
-window.addEventListener('message', function(e){
-  if(!e.data || e.data.type !== 'FC_EMAIL_SETTINGS') return;
+window.addEventListener('message',function(e){
+  if(!e.data||e.data.type!=='FC_EMAIL_SETTINGS')return;
   try{
-    // Update US warehouse email (used by sendOrder)
     if(e.data.usWarehouseEmail){
-      localStorage.setItem('fc_email_us_warehouse', e.data.usWarehouseEmail);
-      // Update the live email variable used in send functions
-      if(typeof LIVE_EMAIL !== 'undefined'){
-        window._fc_warehouse_email = e.data.usWarehouseEmail;
-      }
+      localStorage.setItem('fc_email_us_warehouse',e.data.usWarehouseEmail);
     }
-    // Update supplier email
     if(e.data.supplierEmail){
-      localStorage.setItem('fc_email_supplier', e.data.supplierEmail);
+      localStorage.setItem('fc_email_supplier',e.data.supplierEmail);
     }
-    console.log('[FC] Email settings synced from parent:', e.data);
-  }catch(err){ console.warn('[FC] Email sync error:', err); }
+  }catch(x){}
 });
-// On load: read any previously saved email settings from parent
-window.addEventListener('load', function(){
+window.addEventListener('load',function(){
   try{
-    const usEmail = localStorage.getItem('fc_email_us_warehouse');
-    if(usEmail) window._fc_warehouse_email = usEmail;
-  }catch(e){}
+    var u=localStorage.getItem('fc_email_us_warehouse');
+    if(u) window._fc_warehouse_email=u;
+  }catch(x){}
 });
 </script>
 

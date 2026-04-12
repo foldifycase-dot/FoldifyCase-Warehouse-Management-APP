@@ -70,7 +70,6 @@ body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;fon
 .sync-box{padding:0 14px 10px;}
 .btn-sync{width:100%;padding:9px;background:var(--gold);color:var(--ink);border:none;border-radius:7px;font-family:"Syne",sans-serif;font-weight:700;font-size:11px;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .18s;}
 .btn-sync:hover{background:var(--gold-d);color:#fff;}
-.sync-time{font-size:10px;color:rgba(255,255,255,.3);text-align:center;margin-top:5px;}
 
 /* MAIN CONTENT */
 .main{padding:18px;overflow-y:auto;background:var(--cream);}
@@ -587,7 +586,6 @@ html.in-iframe .layout{height:100vh;}
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M13 8A5 5 0 113 8h2L2 4 0 8h2a6 6 0 1010.9-3.5L14 3a8 8 0 01-1 5z"/></svg>
         Sync Shopify
       </button>
-      <div class="sync-time" id="syncTime">—</div>
     </div>
 
     <hr class="sb-divider">
@@ -2372,7 +2370,7 @@ async function startLoad(){
     dot.className='dot-g';
     const t=new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
     document.getElementById('syncInfo').textContent='Live · synced '+t;
-    document.getElementById('syncTime').textContent='Last sync: '+t;
+    
     showToast('Shopify synced successfully','ok');
     initETA();
     renderAll();
@@ -2583,7 +2581,7 @@ function loadDemo(){
     {id:'12',title:'Slim Matte Case Z Flip 6',qty:31,status:'ok',sold90:29,price:'22.99',variants:4,warehouses:['au','uk']},
   ];
   document.getElementById('syncInfo').textContent='Demo mode — proxy offline';
-  document.getElementById('syncTime').textContent='Demo data';
+  
   renderAll();
 }
 

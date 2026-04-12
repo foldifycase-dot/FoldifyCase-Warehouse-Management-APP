@@ -629,15 +629,7 @@ html.in-iframe .layout{height:100vh;}
 
     <hr class="sb-divider">
 
-    <div class="sb-section">
-      <div class="sb-lbl">Settings</div>
-    </div>
-    <div style="padding:0 10px 16px;">
-      <button class="nav-btn" onclick="setView('thresholds',this)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
-        Thresholds
-      </button>
-    </div>
+    
   </div>
 
   <!-- MAIN CONTENT -->
@@ -3212,22 +3204,52 @@ startLoad();
 
 <script>
 window.addEventListener('message',function(e){
-  if(!e.data||e.data.type!=='FC_EMAIL_SETTINGS')return;
-  try{
-    if(e.data.usWarehouseEmail){
-      localStorage.setItem('fc_email_us_warehouse',e.data.usWarehouseEmail);
-      localStorage.setItem('fc_delivery_notify',e.data.usWarehouseEmail);
-      var a=document.getElementById('usWarehouseEmail');
-      if(a)a.value=e.data.usWarehouseEmail;
-    }
-    if(e.data.supplierEmail){localStorage.setItem('fc_email_supplier',e.data.supplierEmail);localStorage.setItem('fc_default_supplier_email',e.data.supplierEmail);var b=document.getElementById('defaultSupplierEmail');if(b&&!b.value)b.value=e.data.supplierEmail;var c=document.getElementById('supplierEmail');if(c&&!c.value)c.value=e.data.supplierEmail;}
-  }catch(x){}
+  if(!e.data)return;
+  var d=e.data;
+
+  // Email settings
+  if(d.type==='FC_EMAIL_SETTINGS'){
+    try{
+      if(d.usWarehouseEmail){localStorage.setItem('fc_email_us_warehouse',d.usWarehouseEmail);localStorage.setItem('fc_delivery_notify',d.usWarehouseEmail);var a=document.getElementById('usWarehouseEmail');if(a)a.value=d.usWarehouseEmail;}
+      if(d.supplierEmail){localStorage.setItem('fc_email_supplier',d.supplierEmail);localStorage.setItem('fc_default_supplier_email',d.supplierEmail);var b=document.getElementById('defaultSupplierEmail');if(b&&!b.value)b.value=d.supplierEmail;var c=document.getElementById('supplierEmail');if(c&&!c.value)c.value=d.supplierEmail;}
+    }catch(x){}
+  }
+
+  // Threshold settings
+  if(d.type==='FC_THRESHOLD_SETTINGS'){
+    try{
+      if(d.critT){critT=d.critT;var ci=document.getElementById('critT');if(ci)ci.value=d.critT;}
+      if(d.lowT){lowT=d.lowT;var li=document.getElementById('lowT');if(li)li.value=d.lowT;}
+      // Re-render with new thresholds
+      if(typeof allProducts!=='undefined'&&allProducts.length>0){
+        var status=function(q){return q<=critT?'critical':q<=lowT?'low':'ok';};
+        allProducts=allProducts.map(function(p){return Object.assign({},p,{status:status(p.qty)});});
+        if(typeof renderAll==='function')renderAll();
+        if(typeof renderPOLog==='function')renderPOLog();
+      }
+      localStorage.setItem('fc_crit_threshold',d.critT);
+      localStorage.setItem('fc_low_threshold',d.lowT);
+    }catch(x){}
+  }
+
+  // Sync trigger
+  if(d.type==='FC_SYNC_TRIGGER'&&d.hub==='stock'){
+    try{if(typeof startLoad==='function')startLoad();}catch(x){}
+  }
 });
+
+// On load: apply saved settings
 window.addEventListener('load',function(){
   try{
-    var u=localStorage.getItem('fc_email_us_warehouse');var s=localStorage.getItem('fc_email_supplier')||localStorage.getItem('fc_default_supplier_email');
+    var u=localStorage.getItem('fc_email_us_warehouse');
+    var s=localStorage.getItem('fc_email_supplier')||localStorage.getItem('fc_default_supplier_email');
     if(u){var a=document.getElementById('usWarehouseEmail');if(a&&!a.value)a.value=u;}
     if(s){var b=document.getElementById('defaultSupplierEmail');if(b&&!b.value)b.value=s;}
+    // Apply saved thresholds
+    var ct=parseInt(localStorage.getItem('fc_crit_threshold'))||0;
+    var lt=parseInt(localStorage.getItem('fc_low_threshold'))||0;
+    if(ct>0&&typeof critT!=='undefined'){critT=ct;var ci=document.getElementById('critT');if(ci)ci.value=ct;}
+    if(lt>0&&typeof lowT!=='undefined'){lowT=lt;var li=document.getElementById('lowT');if(li)li.value=lt;}
   }catch(x){}
 });
 </script>

@@ -96,6 +96,13 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
 .app-wrap{position:fixed;top:48px;left:0;right:0;bottom:0;overflow:hidden;}
 .app-frame{width:100%;height:100%;border:none;display:none;}
 .app-frame.active{display:block;}
+
+.sp-toggle{position:relative;width:36px;height:20px;flex-shrink:0;}
+.sp-toggle input{opacity:0;width:0;height:0;}
+.sp-toggle-sl{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:20px;cursor:pointer;transition:background .25s;}
+.sp-toggle-sl:before{content:"";position:absolute;width:14px;height:14px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .25s;}
+.sp-toggle input:checked+.sp-toggle-sl{background:#3D7A5A;}
+.sp-toggle input:checked+.sp-toggle-sl:before{transform:translateX(16px);}
 </style>
 </head>
 <body>
@@ -127,30 +134,94 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
 <!-- SETTINGS PANEL -->
 <div class="settings-panel" id="settingsPanel">
 
-  <!-- Main view -->
+  <!-- ── MAIN MENU ── -->
   <div id="spMain">
     <div class="sp-header">
       <div class="sp-title">Settings</div>
       <button class="sp-close" onclick="closeSettings()">×</button>
     </div>
+
+    <!-- Fulfillment Hub -->
     <div class="sp-section">
-      <div class="sp-section-label">Configuration</div>
-      <div class="sp-menu-item" id="spEmailNav" onclick="openEmailSettings()">
+      <div class="sp-section-label">Fulfillment Hub</div>
+      <div class="sp-menu-item" onclick="openSubPanel('spEmail')">
         <div class="sp-menu-icon">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-          </svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
         <div class="sp-menu-text">
           <div class="sp-menu-name">Email Settings</div>
-          <div class="sp-menu-desc">Warehouse & supplier email addresses</div>
+          <div class="sp-menu-desc">Warehouse & supplier addresses</div>
+        </div>
+        <div class="sp-menu-arrow">›</div>
+      </div>
+      <div class="sp-menu-item" onclick="openSubPanel('spAutosend')">
+        <div class="sp-menu-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </div>
+        <div class="sp-menu-text">
+          <div class="sp-menu-name">Auto-Send</div>
+          <div class="sp-menu-desc">Send emails automatically on label purchase</div>
+        </div>
+        <div class="sp-menu-arrow">›</div>
+      </div>
+      <div class="sp-menu-item" onclick="openSubPanel('spDisplay')">
+        <div class="sp-menu-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+        <div class="sp-menu-text">
+          <div class="sp-menu-name">Display</div>
+          <div class="sp-menu-desc">Orders per page, date range defaults</div>
+        </div>
+        <div class="sp-menu-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="sp-divider" style="margin:0 0 4px;"></div>
+
+    <!-- Stock Management Hub -->
+    <div class="sp-section">
+      <div class="sp-section-label">Stock Management Hub</div>
+      <div class="sp-menu-item" onclick="openSubPanel('spThresholds')">
+        <div class="sp-menu-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <div class="sp-menu-text">
+          <div class="sp-menu-name">Stock Thresholds</div>
+          <div class="sp-menu-desc">Critical & low stock alert levels</div>
+        </div>
+        <div class="sp-menu-arrow">›</div>
+      </div>
+      <div class="sp-menu-item" onclick="openSubPanel('spSync')">
+        <div class="sp-menu-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        </div>
+        <div class="sp-menu-text">
+          <div class="sp-menu-name">Shopify Sync</div>
+          <div class="sp-menu-desc">Manually trigger data sync from Shopify</div>
+        </div>
+        <div class="sp-menu-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="sp-divider" style="margin:0 0 4px;"></div>
+
+    <!-- App Info -->
+    <div class="sp-section">
+      <div class="sp-section-label">App</div>
+      <div class="sp-menu-item" onclick="openSubPanel('spAbout')">
+        <div class="sp-menu-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="sp-menu-text">
+          <div class="sp-menu-name">About</div>
+          <div class="sp-menu-desc">App info & connected stores</div>
         </div>
         <div class="sp-menu-arrow">›</div>
       </div>
     </div>
   </div>
 
-  <!-- Email Settings sub-panel -->
+  <!-- ── EMAIL SETTINGS ── -->
   <div id="spEmail" class="sp-sub-panel">
     <div class="sp-back" onclick="backToMain()">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -174,6 +245,147 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
     </div>
   </div>
 
+  <!-- ── AUTO-SEND ── -->
+  <div id="spAutosend" class="sp-sub-panel">
+    <div class="sp-back" onclick="backToMain()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Settings</span>
+      <div class="sp-sub-title">Auto-Send</div>
+    </div>
+    <div class="sp-form">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(61,122,90,.12);border:1px solid rgba(61,122,90,.25);border-radius:9px;padding:12px 14px;margin-bottom:12px;">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#6fd6a0;margin-bottom:2px;">Auto-Send Emails</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);">Automatically send packing slip on every label purchase</div>
+        </div>
+        <label class="sp-toggle">
+          <input type="checkbox" id="sp-autoSend" onchange="saveAutoSend(this)">
+          <span class="sp-toggle-sl"></span>
+        </label>
+      </div>
+      <div class="sp-input-hint" style="margin-top:4px;">When enabled, the fulfillment hub will automatically email the warehouse team whenever a shipping label is purchased — no manual send needed.</div>
+    </div>
+  </div>
+
+  <!-- ── DISPLAY ── -->
+  <div id="spDisplay" class="sp-sub-panel">
+    <div class="sp-back" onclick="backToMain()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Settings</span>
+      <div class="sp-sub-title">Display</div>
+    </div>
+    <div class="sp-form">
+      <div class="sp-field">
+        <label class="sp-label">Orders Per Page</label>
+        <select class="sp-input" id="sp-ordersPerPage" onchange="saveDisplaySettings()">
+          <option value="25">25 orders</option>
+          <option value="50" selected>50 orders</option>
+          <option value="100">100 orders</option>
+          <option value="200">200 orders</option>
+        </select>
+        <div class="sp-input-hint">How many orders to show per page in the Fulfillment Hub</div>
+      </div>
+      <div class="sp-divider" style="margin:0 0 14px;"></div>
+      <div class="sp-field">
+        <label class="sp-label">Default Date Range</label>
+        <select class="sp-input" id="sp-dateRange" onchange="saveDisplaySettings()">
+          <option value="30">Last 30 days</option>
+          <option value="60" selected>Last 60 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="0">All orders</option>
+        </select>
+        <div class="sp-input-hint">Default time window when the Fulfillment Hub first loads</div>
+      </div>
+      <div class="sp-save-status" id="sp-displayStatus"></div>
+    </div>
+  </div>
+
+  <!-- ── STOCK THRESHOLDS ── -->
+  <div id="spThresholds" class="sp-sub-panel">
+    <div class="sp-back" onclick="backToMain()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Settings</span>
+      <div class="sp-sub-title">Stock Thresholds</div>
+    </div>
+    <div class="sp-form">
+      <div class="sp-field">
+        <label class="sp-label">🔴 Critical Stock Level</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input class="sp-input" type="number" id="sp-critT" value="5" min="1" max="100" style="width:90px;text-align:center;">
+          <span style="font-size:11px;color:rgba(255,255,255,.4);">units</span>
+        </div>
+        <div class="sp-input-hint">Triggers immediate reorder alert — products at or below this level show as Critical</div>
+      </div>
+      <div class="sp-divider" style="margin:0 0 14px;"></div>
+      <div class="sp-field">
+        <label class="sp-label">🟡 Low Stock Level</label>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input class="sp-input" type="number" id="sp-lowT" value="20" min="1" max="500" style="width:90px;text-align:center;">
+          <span style="font-size:11px;color:rgba(255,255,255,.4);">units</span>
+        </div>
+        <div class="sp-input-hint">Products at or below this level show as Low — included in weekly digest alerts</div>
+      </div>
+      <button class="sp-save-btn" onclick="saveThresholdSettings()">Save Thresholds</button>
+      <div class="sp-save-status" id="sp-threshStatus"></div>
+    </div>
+  </div>
+
+  <!-- ── SHOPIFY SYNC ── -->
+  <div id="spSync" class="sp-sub-panel">
+    <div class="sp-back" onclick="backToMain()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Settings</span>
+      <div class="sp-sub-title">Shopify Sync</div>
+    </div>
+    <div class="sp-form">
+      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:12px 14px;margin-bottom:14px;">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">Connected Store</div>
+        <div style="font-size:12px;font-weight:600;color:#C8A96E;">scnd9y-a1.myshopify.com</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px;">US Warehouse · Active</div>
+      </div>
+      <button class="sp-save-btn" onclick="triggerSync('stock')" style="margin-bottom:8px;background:rgba(200,169,110,.15);color:#C8A96E;border:1px solid rgba(200,169,110,.3);">
+        ↻ &nbsp;Sync Stock Management Hub
+      </button>
+      <button class="sp-save-btn" onclick="triggerSync('fulfillment')" style="background:rgba(200,169,110,.15);color:#C8A96E;border:1px solid rgba(200,169,110,.3);">
+        ↻ &nbsp;Sync Fulfillment Hub
+      </button>
+      <div class="sp-save-status" id="sp-syncStatus"></div>
+    </div>
+  </div>
+
+  <!-- ── ABOUT ── -->
+  <div id="spAbout" class="sp-sub-panel">
+    <div class="sp-back" onclick="backToMain()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Settings</span>
+      <div class="sp-sub-title">About</div>
+    </div>
+    <div class="sp-form">
+      <div style="text-align:center;padding:8px 0 16px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:#C8A96E;letter-spacing:.1em;">FOLDIFYCASE</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px;letter-spacing:.08em;text-transform:uppercase;">Warehouse Management App</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:7px;border:1px solid rgba(255,255,255,.07);">
+          <span style="font-size:11px;color:rgba(255,255,255,.4);">Store</span>
+          <span style="font-size:11px;font-weight:600;color:#fff;">scnd9y-a1.myshopify.com</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:7px;border:1px solid rgba(255,255,255,.07);">
+          <span style="font-size:11px;color:rgba(255,255,255,.4);">Markets</span>
+          <span style="font-size:11px;font-weight:600;color:#fff;">US · UK · AU</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:7px;border:1px solid rgba(255,255,255,.07);">
+          <span style="font-size:11px;color:rgba(255,255,255,.4);">Brand</span>
+          <span style="font-size:11px;font-weight:600;color:#fff;">FoldifyCase</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.04);border-radius:7px;border:1px solid rgba(255,255,255,.07);">
+          <span style="font-size:11px;color:rgba(255,255,255,.4);">Email domain</span>
+          <span style="font-size:11px;font-weight:600;color:#fff;">foldifycase.com.au</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div class="app-wrap">
@@ -181,7 +393,7 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
   <iframe id="frame-restock" class="app-frame" src="/restock.html" title="Stock Management Hub"></iframe>
 </div>
 <script>
-// ── TAB SWITCHING ──
+// ── TAB SWITCHING ──────────────────────────────────────────────────────────
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
@@ -191,104 +403,144 @@ function switchTab(name){
 }
 window.addEventListener('load',function(){
   try{const last=localStorage.getItem('fc_active_tab');if(last==='restock')switchTab('restock');}catch(e){}
-  loadEmailSettings();
+  loadAllSettings();
 });
 
-// ── SETTINGS PANEL ──
-let settingsOpen = false;
-let emailSubOpen = false;
+// ── SETTINGS PANEL ─────────────────────────────────────────────────────────
+let settingsOpen=false;
 
-function toggleSettings(){
-  settingsOpen ? closeSettings() : openSettings();
-}
+function toggleSettings(){settingsOpen?closeSettings():openSettings();}
+
 function openSettings(){
-  settingsOpen = true;
+  settingsOpen=true;
   document.getElementById('settingsBtn').classList.add('active');
   document.getElementById('settingsPanel').classList.add('open');
   document.getElementById('settingsOverlay').classList.add('open');
+  loadAllSettings();
 }
+
 function closeSettings(){
-  settingsOpen = false;
-  emailSubOpen = false;
+  settingsOpen=false;
   document.getElementById('settingsBtn').classList.remove('active');
   document.getElementById('settingsPanel').classList.remove('open');
   document.getElementById('settingsOverlay').classList.remove('open');
-  // Reset to main panel
-  setTimeout(()=>{
-    document.getElementById('spMain').style.display='block';
-    document.getElementById('spEmail').classList.remove('open');
-  }, 220);
+  setTimeout(()=>backToMain(),220);
 }
-function openEmailSettings(){
-  emailSubOpen = true;
+
+function openSubPanel(id){
   document.getElementById('spMain').style.display='none';
-  document.getElementById('spEmail').classList.add('open');
-  loadEmailSettings();
+  document.querySelectorAll('.sp-sub-panel').forEach(p=>p.classList.remove('open'));
+  document.getElementById(id).classList.add('open');
 }
+
 function backToMain(){
-  emailSubOpen = false;
   document.getElementById('spMain').style.display='block';
-  document.getElementById('spEmail').classList.remove('open');
+  document.querySelectorAll('.sp-sub-panel').forEach(p=>p.classList.remove('open'));
 }
 
-// ── EMAIL SETTINGS - synced via localStorage + broadcast to iframes ──
-const EMAIL_KEYS = {
-  usWarehouse: 'fc_email_us_warehouse',
-  supplier: 'fc_email_supplier',
-};
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&settingsOpen)closeSettings();});
 
-function loadEmailSettings(){
+// ── LOAD ALL SETTINGS ──────────────────────────────────────────────────────
+function loadAllSettings(){
   try{
-    // Read from our key first, fall back to legacy keys from individual hubs
-    var us = localStorage.getItem(EMAIL_KEYS.usWarehouse) || localStorage.getItem('fc_delivery_notify') || '';
-    var sup = localStorage.getItem(EMAIL_KEYS.supplier) || localStorage.getItem('fc_default_supplier_email') || '';
-    document.getElementById('sp-usEmail').value = us;
-    document.getElementById('sp-supplierEmail').value = sup;
+    // Email
+    var us=localStorage.getItem('fc_email_us_warehouse')||localStorage.getItem('fc_delivery_notify')||'';
+    var sup=localStorage.getItem('fc_email_supplier')||localStorage.getItem('fc_default_supplier_email')||'';
+    document.getElementById('sp-usEmail').value=us;
+    document.getElementById('sp-supplierEmail').value=sup;
+
+    // Auto-send
+    var auto=localStorage.getItem('fc_auto_send')==='true';
+    document.getElementById('sp-autoSend').checked=auto;
+
+    // Display
+    var opp=localStorage.getItem('fc_orders_per_page')||'50';
+    var dr=localStorage.getItem('fc_date_range')||'60';
+    document.getElementById('sp-ordersPerPage').value=opp;
+    document.getElementById('sp-dateRange').value=dr;
+
+    // Thresholds
+    var crit=localStorage.getItem('fc_crit_threshold')||'5';
+    var low=localStorage.getItem('fc_low_threshold')||'20';
+    document.getElementById('sp-critT').value=crit;
+    document.getElementById('sp-lowT').value=low;
   }catch(e){}
 }
 
+// ── EMAIL SETTINGS ─────────────────────────────────────────────────────────
 function saveEmailSettings(){
-  const usEmail = document.getElementById('sp-usEmail').value.trim();
-  const supplierEmail = document.getElementById('sp-supplierEmail').value.trim();
-
-  // Save to localStorage - write all key variants so both hubs pick it up
+  var usEmail=document.getElementById('sp-usEmail').value.trim();
+  var supEmail=document.getElementById('sp-supplierEmail').value.trim();
   try{
     if(usEmail){
-      localStorage.setItem(EMAIL_KEYS.usWarehouse, usEmail);   // fc_email_us_warehouse
-      localStorage.setItem('fc_delivery_notify', usEmail);      // restock legacy key
+      localStorage.setItem('fc_email_us_warehouse',usEmail);
+      localStorage.setItem('fc_delivery_notify',usEmail);
     }
-    if(supplierEmail){
-      localStorage.setItem(EMAIL_KEYS.supplier, supplierEmail);         // fc_email_supplier
-      localStorage.setItem('fc_default_supplier_email', supplierEmail); // restock legacy key
+    if(supEmail){
+      localStorage.setItem('fc_email_supplier',supEmail);
+      localStorage.setItem('fc_default_supplier_email',supEmail);
     }
   }catch(e){}
-
-  // Broadcast to both iframes
-  const msg = {
-    type: 'FC_EMAIL_SETTINGS',
-    usWarehouseEmail: usEmail,
-    supplierEmail: supplierEmail,
-    // Include legacy key values for compatibility
-    fc_delivery_notify: usEmail,
-    fc_default_supplier_email: supplierEmail,
-  };
-  ['frame-fulfillment','frame-restock'].forEach(id=>{
-    try{
-      document.getElementById(id).contentWindow.postMessage(msg,'*');
-    }catch(e){}
-  });
-
-  // Show saved status
-  const status = document.getElementById('sp-saveStatus');
-  status.textContent = '✓ Saved and synced to both hubs';
-  status.style.opacity = '1';
-  setTimeout(()=>{status.style.opacity='0';},2500);
+  broadcastToFrames({type:'FC_EMAIL_SETTINGS',usWarehouseEmail:usEmail,supplierEmail:supEmail,fc_delivery_notify:usEmail,fc_default_supplier_email:supEmail});
+  showStatus('sp-saveStatus','✓ Saved and synced to both hubs');
 }
 
-// Close settings on Escape
-document.addEventListener('keydown',function(e){
-  if(e.key==='Escape' && settingsOpen) closeSettings();
-});
+// ── AUTO-SEND ──────────────────────────────────────────────────────────────
+function saveAutoSend(cb){
+  var val=cb.checked;
+  try{localStorage.setItem('fc_auto_send',val?'true':'false');}catch(e){}
+  broadcastToFrames({type:'FC_AUTOSEND_SETTINGS',autoSend:val});
+  showStatus('sp-saveStatus','✓ Auto-Send '+(val?'enabled':'disabled'));
+}
+
+// ── DISPLAY SETTINGS ───────────────────────────────────────────────────────
+function saveDisplaySettings(){
+  var opp=document.getElementById('sp-ordersPerPage').value;
+  var dr=document.getElementById('sp-dateRange').value;
+  try{
+    localStorage.setItem('fc_orders_per_page',opp);
+    localStorage.setItem('fc_date_range',dr);
+  }catch(e){}
+  broadcastToFrames({type:'FC_DISPLAY_SETTINGS',ordersPerPage:parseInt(opp),dateRange:parseInt(dr)});
+  showStatus('sp-displayStatus','✓ Display settings saved');
+}
+
+// ── THRESHOLDS ─────────────────────────────────────────────────────────────
+function saveThresholdSettings(){
+  var crit=parseInt(document.getElementById('sp-critT').value)||5;
+  var low=parseInt(document.getElementById('sp-lowT').value)||20;
+  if(crit>=low){showStatus('sp-threshStatus','⚠ Critical must be less than Low');return;}
+  try{
+    localStorage.setItem('fc_crit_threshold',crit);
+    localStorage.setItem('fc_low_threshold',low);
+  }catch(e){}
+  broadcastToFrames({type:'FC_THRESHOLD_SETTINGS',critT:crit,lowT:low});
+  showStatus('sp-threshStatus','✓ Thresholds saved — Stock Hub updated');
+}
+
+// ── SHOPIFY SYNC ───────────────────────────────────────────────────────────
+function triggerSync(hub){
+  var frame=document.getElementById('frame-'+(hub==='stock'?'restock':'fulfillment'));
+  if(!frame){showStatus('sp-syncStatus','Hub not loaded');return;}
+  try{frame.contentWindow.postMessage({type:'FC_SYNC_TRIGGER',hub:hub},'*');}catch(e){}
+  showStatus('sp-syncStatus','↻ Sync triggered for '+(hub==='stock'?'Stock':'Fulfillment')+' Hub…');
+}
+
+// ── BROADCAST TO FRAMES ────────────────────────────────────────────────────
+function broadcastToFrames(msg){
+  ['frame-fulfillment','frame-restock'].forEach(function(id){
+    try{document.getElementById(id).contentWindow.postMessage(msg,'*');}catch(e){}
+  });
+}
+
+// ── SHOW STATUS MESSAGE ────────────────────────────────────────────────────
+function showStatus(id,msg){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=msg;
+  el.style.opacity='1';
+  setTimeout(function(){el.style.opacity='0';},3000);
+}
 </script>
 </body>
 </html>

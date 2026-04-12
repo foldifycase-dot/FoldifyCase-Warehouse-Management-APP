@@ -1099,23 +1099,46 @@ function uploadLabelPDF(btn, orderId, orderName) {
 
 <script>
 window.addEventListener('message',function(e){
-  if(!e.data||e.data.type!=='FC_EMAIL_SETTINGS')return;
-  try{
-    if(e.data.usWarehouseEmail){
-      localStorage.setItem('fc_email_us_warehouse',e.data.usWarehouseEmail);
-    }
-    if(e.data.supplierEmail){
-      localStorage.setItem('fc_email_supplier',e.data.supplierEmail);
-    }
-  }catch(x){}
+  if(!e.data)return;
+  var d=e.data;
+
+  // Email settings
+  if(d.type==='FC_EMAIL_SETTINGS'){
+    try{
+      if(d.usWarehouseEmail){localStorage.setItem('fc_email_us_warehouse',d.usWarehouseEmail);customEmail=d.usWarehouseEmail;var inp=el('customInput');if(inp)inp.value=d.usWarehouseEmail;if(typeof updateUI==='function')updateUI();}
+    }catch(x){}
+  }
+
+  // Auto-send
+  if(d.type==='FC_AUTOSEND_SETTINGS'){
+    try{
+      autoOn=d.autoSend;
+      var cb=document.getElementById('autoChk');
+      if(cb)cb.checked=d.autoSend;
+      localStorage.setItem('fc_auto_send',d.autoSend?'true':'false');
+    }catch(x){}
+  }
+
+  // Display settings
+  if(d.type==='FC_DISPLAY_SETTINGS'){
+    try{localStorage.setItem('fc_orders_per_page',d.ordersPerPage);localStorage.setItem('fc_date_range',d.dateRange);}catch(x){}
+  }
+
+  // Sync trigger
+  if(d.type==='FC_SYNC_TRIGGER'&&d.hub==='fulfillment'){
+    try{if(typeof loadOrders==='function')loadOrders();}catch(x){}
+  }
 });
+
+// On load: apply saved settings
 window.addEventListener('load',function(){
   try{
     var u=localStorage.getItem('fc_email_us_warehouse');
-    if(u) window._fc_warehouse_email=u;
+    if(u){customEmail=u;var inp=el('customInput');if(inp)inp.value=u;if(typeof updateUI==='function')updateUI();}
+    var auto=localStorage.getItem('fc_auto_send')==='true';
+    if(auto){autoOn=true;var cb=document.getElementById('autoChk');if(cb)cb.checked=true;}
   }catch(x){}
 });
 </script>
-
 </body>
 </html>

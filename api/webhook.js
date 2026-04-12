@@ -52,7 +52,7 @@ function fetchLabelFromBlob(orderId, orderName) {
 }
 
 const WAREHOUSE_EMAIL = process.env.WAREHOUSE_EMAIL || 'uswarehousefoldifycase@gmail.com';
-const FROM_EMAIL = process.env.FROM_EMAIL || 'warehouse@foldifycase.com.au';
+const FROM_EMAIL = (process.env.FROM_EMAIL || '').trim() || 'warehouse@foldifycase.com.au';
 const SHOPIFY_DOMAIN = process.env.SHOPIFY_DOMAIN || '';
 const SHOPIFY_TOKEN = process.env.SHOPIFY_TOKEN || '';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
@@ -71,8 +71,12 @@ function getCountryCode(addr) {
 
 function sendResendEmail(to, subject, html) {
   return new Promise((resolve, reject) => {
+    // Ensure from address is always valid
+    const safeFrom = FROM_EMAIL && FROM_EMAIL.includes('@')
+      ? 'FoldifyCase <' + FROM_EMAIL + '>'
+      : 'FoldifyCase <warehouse@foldifycase.com.au>';
     const data = JSON.stringify({
-      from: 'FoldifyCase <' + FROM_EMAIL + '>', to, subject, html,
+      from: safeFrom, to, subject, html,
       headers: {}, tags: [], click_tracking: false
     });
     const options = {

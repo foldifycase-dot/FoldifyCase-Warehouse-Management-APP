@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoldifyCase Warehouse Hub</title>
+<!-- cf-skip-email-obfuscation -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F5F3E9;--ink:#1A1A18;--gold:#C8A96E;--gold-d:#A6873A;--green:#3D7A5A;--red:#C94040;--blue:#2D5FA6;--border:rgba(26,26,24,0.12);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;font-size:13px;min-height:100vh;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;background:var(--ink);border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-name{font-family:"Syne",sans-serif;font-weight:800;font-size:15px;color:#fff;letter-spacing:.06em;}
+.logo-sub{font-size:9px;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;}
+.pills{display:flex;gap:8px;}
+.pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:30px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.75);}
+.dot{width:7px;height:7px;border-radius:50%;}
+.dot-g{background:#34d058;animation:pulse 2s infinite;}
+.dot-gold{background:var(--gold);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 60px);}
+.sidebar{background:#3D3D38;padding:0;border-right:1px solid rgba(255,255,255,.06);overflow-y:auto;}
+.email-box{background:rgba(0,0,0,.3);border-bottom:1px solid rgba(255,255,255,.07);padding:16px 18px 20px;}
+.eb-title{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;color:var(--gold);margin-bottom:3px;}
+.eb-sub{font-size:10px;color:rgba(255,255,255,.4);margin-bottom:12px;line-height:1.5;}
+
+.email-show{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:10px 12px;margin-bottom:10px;}
+.email-show-lbl{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3px;}
+.email-show-addr{font-size:12px;color:#6fd6a0;font-weight:600;word-break:break-all;}
+.email-show-addr.live{color:var(--gold);}
+.custom-row{display:flex;gap:6px;}
+.custom-input{flex:1;padding:8px 10px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:#fff;font-family:"Inter",sans-serif;font-size:11px;outline:none;}
+.custom-input:focus{border-color:var(--gold);}
+.custom-input::placeholder{color:rgba(255,255,255,.25);}
+.btn-set{padding:8px 11px;background:var(--gold);color:var(--ink);border:none;border-radius:6px;font-family:"Syne",sans-serif;font-weight:700;font-size:10px;cursor:pointer;}
+.sb-sec{padding:12px 0 0;}
+.sb-lbl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;font-family:"Syne",sans-serif;padding:0 14px;}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:0 14px 10px;} .stats .stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:8px 6px;text-align:center;}
+.stat-n{font-family:"Inter",sans-serif;font-weight:700;font-size:17px;color:var(--gold);line-height:1;}
+.stat-l{font-size:10px;color:rgba(255,255,255,.35);margin-top:3px;}
+.divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:8px 14px;}
+.sb-divider-gap{border:none;border-top:1px solid rgba(255,255,255,.07);margin:10px 14px 10px;}
+.sb-section-hdr{padding:12px 14px 0;}
+.sb-section-hdr .sb-lbl{padding:0;}
+.auto-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:7px;padding:9px 10px;margin:0 14px 10px;}
+.auto-txt{font-size:11px;color:rgba(255,255,255,.7);font-family:"Syne",sans-serif;font-weight:700;letter-spacing:.03em;}
+.auto-txt strong{color:#6fd6a0;display:inline;font-size:11px;font-weight:700;margin-right:4px;}
+.tog{position:relative;width:34px;height:19px;}
+.tog input{opacity:0;width:0;height:0;}
+.tog-sl{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:22px;cursor:pointer;transition:background .25s;}
+.tog-sl:before{content:"";position:absolute;width:13px;height:13px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .25s;}
+.tog input:checked + .tog-sl{background:var(--green);}
+.tog input:checked + .tog-sl:before{transform:translateX(15px);}
+.filters{display:flex;flex-direction:column;gap:1px;padding:0 10px 16px;}
+.fbtn{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:7px;border:1px solid transparent;background:transparent;color:rgba(255,255,255,.55);font-family:"Inter",sans-serif;font-size:12px;cursor:pointer;transition:all .18s;width:100%;margin-bottom:1px;}
+.fbtn:hover{background:rgba(255,255,255,.06);color:#fff;}
+.fbtn.active{background:rgba(200,169,110,.14);border-color:rgba(200,169,110,.28);color:var(--gold);}
+.fc{font-size:10px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);border-radius:20px;padding:1px 7px;font-weight:500;}
+.fbtn.active .fc{background:var(--gold);color:var(--ink);}
+.main{padding:26px;}
+.page-hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px;}
+.page-title{font-family:"DM Mono",monospace;font-weight:500;font-size:22px;letter-spacing:.12em;text-transform:uppercase;}
+.page-title em{font-style:normal;font-weight:500;color:var(--gold);}
+.page-sub{font-size:12px;color:rgba(26,26,24,.45);margin-top:5px;font-weight:400;line-height:1.5;}
+.hdr-acts{display:flex;gap:8px;}
+.btn-out{padding:9px 16px;background:transparent;border:1.5px solid var(--border);border-radius:7px;font-family:"Inter",sans-serif;font-size:11px;font-weight:500;color:var(--ink);cursor:pointer;transition:all .18s;}
+.btn-out:hover{border-color:var(--ink);background:var(--ink);color:var(--cream);}
+.btn-sol{padding:9px 18px;background:var(--ink);border:none;border-radius:7px;font-family:"Syne",sans-serif;font-weight:700;font-size:11px;letter-spacing:.05em;color:var(--cream);cursor:pointer;transition:all .18s;}
+.btn-sol:hover{background:var(--gold);color:var(--ink);}
+.banner{display:flex;align-items:center;gap:10px;padding:10px 15px;border-radius:9px;margin-bottom:16px;font-size:12px;}
+.banner.test{background:rgba(61,122,90,.1);border:1px solid rgba(61,122,90,.22);color:#2a6645;}
+.banner.live{background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.25);color:var(--gold-d);}
+.search-wrap{position:relative;margin-bottom:10px;}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:.3;font-size:14px;}
+.search-input{width:100%;padding:10px 13px 10px 38px;background:#fff;border:1.5px solid var(--border);border-radius:7px;font-family:"Inter",sans-serif;font-size:13px;color:var(--ink);outline:none;}
+/* Country pill buttons replaced by dropdown */
+.tbl-wrap{background:#fff;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;}
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;border-top:1.5px solid var(--border);}
+.pag-info{font-size:12px;color:rgba(26,26,24,.45);}
+.pag-btns{display:flex;gap:4px;}
+.pag-btn{width:34px;height:34px;border:1.5px solid var(--border);border-radius:7px;background:transparent;font-family:"Inter",sans-serif;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.pag-btn:hover{border-color:var(--ink);background:var(--ink);color:var(--cream);}
+.pag-btn.active{background:var(--ink);color:var(--cream);border-color:var(--ink);}
+.pag-btn:disabled{opacity:.3;cursor:not-allowed;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:12px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,24,.4);background:#EAE7D8;border-bottom:1px solid var(--border);font-weight:600;}
+thead th:first-child{padding-left:18px;}
+tbody tr{border-bottom:1px solid var(--border);transition:background .13s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:#fafaf5;}
+td{padding:12px 14px;vertical-align:middle;}
+td:first-child{padding-left:18px;}
+.cb{width:15px;height:15px;cursor:pointer;accent-color:var(--gold-d);}
+.onum{font-family:"Inter",sans-serif;font-weight:700;font-size:14px;letter-spacing:-.01em;}
+.odate{font-size:11px;color:rgba(26,26,24,.38);margin-top:2px;}
+.cname{font-weight:600;font-size:13px;letter-spacing:-.01em;}
+.caddr{font-size:11px;color:rgba(26,26,24,.45);margin-top:2px;}
+.chip{display:inline-flex;background:#EAE7D8;border-radius:4px;padding:2px 7px;font-size:10px;margin:2px 2px 0 0;color:#3D3D38;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.bdot{width:5px;height:5px;border-radius:50%;}
+.badge.unfulfilled{background:rgba(201,64,64,.1);color:var(--red);}
+.badge.unfulfilled .bdot{background:var(--red);}
+.badge.fulfilled,.badge.sent{background:rgba(61,122,90,.1);color:var(--green);}
+.badge.fulfilled .bdot,.badge.sent .bdot{background:var(--green);}
+.badge.partial{background:rgba(200,169,110,.1);color:var(--gold-d);}
+.badge.partial .bdot{background:var(--gold-d);}
+.badge.cancelled{background:rgba(26,26,24,.08);color:rgba(26,26,24,.4);}
+.badge.cancelled .bdot{background:rgba(26,26,24,.3);}
+.amt{font-family:"Inter",sans-serif;font-weight:700;font-size:14px;letter-spacing:-.01em;}
+.amtc{font-size:10px;color:rgba(26,26,24,.38);font-weight:500;}
+.btn-send{padding:7px 14px;background:var(--ink);color:var(--cream);border:none;border-radius:6px;font-family:"Inter",sans-serif;font-weight:600;font-size:11px;cursor:pointer;white-space:nowrap;transition:all .18s;}
+.btn-send:hover{background:var(--green);}
+.btn-send:disabled{opacity:.5;cursor:not-allowed;}
+.btn-send.not-ready{background:#B87D2A;color:#fff;}
+.btn-send.not-ready:hover{background:#B87D2A;}
+.btn-send.no-label{background:#888;color:#fff;}
+.btn-send.no-label:hover{background:#888;}
+.btn-send.no-label{opacity:.45;cursor:not-allowed;background:#888;color:#fff;font-size:10px;letter-spacing:.04em;}
+.btn-send.resend{background:#5C4A1E;color:#C8A96E;border:1px solid #C8A96E;}
+.btn-send.resend:hover{background:#C8A96E;color:#1A1A18;}
+.empty{padding:50px;text-align:center;color:rgba(26,26,24,.32);}
+.filter-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.date-filter-wrap{display:flex;align-items:center;gap:6px;}
+.date-lbl{font-size:11px;color:rgba(26,26,24,.5);font-weight:500;}
+.date-filter-wrap input[type=date]{padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;font-family:"Inter",sans-serif;font-size:12px;color:var(--ink);background:#fff;outline:none;cursor:pointer;}
+.date-filter-wrap input[type=date]:focus{border-color:var(--gold);}
+.dropdown-wrap{position:relative;}
+.dropdown-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border:1.5px solid var(--border);border-radius:7px;background:#fff;font-family:"Inter",sans-serif;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.dropdown-btn:hover{border-color:var(--ink);background:#f5f3e9;}
+.dropdown-btn.active{background:var(--ink);color:var(--gold);border-color:var(--ink);}
+.dropdown-btn .arrow{display:inline-block;transition:transform .2s;font-style:normal;}
+.dropdown-btn.open .arrow{transform:rotate(180deg);}
+.filter-badge{color:var(--gold);font-size:10px;margin-left:2px;}
+.dropdown-menu{position:fixed;background:#fff;border:1.5px solid var(--border);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:240px;z-index:9999;padding:8px 0;max-height:420px;overflow-y:auto;}
+.dropdown-section{padding:6px 14px 4px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:rgba(26,26,24,.4);font-weight:600;}
+.dropdown-item{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;border:none;background:transparent;font-family:"Inter",sans-serif;font-size:12px;color:var(--ink);cursor:pointer;text-align:left;transition:background .15s;}
+.dropdown-item:hover{background:#f5f3e9;}
+.dropdown-item.active{color:var(--gold-d);font-weight:600;}
+.dropdown-item.active .di-dot{color:var(--gold);}
+.di-dot{font-size:10px;color:#ccc;flex-shrink:0;}
+.di-count{margin-left:auto;font-size:10px;color:rgba(26,26,24,.4);background:#f0ede4;padding:1px 6px;border-radius:10px;}
+.dropdown-divider{border:none;border-top:1px solid var(--border);margin:4px 0;}
+.dropdown-clear{display:block;width:100%;padding:9px 14px;border:none;background:transparent;font-family:"Inter",sans-serif;font-size:11px;color:rgba(201,64,64,.7);cursor:pointer;text-align:left;transition:background .15s;}
+.dropdown-clear:hover{background:rgba(201,64,64,.06);color:var(--red);}
+.empty-title{font-family:"Syne",sans-serif;font-weight:700;font-size:15px;margin-top:10px;}
+.empty-sub{font-size:11px;margin-top:5px;}
+.log-section{margin-top:22px;}
+.log-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.log-title{font-family:"Syne",sans-serif;font-weight:700;font-size:15px;}
+.log-wrap{background:#fff;border:1.5px solid var(--border);border-radius:11px;overflow:hidden;}
+.log-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);}
+.log-item:last-child{border-bottom:none;}
+.log-dot{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.log-dot.success,.log-dot.auto{background:rgba(61,122,90,.1);}
+.log-dot.test{background:rgba(45,95,166,.1);}
+.log-dot.error{background:rgba(201,64,64,.1);}
+.log-msg{font-size:13px;font-weight:600;color:var(--ink);}
+.log-det{font-size:11px;color:rgba(26,26,24,.42);margin-top:3px;line-height:1.5;}
+.log-empty{padding:24px;text-align:center;color:rgba(26,26,24,.32);font-size:12px;}
+.toast{position:fixed;bottom:24px;right:24px;padding:13px 18px;background:var(--ink);color:var(--cream);border-radius:9px;font-family:"Inter",sans-serif;font-weight:600;font-size:13px;display:flex;align-items:center;gap:9px;z-index:999;transform:translateY(80px);opacity:0;transition:all .32s ease;max-width:360px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-left:4px solid var(--green);}
+.toast.error{border-left:4px solid var(--red);}
+.toast.info{border-left:4px solid var(--gold);}
+.toast.test{border-left:4px solid var(--blue);}
+
+/* Hide topbar when embedded in combined app */
+html.in-iframe .topbar{display:none!important;}
+html.in-iframe .layout{min-height:calc(100vh);}
+</style>
+
+<script>if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}</script>
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">
+    <img src="data:image/png;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCAH4AfgDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwD5/ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA9//Zl/5mn/ALdP/a1fQFfP/wCzL/zNP/bp/wC1q+gKAPgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD3/9mX/maf8At0/9rV9AV8//ALMv/M0/9un/ALWr6AoA+AKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAPf/2Zf+Zp/wC3T/2tX0BXz/8Asy/8zT/26f8AtavoCgD4AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA9//Zl/5mn/ALdP/a1fQFfP/wCzL/zNP/bp/wC1q+gKAPgCiiigAooooAKKKKACiiigAooooAKKKKACiiuy+HHh7QfFfiUaNrV7dWjXC4tZIGUBpByUO4HkjOPcY5JFAHG0V9L/APDN3hz/AKDOq/nH/wDE0f8ADN3hz/oM6r+cf/xNAHzRRX0v/wAM3eHP+gzqv5x//E0f8M3eHP8AoM6r+cf/AMTQB80UV9Lf8M3eHf8AoM6r/wCQ/wD4mj/hm7w7/wBBnVf/ACH/APE0AfNNFfS3/DNvh7/oNap+Uf8A8TR/wzb4e/6DWqflH/8AE0AfNNFfS3/DN3h7/oNap+Uf/wATR/wzd4e/6DWqflH/APE0AfNNFfSv/DNvh7/oN6p+Uf8A8TR/wzb4e/6DeqflH/8AE0AfNVFfSv8Awzd4f/6Dep/lH/8AE0f8M2+H/wDoN6n+Uf8AhQB81UV9K/8ADN3h/wD6Dep/lH/hR/wzboH/AEG9T/75j/woA+aqK+lf+GbdA/6Depf98x/4Un/DNmgf9BzUv++Y/wDCgD5ror6U/wCGbNA/6Dmpf98x/wCFH/DNug/9BzUv++Y/8KAPmuivpT/hm3Qf+g5qX/fMf+FH/DNug/8AQc1L/vmP/CgD5ror6U/4Zt0H/oOal/3zH/hR/wAM26F/0HNR/wC+I/8ACgD5ror6S/4Zs0L/AKDuo/8AfCf4Uf8ADNuh/wDQd1H/AL4T/CgD5tor6S/4Zs0P/oO6j/3wn+FH/DNmh/8AQd1D/v2n+FAHzbRX0l/wzZof/Qd1H/v2n+FH/DNmh/8AQe1H/v2n+FAHzbRX0l/wzZon/Qe1D/v2n+FJ/wAM2aJ/0HtQ/wC/af4UAfN1Fep/FD4baB4A060Nvq13dajdOfLgkVQBGPvMcDPUgD1yfSvLKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD3/8AZl/5mn/t0/8Aa1fQFfP/AOzL/wAzT/26f+1q+gKAPgCiiigAooooAKKKKACiiigAooooAK1vDehXPibxHYaNaD97dShN2MhF6sx9gASfpWTX0N+zv4Q8q1u/Fd1H802bazJH8IPzsPqQFB/2WHegDn/jN8L7XwxbWmt6FblNOCLb3UYJPluBhXPs3Qn1x/erx6CeS2uIp4JGjmjYOjqcFWByCD65Ar7t1PTbXWNMudNvohLa3MZjlQ9wR/P37YFfF/jXwpd+DPFF1pF1llQ74JiMCWI52t+hB9CCO1AH1R8M/G8fjjwlFeOyjULfEN6g4w/ZgPRhyPxHau0r42+GfjeTwP4tivHZjp9xiG9jHOU7MB6qeR+I719iQTx3NvFPBIskMih0dTkMpGQQfQgigCWiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKhubmGztZrq4kWKCFDJJI5wFUDJJ9gM1NXiX7QHjX+z9Li8K2UmLi9Aluyv8MQPC+24jn2GOhoA8U8e+LJ/Gfi271aQssLHy7aMn/VxLnaPqckn3JrmaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD3/APZl/wCZp/7dP/a1fQFfP/7Mv/M0/wDbp/7Wr6AoA+AKKKKACiiigAooooAKKKKACiiigDT0DRbnxFr9jpFmMz3cojU4ztB6sfYDJPsK+3NG0q10PRrTSrJdttaRLFGD1wB1Puep9zXiH7O/hDAu/Fl1H1zbWRI/7+OP0UH/AHq9+oAK86+L/gMeM/CzT2kedXsA0ttjrKvVo/xAyPcD1Nei0UAfARBUkEEEHkV9GfALx39tsW8JahNm4tlMlizHl4/4k9ypOR7Z7LXJfHTwH/YOujxFp8ONO1Bz5yqOIpzkn6BuSPcN04ryzStTutG1W11KxlMV1bSCSJ/Qj19uxHccUAfeNFYHgzxTaeMfDFprNrhfMG2aIHPlSj7y/genqCD3rfoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAM/XNYtPD+iXmrXz7La1iMj++OgHuTgD3NfE3iLXbzxL4gvdYvmzPdSFyM5Cjoqj2AAA9hXsH7QfjX7TeweE7KXMVuRPelTwXI+RD9AckepHpXhVABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAe/8A7Mv/ADNP/bp/7Wr6Ar5//Zl/5mn/ALdP/a1fQFAHwBRRRQAUUUUAFFFFABRRRQAVoaLpN1rutWelWa7ri7mWJM9Bk9T7DqfYVn173+zv4Q8ye78V3UXyx5trMkfxEfvGH0BCg+7elAHuWg6Pa+H9CsdIs1xBaQrEpIwWx1Y+5OSfc1o0UUAFFFFAGZ4g0Oy8SaFeaRfpvtrpNreqnqGHuCAR7ivizxP4dvfCviG70a/TE1u+A44EinlWHsRg/p1Ffc1eU/G7wF/wkvh7+2rCHdqmmoWIUczQDJZfcjlh+I6kUAeRfBrx5/wiHicWV7Nt0nUWWObceIpOiyewycH2Oewr6zr4Br6o+CPjweJvDv8AYt9Nu1TTUCgk8zQDAVvcjhT+BPJoA9WooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigArnvG3iiDwd4TvdZm2s8S7YIif9ZKeFX6Z5PoAT2roa+Wvjp42/wCEg8U/2JaS7tP0pijY6PP0Y/8AAfuj3DetAHl97eXGo31xe3crS3FxI0ssjdWZjkn8SarUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB7/APsy/wDM0/8Abp/7Wr6Ar5//AGZf+Zp/7dP/AGtX0BQB8AUUUUAFFFFABRRRQAUUUUAXtJ0y51nVrTTLNN1zdSrFGO2WOOfQc8nsOa+3PDuh23hvw9YaPaD9zaRCMHGCx6sx9ySSfrXhX7PPhD7Rf3fiq7jzHbZt7QkdZCPnYfRSB/wI+lfRNABRRRQAUUUUAFFFFAHyf8Z/AX/CI+Jjf2MO3SdRYvFtHEUnVk9hzkexI7GuL8LeI7zwp4js9ZsW/e275ZCcCRDwyH2IyPbg9RX2P4u8MWfjDw1d6Ne8LKuY5MZMUg5Vh9D+YJHevi7WdJvNC1i70rUIjFd20hjkXtkdwe4PBB7g5oA+3dC1mz8Q6Jaatp8gktrqMOh9PVT6EHII9RWjXzP8BvHn9kayfDN/Liy1B82zMeI5+mPYMBj6gepNfTFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUEgDJOAO5oA4j4p+Mx4L8Gz3MLgajdZgsx3Dkcv9FGT6ZwO9fHbOzsWYksTkknOa7r4s+M/+Ez8ZTS28m7TbPNvaYPDAH5n/AOBHn6BfSuCoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA9//AGZf+Zp/7dP/AGtX0BXz/wDsy/8AM0/9un/tavoCgD4AooooAKKKKACiiigAooooA+svgf4g03V/h/bafaRpBdaZ+6uIQepJJEn/AALk/UEdK9Mr4q8A+MLnwT4qttVi3Nb/AOquogf9ZESMj6jAI9wK+zbG9ttSsYL60lWa3nRZIpF6MpGQRQBYooooAKKKKACiiigArxb48+Af7U0v/hKdOize2SbbtF6yQj+L3K/+gk+gr2mmSRpLG0cihkYEMrDII75HpQB8Do7RuroxVlIIYHBB7YNfTvg345eHJ/DFr/wk2pm01aNfLmH2aVxIR0cFFI5HJHGDnjGK8d+K3gZvBHipkgQ/2VeZmtG/ujPzRn3UkfgR6muBoA+v/wDhdvw7/wChh/8AJK4/+N0f8Lt+Hf8A0MP/AJJXH/xuvkCigD6//wCF2/Dv/oYf/JK4/wDjdH/C7fh3/wBDD/5JXH/xuvkCigD6/wD+F2/Dv/oYf/JK4/8AjdH/AAu34d/9DD/5JXH/AMbr5AooA+v/APhdvw7/AOhh/wDJK4/+N0f8Lt+Hf/Qw/wDklcf/ABuvkCigD6//AOF2/Dv/AKGH/wAkrj/43R/wu34d/wDQw/8Aklcf/G6+QKKAPr//AIXb8O/+hh/8krj/AON0f8Lt+Hf/AEMP/klcf/G6+QKKAPr/AP4Xb8O/+hh/8krj/wCN0f8AC7fh3/0MP/klcf8AxuvkCigD6/8A+F2/Dv8A6GH/AMkrj/43R/wu34d/9DD/AOSVx/8AG6+QKKAPr/8A4Xb8O/8AoYf/ACSuP/jdH/C7fh3/ANDD/wCSVx/8br5AooA+v/8Ahdvw7/6GH/ySuP8A43R/wu34d/8AQw/+SVx/8br5AooA+v8A/hdvw7/6GH/ySuP/AI3XHfEv4z6Dd+DrjTvC+ptc3t5+5kcQyR+VEQdxBZRyR8ox0yTxgV840UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAHv8A+zL/AMzT/wBun/tavoCvn/8AZl/5mn/t0/8Aa1fQFAHwBRRRQAUUUUAFFFFABRRRQAV738AvH3lyHwfqM3yMWk09mPQ8lo/x5Ye+R3ArwSp7W5nsrqG6tpWinhcSRyIcFWByCPcHFAH3vRXI/DnxpD438JwagCq3sX7q8iH8MgAyQPQjBH1x2rrqACiiigAooooAKKKKAOW8f+D7bxt4VudKl2rcj95azEf6uUDg/Q9D7GvjO+srnTr6eyu4mhuYHMcsbDBVgcEGvvWvBPj94CLoPGGnRZZQseoIo6josv4cKfbaexNAHz5RRX0n8CfF9preit4b1GOBtQsFzA7oCZYc9PcqTj6EehoA+bKK+9/sFn/z6Qf9+x/hR9gs/wDn0g/79j/CgD4Ior73+wWf/PpB/wB+x/hR9gs/+fSD/v2P8KAPgiivvf7BZ/8APpB/37H+FH2Cz/59IP8Av2P8KAPgiivvf7BZ/wDPpB/37H+FH2Cz/wCfSD/v2P8ACgD4Ior73+wWf/PpB/37H+FH2Cz/AOfSD/v2P8KAPgiivvf7BZ/8+kH/AH7H+FH2Cz/59IP+/Y/woA+CKK+9/sFn/wA+kH/fsf4UfYLP/n0g/wC/Y/woA+CKK+9/sFn/AM+kH/fsf4UfYLP/AJ9IP+/Y/wAKAPgiivvf7BZ/8+kH/fsf4UfYLP8A59IP+/Y/woA+CKK+9/sFn/z6Qf8Afsf4UfYLP/n0g/79j/CgD4Ior73+wWf/AD6Qf9+x/hR9gs/+fSD/AL9j/CgD4Ior73+wWf8Az6Qf9+x/hR9gs/8An0g/79j/AAoA+CKK+9/sFn/z6Qf9+x/hR9gs/wDn0g/79j/CgD4Ior73+wWf/PpB/wB+x/hR9gs/+fSD/v2P8KAPgiivvf7BZ/8APpB/37H+FH2Cz/59IP8Av2P8KAPgiivvf7BZ/wDPpB/37H+FV71dM06xuL27htore3jaWWRoxhVUZJ6dgKAPhCit7xj4ik8VeKb3V3jEUcz4hiAAEcY4VeO+Bz6nJrBoAKKKKACiiigAooooA9//AGZf+Zp/7dP/AGtX0BXz/wDsy/8AM0/9un/tavoCgD4AooooAKKKKACiiigAooooAKKKKAO3+GPjiTwP4riuZGY6dc4ivYxz8meHA9VJz9MjvX2HDLHPCk0LrJFIoZGU5DA8gg+hr4Fr6O+Afjz7dYnwlqM2bi2XfYsx5eMcsn1XqPbPZaAPcKKKKACiiigAooooAKhurWG9tZrW5iWWCZDHJG4yGUjBB+oNTUUAfGHxF8FzeCPFc+nnc1lLmWzlPO+MngH3B4P0z3rC0HWrzw7rlnq9hJsubWQOp7EdCp9QQSD7E19bfFDwPH458KyW8SqNStcy2ch4+bHKE+jYx9QD2r48mikgmeGVGSWNirqwwVI6gj1FAH3D4Y8RWXirw7Z6zYtmG4TJUnJjYcMh9wcj369DWxXyz8D/AB3/AMI34iOi3823TNScKCxwIpuit9G4U/8AASeBX1NQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABXhf7QfjU21lB4TspcSXAE96VPIQH5UP1IyfYD1r2DxFrlr4a8P32sXrYgtYy5GcFj0VR7kkAe5r4m1zWLvxBrd5q18++5upTI/tnoB7AYA9hQBnUUUUAFFFFABRRRQAUUUUAe/8A7Mv/ADNP/bp/7Wr6Ar5//Zl/5mn/ALdP/a1fQFAHwBRRRQAUUUUAFFFFABRRRQAUUUUAFXdM1K60fU7bUrGUxXVtIJInHYg/y9u+TVKigD7d8FeK7Txn4XtdXtcKzjZcRA58qUAbl/UEeoIPeuhr5H+EHjw+DPFIgu5SNIvysdwCeIm/hk9sE4PsT1wK+uAQRkHg+lABRRRQAUUUUAFFFFABXzl8fPAX2C+Hi3T4cW9y4S+VRwkp4D/Ruh98d2r6NqnqumWus6VdabfRCW1uYzHKnqD6e/cHseaAPg2vrT4N+PB4u8LizvZt2racojm3HmVP4ZPfjg+4z3FfNvjXwpd+DPE91o91llQ74JSMCWI52sPywfQgjtTfBnim68HeJ7TWbXLCI7ZogcebEfvL+I6ehAPagD7eoqnpep2us6Va6lYyiW1uYxJE47g+voexHY8VcoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKK5rx54rh8GeEbzV5NrTKPLto2/5aSt90fQck+wNAHin7QHjX7dqsXhWylJt7MiW7KnhpSPlX3Cg/mfUV4jU91dT313Nd3MjSzzu0kkjHJZiSST9STUFABRRRQAUUUUAFFFFABRRRQB7/wDsy/8AM0/9un/tavoCvn/9mX/maf8At0/9rV9AUAfAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFfUHwM8e/wBv6GfD1/NnUdPQeSzHmWDoPxXgH2K+9fL9anh/XL3w3rtnq9g+y5tX3L6MOhU+xBIPsaAPuqisjwz4hsvFPh+01iwfdDcIDtJ5jb+JT7g5H4e9a9ABRRRQAUUUUAFFFFAHnHxg8BDxl4XNxZxbtYsAZLfA5lX+KP8AEcj3GOMmvkkgg4PUetfftfMHxz8BDw/rv/CQ6fFjTtRc+aqjiKc8n6BuSPcMOBigDT+Afjz7FfN4S1GXFvcsZLFmPCS9WT6N1HuD1LV9GV8DQzSW88c0MjRyxsGR1OCrDkEH1FfYvwz8bxeOPCcV27KNRt8RXsY7P2YD0Ycj8R2oA7SiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACvlT43+NT4l8WnSrSTOnaUzRDHSSbo7e+CNo+hPevb/ix4z/4QzwbNJbybdSvM29oAeVOPmf8A4CDn6lfWvj4kk5PJPegBKKKKACiiigAooooAKKKKACiiigD3/wDZl/5mn/t0/wDa1fQFfP8A+zL/AMzT/wBun/tavoCgD4AooooAKKKKACiiigAooooAKKKKACiiigAooooA9Y+CPj3/AIRrxD/Yl/Lt0vUnAUseIZzgK3sDwp/AngGvqavgGvrL4MePB4u8MiwvZd2racqxy7jzLH0V/c8YPuAT1FAHplFFFABRRRQAUUUUAFZniDQrLxLoN5o9+m63uUKk45U9Qw9wQCPcVp0UAfDPiXw/e+FvEF5o1+mJ7Z9u4DiReqsPYgg/jW38NfG0vgjxZBeszGwmxDexr3jJ+8B3KnkfiO9e5/G/wEfEmgDW7CEtqemoSyqMmaHqy+5Xlh/wIdSK+WaAPvq3niuraK4gkWSGVA8bqchlIyCD6EGpK8M+AfjwXdm3hHUJszwAyWLMeWj6sn/AeSPbPYV7nQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFIzBVLMQABySaWvKPjp40/4R7wsNGs5duoaqrISDzHAOHPsT90fVsdKAPEPin4zPjXxlPcwyE6da5gsx22A8v9WOT9MDtXD0UUAFFFFABRRRQAUUUUAFFFFABRRRQB7/APsy/wDM0/8Abp/7Wr6Ar5//AGZf+Zp/7dP/AGtX0BQB8AUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFb3hDxPeeD/EtprNny0LYkjJwJYzwyn6j8jg9qwaKAPvDR9Vs9d0e01Swl821uoxJG3fB7H0I6EdiKvV81/Abx9/ZWqf8ItqM2LO9fdaM3SOY/wAPsG/mB619KUAFFFFABRRRQAUUUUAFfJ3xl8Bf8Ih4mN9Yw7dI1Fi8W0cRSdWj9hzkexx2NfWNYXjDwvaeMPDN3o14ABKuYpMZMUg+64+h6+oyO9AHxXpmo3WkapbajZSmK5tpBJE47MDkfh7d69T/AOGjvF//AEDdD/78S/8Ax2vLtY0q80LV7vS7+Lyrq2kMcidsjuPUHgg9wQaoUAewf8NHeL/+gbof/fiX/wCO0f8ADR3i/wD6Buhn/tjL/wDHK8fooA9h/wCGj/F3/QM0T/vzL/8AHKP+Gj/Fv/QM0T/vzL/8crx6igD2H/ho/wAW/wDQM0X/AL9S/wDxynf8NH+LP+gXov8A36l/+OV45RQB7H/w0f4r/wCgXov/AH6l/wDjlJ/w0f4r/wCgVov/AH6l/wDjleO0UAex/wDDR/ir/oFaN/37l/8AjlH/AA0h4q/6BWjf9+5f/jleOUUAeyf8NH+Kf+gVo/8A37l/+OUf8NIeKP8AoFaP/wB8S/8AxdeN0UAey/8ADSHij/oE6P8A98S//F0f8NIeKP8AoE6P/wB8S/8AxdeNUUAey/8ADSHif/oEaR/3zL/8XS/8NIeJ/wDoEaR/3zJ/8XXjNFAHs3/DSHib/oEaR/3zJ/8AF0f8NIeJf+gPpP8A3zJ/8XXjNFAHs/8Aw0j4l/6A+k/lJ/8AFUf8NI+Jf+gPpP5Sf/FV4xRQB7P/AMNI+JP+gNpX5Sf/ABVea+LfFOoeMfEM+salsE0gVVjjzsjUDhVBJwOp68kk96wqKACiiigAooooAKKKKACiiigAooooAKKKKAPf/wBmX/maf+3T/wBrV9AV8/8A7Mv/ADNP/bp/7Wr6AoA+AKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigCSOR4pFkjYq6kFWU4IPqDX198KfHKeNvCiSTyD+1bPbDeJ6nHyuPZgCfqCK+Pa6rwB4wufBHiq21SPc1uf3d1CD/rIieR9RwR7j0JoA+1KKr2N7balYwXtpKs1tOgkikU5DKRkEVYoAKKKKACiiigAooooA8V+PPgL+1NLHinT4c3lmm27RRzJCOje5Xv/sk+lfNdffckaSxtHIoZGBDKwyCO+R6V8gfFXwK/gjxU0cCH+y7zMtm/oM/Mh91Jx9CD3oA4OiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA9/wD2Zf8Amaf+3T/2tX0BXz/+zL/zNP8A26f+1q+gKAPgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAPfPgD498tz4P1GXCsWk092PQ9Wi/Hlh/wIdwK+gq+CLW6msruG6tpWinhcSRyIcFWByCPoRX2V8OvGcHjfwpb6iCovI8RXkQ/glA5IHoeo+uOoNAHW0UUUAFFFFABRRRQAVyvxA8HW3jfwpc6XJtW5X97azH/lnKAcfgeQfY+tdVRQB8FXtncafez2V3E0VzbyNHLGwwVYHBB/EVWr6C+P3gLcg8YadD8ygR6gqjqOiyfyU/8B9Ca+faACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD3/wDZl/5mn/t0/wDa1fQFfP8A+zL/AMzT/wBun/tavoCgD4AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAruPhf45k8D+K47mVmOmXOIr2Nf7ueHA9VPP0yO9cPRQB99QzRzQpNE6vHIoZHU5DA8gg+hqSvD/gJ49+3WB8JahNm4tkL2TMeXiHJT6r1Ht7LXuFABRRRQAUUUUAFFFFAEN1awXtpNaXMSy28yGOSNxkMpGCCPcZr41+Ingy48D+K59NYM1pJ+9tJj/HETwCfUdD9M9CK+0K4j4oeBk8ceFJLeJVGpWuZrNz/AHscoT6MMD6gHtQB8cUVLNFJBM8MqMksbFXVhgqR1BHqKioAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA9/8A2Zf+Zp/7dP8A2tX0BXz/APsy/wDM0/8Abp/7Wr6AoA+AKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKALulandaNqtrqVjKYrq2kEkT+hHr7diO44r7Q8FeK7Txn4YtdYtcKzjZPEDkxSjG5T+eR6gg96+Iq9I+D3jw+DfFAt7yXbo+oER3G48RN/DJ+BOD7HPOBQB9bUUAgjIPB9KKACiiigAooooAKKKKAPnH49+AvsF+PFmnQ4trptt8qjhJTwH+jdD789Wrw+vvLVdMtNZ0q602/iEtrcxmOVD3B/ke4PY18XeNPCt34M8T3Wj3QJEZ3wykYEsRztYfhwfQgjtQBz1FFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAe//sy/8zT/ANun/tavoCvn/wDZl/5mn/t0/wDa1fQFAHwBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAfUHwM8e/8ACQaF/wAI/qEu7UtOQeUzHmWAcA+5XgH2K9TmvXq+FfD+u3vhrXrPWLB9txbSBgM8MOhU+xBIPsa+0/DXiGy8UeH7PWLB8wXKBtuclG6Mp9wQRQBr0UUUAFFFFABRRRQAV5v8YfAf/CZeGDc2cQOr6eGkt9o5lTq0fuTjI9xjua9IooA+AiCDg9R60levfHLwF/wj+v8A/CQWEONN1JyZVUcQz9SPYNyR7hhwMV5DQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAHv8A+zL/AMzT/wBun/tavoCvn/8AZl/5mn/t0/8Aa1fQFAHwBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFes/BDx6PDfiA6JfzbdM1JwFZjgQz9Fb2DcKf+AnoDXk1FAH39RXmnwa8e/8ACX+GRY3027V9OUJLu6yx9Fk9zxg+4z3Fel0AFFFFABRRRQAUUUUAZfiHQrLxNoN5pF+m63uk2k91PUMPcEAj3FfFniTQL3wx4gvNHv0xPbOV3Y4deqsPYjB/GvuevJfjh4C/4SPQBrljFu1PTUJcKOZoBksvuV5Yf8CHJIoA+W6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD3/9mX/maf8At0/9rV9AV8//ALMv/M0/9un/ALWr6AoA+AKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA3/AAf4ovPB/ia01izOTE2JY84EsZ+8p+o6HsQD2r7R0jVbPXdItNUsJRLa3MYkjfvg9iOxHII7EEV8H17X8BvHv9l6p/wiuoTYs7x91o7HiOY9V9g3b/aA9aAPpOiiigAooooAKKKKAClxkUlFAHyb8ZfAZ8IeJje2UO3SNRZnh2jiJ+rR+w5yPY47GvM6+z/idY6RffDzVl1pxHaxQmVZQAWjkH3CvqSxAx3zjvXxhQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAe/8A7Mv/ADNP/bp/7Wr6Ar5//Zl/5mn/ALdP/a1fQFAHwBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABUkcjxSLJGxV1IKspwQfUGo6KAPsP4VeOk8b+FVkncf2pZ4ivE9Tj5XHswGfqCO1d3XxZ8P/GNz4I8V22qR7mtm/dXcI/5aREjP4jgj3HoTX2XZXlvqNlBe2kqy21xGskUinIZSMgj8DQBYooooAKKKKACiiuP+JPjOPwR4RuL9WU3037mzjP8AFIR1I9FHJ+mO9AHjnx98cf2lqqeFrGXNrYtvuyp4ebHC/RQfzJ9K8UqWaaS4nkmmkaSWRizuxyWY8kk+pqKgAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA9//Zl/5mn/ALdP/a1fQFfP/wCzL/zNP/bp/wC1q+gKAPgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAr334A+PdrnwfqM3yndJp7Meh6tF/Nh/wL2rwKp7W6nsruG7tpWiuIXEkciHBVgcgj6GgD73orkvh34zt/G/hSDUl2rdp+6u4R/BKAMnHoeCPrjqDXW0AFFFFADWdUUsxAUDJJ4wK+P/AIreN28a+LpZLeQnTLPMNoueGGfmf/gRH5BR2r2X46+OP7A8Ojw/ZTY1DU0IlKnmODox/wCBHK/Td7V8vUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB7/APsy/wDM0/8Abp/7Wr6Ar5//AGZf+Zp/7dP/AGtX0BQB8AUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAHcfC/wAcv4I8Vx3ErMdNusQ3iD+7nhwPVTk/Qkd6+woZo5oUmidXjkUMjqchgeQQfQ18C19H/ATx79vsP+ET1GbNzarusWY8vEOSmfVeo9uOi0Ae31Q1nVrTQtGvNVv5PLtbWMySN3wOw9STgAdyRV+vnT4/+Oftl+nhKwl/cWxEt6ynhpMfKn0UHJ9yO4oA8m8U+IrvxZ4kvdZvT+9uHJVM5EaDhVHsBge/XvWLRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAHv/wCzL/zNP/bp/wC1q+gK+f8A9mX/AJmn/t0/9rV9AUAfAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVe0rU7vRtVtdSsJTFdW0gkicdiP6diO4qjRQB9aX3xa05PhUPFduUF3Mv2eK1JyVuscqfUD73uuPUV8o3NzNeXU11cyNLPM5kkkc5LMTkk+5JNN81zCIi7eWGLBM8AnAJx68D8qjoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA9//Zl/5mn/ALdP/a1fQFfP/wCzL/zNP/bp/wC1q+gKAPgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD3/9mX/maf8At0/9rV9AV8//ALMv/M0/9un/ALWr6AoA+AKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAPf/2Zf+Zp/wC3T/2tX0BXz/8Asy/8zT/26f8AtavoCgD4AooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA9//Zl/5mn/ALdP/a1fQFfP/wCzL/zNP/bp/wC1q+gKAPgCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD3/9mX/maf8At0/9rV9AV8//ALMv/M0/9un/ALWr6AoA+f8A/hmX/qbv/Kb/APbaP+GZf+pu/wDKb/8Aba+gKKAPn/8A4Zl/6m7/AMpv/wBto/4Zl/6m7/ym/wD22voCigD5/wD+GZf+pu/8pv8A9to/4Zl/6m7/AMpv/wBtr6AooA+f/wDhmX/qbv8Aym//AG2j/hmX/qbv/Kb/APba+gKKAPn/AP4Zl/6m7/ym/wD22j/hmX/qbv8Aym//AG2voCigD5//AOGZf+pu/wDKb/8AbaP+GZf+pu/8pv8A9tr6AooA+f8A/hmX/qbv/Kb/APbaP+GZf+pu/wDKb/8Aba+gKKAPn/8A4Zl/6m7/AMpv/wBto/4Zl/6m7/ym/wD22voCigD5/wD+GZf+pu/8pv8A9to/4Zl/6m7/AMpv/wBtr6AooA+f/wDhmX/qbv8Aym//AG2j/hmX/qbv/Kb/APba+gKKAPn/AP4Zl/6m7/ym/wD22j/hmX/qbv8Aym//AG2voCigD5//AOGZf+pu/wDKb/8AbaP+GZf+pu/8pv8A9tr6AooA+f8A/hmX/qbv/Kb/APbaP+GZf+pu/wDKb/8Aba+gKKAPn/8A4Zl/6m7/AMpv/wBto/4Zl/6m7/ym/wD22voCigD5/wD+GZf+pu/8pv8A9to/4Zl/6m7/AMpv/wBtr6AooA+f/wDhmX/qbv8Aym//AG2j/hmX/qbv/Kb/APba+gKKAPn/AP4Zl/6m7/ym/wD22j/hmX/qbv8Aym//AG2voCigD5//AOGZf+pu/wDKb/8AbaP+GZf+pu/8pv8A9tr6AooA+f8A/hmX/qbv/Kb/APbaP+GZf+pu/wDKb/8Aba+gKKAPn/8A4Zl/6m7/AMpv/wBto/4Zl/6m7/ym/wD22voCigD5/wD+GZf+pu/8pv8A9to/4Zl/6m7/AMpv/wBtr6AooA+f/wDhmX/qbv8Aym//AG2j/hmX/qbv/Kb/APba+gKKAPn/AP4Zl/6m7/ym/wD22j/hmX/qbv8Aym//AG2voCigD5//AOGZf+pu/wDKb/8AbaP+GZf+pu/8pv8A9tr6AooA+f8A/hmX/qbv/Kb/APbaP+GZf+pu/wDKb/8Aba+gKKAPn/8A4Zl/6m7/AMpv/wBto/4Zl/6m7/ym/wD22voCigD5/wD+GZf+pu/8pv8A9to/4Zl/6m7/AMpv/wBtr6AooA+f/wDhmX/qbv8Aym//AG2j/hmX/qbv/Kb/APba+gKKAPn/AP4Zl/6m7/ym/wD22j/hmX/qbv8Aym//AG2voCigD5//AOGZf+pu/wDKb/8AbaP+GZf+pu/8pv8A9tr6AooA+f8A/hmX/qbv/Kb/APbaP+GZf+pu/wDKb/8Aba+gKKAPP/hl8Mv+Fc/2p/xN/wC0Pt/lf8u3lbNm/wD22znf7dK9AoooA//Z" alt="F" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">
+    <div><div class="logo-name">FOLDIFYCASE</div><div class="logo-sub">Warehouse Hub</div></div>
+  </div>
+  <div class="pills">
+    <div class="pill"><div class="dot dot-g"></div><span id="gmailPill">foldifycase</span></div>
+    <div class="pill"><div class="dot dot-gold"></div><span id="shopPill">Loading...</span></div>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-sec">
+      <div class="sb-lbl">Stats</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-n" id="stTotal">0</div><div class="stat-l">Orders</div></div>
+        <div class="stat"><div class="stat-n" id="stPending" style="color:#C94040">0</div><div class="stat-l">Pending</div></div>
+        <div class="stat"><div class="stat-n" id="stSent" style="color:#3D7A5A">0</div><div class="stat-l">Sent</div></div>
+        <div class="stat" style="background:rgba(200,169,110,.1);border-color:rgba(200,169,110,.25);">
+          <div class="stat-n" id="stUSShipped" style="color:#C8A96E">0</div>
+          <div class="stat-l" style="color:rgba(200,169,110,.7);">US Shipped</div>
+        </div>
+      </div>
+      <div class="auto-row">
+        <div class="auto-txt"><strong>Auto-Send</strong>On every label purchase</div>
+        <label class="tog"><input type="checkbox" id="autoChk" onchange="toggleAuto(this)"><span class="tog-sl"></span></label>
+      </div>
+    </div>
+    <div class="sb-divider-gap"></div>
+    <div class="filters">
+      <div class="sb-section-hdr">
+        <div class="sb-lbl">Filter Orders</div>
+      </div>
+      <button class="fbtn active" onclick="setFilter('all',this)">
+        <span style="display:flex;align-items:center;gap:8px;"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="opacity:.7;flex-shrink:0"><path d="M1 1h14v2H1V1zm2 4h10v2H3V5zm2 4h6v2H5V9zm1 4h4v2H6v-2z"/></svg>All Orders</span>
+        <span class="fc" id="fcAll">0</span>
+      </button>
+      <button class="fbtn" onclick="setFilter('unfulfilled',this)">
+        <span style="display:flex;align-items:center;gap:8px;"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="opacity:.7;flex-shrink:0"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M8 5v4M8 11v1"/></svg>Unfulfilled</span>
+        <span class="fc" id="fcUF">0</span>
+      </button>
+      <button class="fbtn" onclick="setFilter('fulfilled',this)">
+        <span style="display:flex;align-items:center;gap:8px;"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="opacity:.7;flex-shrink:0"><path d="M2 8l4 4 8-8"/></svg>Fulfilled</span>
+        <span class="fc" id="fcFul">0</span>
+      </button>
+      <button class="fbtn" onclick="setFilter('partial',this)">
+        <span style="display:flex;align-items:center;gap:8px;"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="opacity:.7;flex-shrink:0"><path d="M8 2v6l4 2"/><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>Partial</span>
+        <span class="fc" id="fcPart">0</span>
+      </button>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="page-hdr">
+      <div>
+        <h1 class="page-title">Warehouse <em>Fulfilment</em></h1>
+        <p class="page-sub">Click Refresh Orders to load your latest Shopify orders. Click Send Label to email the warehouse instantly.</p>
+      </div>
+      <div class="hdr-acts">
+        <button class="btn-out" style="font-size:10px;padding:7px 12px;" onclick="simulatePurchase()">Simulate</button>
+        <button class="btn-sol" onclick="loadOrders()">Refresh Orders</button>
+      </div>
+    </div>
+    <!-- Banner removed - email destination visible in left sidebar -->
+    <div class="search-wrap">
+      <span class="search-icon">&#9906;</span>
+      <input class="search-input" type="text" id="searchInput" placeholder="Search order, customer, product..." oninput="currentPage=1;renderTable()">
+    </div>
+    <div class="filter-row" id="filterRow">
+      <div class="date-filter-wrap">
+        <label class="date-lbl">From:</label>
+        <input type="date" id="dateFrom" onchange="currentPage=1;renderTable();updateStats();">
+        <label class="date-lbl">To:</label>
+        <input type="date" id="dateTo" onchange="currentPage=1;renderTable();updateStats();">
+      </div>
+      <div class="dropdown-wrap" id="dropdownWrap">
+        <button class="dropdown-btn" id="dropdownBtn" onclick="toggleDropdown()">
+          <span class="arrow">&#9660;</span> Filter <span id="filterBadge" class="filter-badge" style="display:none;">●</span>
+        </button>
+        <div class="dropdown-menu" id="dropdownMenu" style="display:none;">
+          <div class="dropdown-section">COUNTRY</div>
+          <button class="dropdown-item active" data-country="all" onclick="setCountryFilter('all',this)"><span class="di-dot">&#9679;</span> All Countries <span class="di-count" id="ccAll">0</span></button>
+          <button class="dropdown-item" data-country="US" onclick="setCountryFilter('US',this)"><span class="di-dot">&#9675;</span> United States <span class="di-count" id="ccUS">0</span></button>
+          <button class="dropdown-item" data-country="AU" onclick="setCountryFilter('AU',this)"><span class="di-dot">&#9675;</span> Australia <span class="di-count" id="ccAU">0</span></button>
+          <button class="dropdown-item" data-country="GB" onclick="setCountryFilter('GB',this)"><span class="di-dot">&#9675;</span> United Kingdom <span class="di-count" id="ccUK">0</span></button>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">FULFILMENT STATUS</div>
+          <button class="dropdown-item active" data-status="all" onclick="setStatusFilter('all',this)"><span class="di-dot">&#9679;</span> All Statuses</button>
+          <button class="dropdown-item" data-status="unfulfilled" onclick="setStatusFilter('unfulfilled',this)"><span class="di-dot">&#9675;</span> Unfulfilled</button>
+          <button class="dropdown-item" data-status="fulfilled" onclick="setStatusFilter('fulfilled',this)"><span class="di-dot">&#9675;</span> Fulfilled</button>
+          <button class="dropdown-item" data-status="partial" onclick="setStatusFilter('partial',this)"><span class="di-dot">&#9675;</span> Partial</button>
+          <button class="dropdown-item" data-status="sent" onclick="setStatusFilter('sent',this)"><span class="di-dot">&#9675;</span> Label Sent (Re-send)</button>
+          <button class="dropdown-item" data-status="not_sent" onclick="setStatusFilter('not_sent',this)"><span class="di-dot">&#9675;</span> Not Yet Sent</button>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-section">ORDER TYPE</div>
+          <button class="dropdown-item active" data-ordertype="all" onclick="setOrderTypeFilter('all',this)"><span class="di-dot">&#9679;</span> All Order Types</button>
+          <button class="dropdown-item" data-ordertype="warehouse" onclick="setOrderTypeFilter('warehouse',this)"><span class="di-dot">&#9675;</span> Warehouse (US Label)</button>
+          <button class="dropdown-item" data-ordertype="dropship" onclick="setOrderTypeFilter('dropship',this)"><span class="di-dot">&#9675;</span> Dropship (No US Label)</button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-clear" onclick="clearFilters()">&#10005; Clear All Filters</button>
+        </div>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="padding-left:18px;"><input type="checkbox" class="cb" onchange="toggleSelAll(this)"></th>
+          <th>Order</th><th>Customer</th><th>Items</th><th>Status</th><th>Amount</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="tbody"><tr><td colspan="7"><div class="empty"><div class="empty-title">Click Refresh Orders to load</div></div></td></tr></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="paginationBar" style="display:none;">
+      <div class="pag-info" id="pagInfo">Showing 1-30 of 0 orders</div>
+      <div class="pag-btns">
+        <button class="pag-btn" id="pagPrev" onclick="changePage(-1)" disabled>&#8592;</button>
+        <div id="pagBtnContainer" style="display:flex;gap:4px;"></div>
+        <button class="pag-btn" id="pagNext" onclick="changePage(1)">&#8594;</button>
+      </div>
+    </div>
+    <div class="log-section">
+      <div class="log-hdr" style="cursor:pointer;" onclick="toggleLog()">
+        <div class="log-title" style="display:flex;align-items:center;gap:8px;">
+          Email Activity Log
+          <span id="logToggleIcon" style="font-size:12px;color:rgba(26,26,24,.4);transition:transform .2s;">▶ Show</span>
+        </div>
+        <button class="btn-out" style="padding:6px 12px;font-size:10px;" onclick="event.stopPropagation();clearLog()">Clear</button>
+      </div>
+      <div class="log-wrap" id="actLog" style="display:none;"><div class="log-empty">No emails sent yet.</div></div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"><span id="tIcon">ok</span><span id="tMsg"></span></div>
+<script>
+var _a = "gmail.com";
+var _c = "uswarehousefoldifycase";
+var _d = "foldifycase";
+var LIVE_EMAIL = _c + "@" + _a;
+var FROM_EMAIL = _d + "@" + _a;
+var SHOPIFY_DOM = "scnd9y-a1.myshopify.com";
+var mode = "live", customEmail = "", autoOn = false;
+var orders = [], activeFilter = "all", activeCountry = "all";
+var currentPage = 1, PAGE_SIZE = 30;
+var logItems = [], liveSent = 0;
+// Track sent orders persistently across refreshes (Live mode only)
+// Preserve existing sent history - migrate from old key if needed
+// Sent order IDs - loaded from blob (survives updates + works on all devices)
+var sentOrderIds = JSON.parse(localStorage.getItem('fc_sent_orders') || '[]');
+sentOrderIds = sentOrderIds.map(function(id) { return String(id); });
+
+// Load sent orders from blob store on startup (merges with localStorage)
+function loadSentOrdersFromBlob() {
+  fetch('/api/sent-orders')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.success && d.ids && d.ids.length > 0) {
+        // Merge blob IDs with any local ones
+        var merged = new Set(sentOrderIds);
+        d.ids.forEach(function(id) { merged.add(String(id)); });
+        sentOrderIds = Array.from(merged);
+        // Update localStorage with merged set
+        localStorage.setItem('fc_sent_orders', JSON.stringify(sentOrderIds));
+        console.log('Loaded', sentOrderIds.length, 'sent orders from blob');
+        // Re-render table to show Re-send buttons correctly
+        if (orders.length > 0) renderTable();
+      }
+    })
+    .catch(function(e) {
+      console.log('Could not load sent orders from blob:', e.message);
+    });
+}
+// Filter state
+var filterDateFrom = '';
+var filterDateTo = '';
+var activeStatus = 'all';   // all / unfulfilled / fulfilled / partial / sent
+var activeOrderType = 'all'; // all / warehouse / dropship
+
+function markOrderSent(orderId) {
+  var id = String(orderId);
+  if (!sentOrderIds.includes(id)) {
+    sentOrderIds.push(id);
+    localStorage.setItem('fc_sent_orders', JSON.stringify(sentOrderIds));
+  }
+  // Also persist to blob so it survives app updates and works on all devices
+  fetch('/api/sent-orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId: id })
+  }).catch(function(e) {
+    console.log('Could not save sent order to blob:', e.message);
+  });
+}
+
+function isOrderSentLive(orderId) {
+  return sentOrderIds.includes(String(orderId));
+}
+
+function el(id){ return document.getElementById(id); }
+
+function toggleDropdown() {
+  var menu = el('dropdownMenu');
+  var btn = el('dropdownBtn');
+  var isOpen = menu.style.display !== 'none';
+  if (isOpen) {
+    menu.style.display = 'none';
+    btn.classList.remove('open');
+  } else {
+    var rect = btn.getBoundingClientRect();
+    menu.style.display = 'block';
+    menu.style.top = (rect.bottom + 6) + 'px';
+    menu.style.left = rect.left + 'px';
+    btn.classList.add('open');
+  }
+}
+
+// stopPropagation attached in window.onload after menu is built
+
+// Close dropdown when clicking outside - use mousedown to not interfere with onclick
+document.addEventListener('mousedown', function(e) {
+  var wrap = el('dropdownWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    var menu = el('dropdownMenu');
+    if (menu) menu.style.display = 'none';
+    var btn = el('dropdownBtn');
+    if (btn) btn.classList.remove('open');
+  }
+});
+
+// Reposition dropdown on scroll/resize
+window.addEventListener('scroll', function() {
+  var menu = el('dropdownMenu');
+  if (menu && menu.style.display !== 'none') {
+    var btn = el('dropdownBtn');
+    if (btn) {
+      var rect = btn.getBoundingClientRect();
+      menu.style.top = (rect.bottom + 6) + 'px';
+      menu.style.left = rect.left + 'px';
+    }
+  }
+}, true);
+
+window.addEventListener('resize', function() {
+  var menu = el('dropdownMenu');
+  if (menu && menu.style.display !== 'none') {
+    var btn = el('dropdownBtn');
+    if (btn) {
+      var rect = btn.getBoundingClientRect();
+      menu.style.top = (rect.bottom + 6) + 'px';
+      menu.style.left = rect.left + 'px';
+    }
+  }
+});
+
+function setStatusFilter(value, btn) {
+  activeStatus = value;
+  document.querySelectorAll('.dropdown-item[data-status]').forEach(function(b) {
+    var isActive = b === btn;
+    b.classList.toggle('active', isActive);
+    var dot = b.querySelector('.di-dot');
+    if (dot) dot.innerHTML = isActive ? '&#9679;' : '&#9675;';
+  });
+  updateFilterBadge();
+  el('dropdownMenu').style.display = 'none';
+  var dbtn = el('dropdownBtn'); if(dbtn) dbtn.classList.remove('open');
+  currentPage = 1;
+  renderTable();
+  updateStats();
+}
+
+function setOrderTypeFilter(value, btn) {
+  activeOrderType = value;
+  document.querySelectorAll('.dropdown-item[data-ordertype]').forEach(function(b) {
+    var isActive = b === btn;
+    b.classList.toggle('active', isActive);
+    var dot = b.querySelector('.di-dot');
+    if (dot) dot.innerHTML = isActive ? '&#9679;' : '&#9675;';
+  });
+  updateFilterBadge();
+  el('dropdownMenu').style.display = 'none';
+  var dbtn = el('dropdownBtn'); if(dbtn) dbtn.classList.remove('open');
+  currentPage = 1;
+  renderTable();
+}
+
+function updateFilterBadge() {
+  var badge = el('filterBadge');
+  var btn = el('dropdownBtn');
+  var hasFilter = activeCountry !== 'all' || activeStatus !== 'all' || activeOrderType !== 'all';
+  if (badge) badge.style.display = hasFilter ? 'inline' : 'none';
+  if (btn) btn.classList.toggle('active', hasFilter);
+}
+
+function clearFilters() {
+  activeCountry = 'all';
+  activeStatus = 'all';
+  activeOrderType = 'all';
+  el('dateFrom').value = '';
+  el('dateTo').value = '';
+  // Reset all dropdown item groups
+  ['data-country', 'data-status', 'data-ordertype'].forEach(function(attr) {
+    document.querySelectorAll('.dropdown-item[' + attr + ']').forEach(function(b) {
+      var isAll = b.getAttribute(attr) === 'all';
+      b.classList.toggle('active', isAll);
+      var dot = b.querySelector('.di-dot');
+      if (dot) dot.innerHTML = isAll ? '&#9679;' : '&#9675;';
+    });
+  });
+  updateFilterBadge();
+  updateStats();
+  currentPage = 1;
+  renderTable();
+}
+
+function setCountryFilter(code, btn) {
+  activeCountry = code;
+  document.querySelectorAll('.dropdown-item[data-country]').forEach(function(b) {
+    var isActive = b === btn;
+    b.classList.toggle('active', isActive);
+    var dot = b.querySelector('.di-dot');
+    if (dot) dot.innerHTML = isActive ? '&#9679;' : '&#9675;';
+  });
+  updateFilterBadge();
+  updateCountryCounts();
+  el('dropdownMenu').style.display = 'none';
+  var dbtn = el('dropdownBtn'); if(dbtn) dbtn.classList.remove('open');
+  currentPage = 1;
+  renderTable();
+}
+function getEmail(){
+  // Check settings panel email first, then customEmail, then hardcoded
+  var settingsEmail = '';
+  try{ settingsEmail = localStorage.getItem('fc_email_us_warehouse') || ''; }catch(e){}
+  return customEmail || settingsEmail || LIVE_EMAIL;
+}
+
+function setCustom(){
+  var v = el("customInput").value.trim();
+  if(!v || v.indexOf("@") < 0){ showToast("Enter a valid email","error"); return; }
+  customEmail = v; updateUI();
+  showToast("Email set to " + v, "info");
+}
+
+function toggleAuto(cb){
+  autoOn = cb.checked;
+  if (autoOn) {
+    showToast("Auto-send ON — scanning orders for ready labels...", "success");
+    // Scan all current orders and send any that are ready
+    setTimeout(function(){ scanAndAutoSend(); }, 500);
+  } else {
+    showToast("Auto-send OFF", "info");
+  }
+}
+
+// Scan all orders and auto-send those that meet both conditions
+function scanAndAutoSend() {
+  if (!autoOn) return;
+  var isLive = mode === 'live' && !customEmail;
+
+  // Only scan the most recent 100 orders (orders are newest first)
+  var ordersToScan = orders.slice(0, PAGE_SIZE * 2); // First 2 pages only
+  var eligible = [];
+  var skippedAlreadySent = [];
+  var skippedNotReady = [];
+
+  ordersToScan.forEach(function(o) {
+    var carrier = (o.carrier || '').trim().toLowerCase();
+    var isReady = (o.status === 'fulfilled' || o.status === 'partial')
+      && carrier && carrier !== 'other';
+
+    if (!isReady) {
+      skippedNotReady.push(o.num);
+      return;
+    }
+    // In Live mode: skip orders already sent (persists across refreshes)
+    if (isLive && isOrderSentLive(o.shopifyOrderId || o.id)) {
+      skippedAlreadySent.push(o.num);
+      return;
+    }
+    if (o.status === 'sent') {
+      skippedAlreadySent.push(o.num);
+      return;
+    }
+    eligible.push(o);
+  });
+
+  // Log a detailed scan summary
+  addLog({
+    type: 'auto', icon: '🔍',
+    msg: 'Auto-scan: ' + ordersToScan.length + ' orders scanned (first 2 pages)',
+    det: '✅ Eligible: ' + eligible.length
+      + ' | ⏭ Already sent: ' + skippedAlreadySent.length
+      + ' | ⏳ Not ready: ' + skippedNotReady.length
+      + (skippedAlreadySent.length > 0 ? ' | Skipped (sent): ' + skippedAlreadySent.slice(0,5).join(', ') + (skippedAlreadySent.length > 5 ? '...' : '') : '')
+  });
+
+  if (eligible.length === 0) {
+    showToast('Auto-scan: ' + ordersToScan.length + ' scanned, ' + skippedAlreadySent.length + ' already sent, 0 new', 'info');
+    return;
+  }
+
+  // SEND: oldest to newest — reverse the queue so warehouse gets oldest first
+  var sendQueue = eligible.slice().reverse();
+
+  addLog({ type: 'auto', icon: '🤖', msg: eligible.length + ' eligible order(s) — sending oldest first', det: 'Checking label uploads for: ' + eligible.map(function(o){return o.num;}).join(', ') });
+
+  var idx = 0;
+  var sent = 0;
+  var skipped = 0;
+
+  function checkNext() {
+    if (!autoOn) return;
+    if (idx >= sendQueue.length) {
+      showToast('Auto-scan done: ' + sent + ' sent, ' + skipped + ' skipped', sent > 0 ? 'success' : 'info');
+      return;
+    }
+    var o = sendQueue[idx++];
+    var nameClean = (o.num || '').replace(/#/g, '').trim();
+    fetch('/api/check-label?orderName=' + encodeURIComponent(nameClean))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data.exists) {
+          sent++;
+          addLog({ type: 'auto', icon: '🤖', msg: o.num + ' — sending (oldest first)', det: 'Label confirmed in Blob' });
+          sendOrder(o);
+          // Mark as sent in Live mode so it won't resend after refresh
+          if (isLive) markOrderSent(o.shopifyOrderId || o.id);
+        } else {
+          skipped++;
+          addLog({ type: 'info', icon: '⏭', msg: o.num + ' skipped', det: 'Label PDF not uploaded yet' });
+        }
+        setTimeout(checkNext, 800);
+      })
+      .catch(function(){ skipped++; setTimeout(checkNext, 800); });
+  }
+  checkNext();
+}
+
+// Auto-send with validation: checks Send Label is available AND label is uploaded
+function autoSendIfReady(o) {
+  if (!autoOn) return;
+
+  // Condition 1: Must have a real carrier (Send Label button available)
+  var carrier = (o.carrier || '').trim().toLowerCase();
+  var isReady = (o.status === 'fulfilled' || o.status === 'partial') 
+    && carrier && carrier !== 'other';
+
+  if (!isReady) {
+    console.log('Auto-send skipped for ' + o.num + ': Send Label not available (status: ' + o.status + ', carrier: ' + carrier + ')');
+    addLog({ type: 'info', icon: '⏭', msg: o.num + ' skipped', det: 'Send Label not available — order not fulfilled or no carrier' });
+    return;
+  }
+
+  // Condition 2: Label must be uploaded in Vercel Blob
+  var nameClean = (o.num || '').replace(/#/g, '').trim();
+  fetch('/api/check-label?orderName=' + encodeURIComponent(nameClean))
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!data.exists) {
+        console.log('Auto-send skipped for ' + o.num + ': No label uploaded in Blob');
+        addLog({ type: 'info', icon: '⏭', msg: o.num + ' skipped', det: 'Label PDF not uploaded yet — upload it first then it will send' });
+        showToast(o.num + ' — Label not uploaded, auto-send skipped', 'info');
+        return;
+      }
+      // Both conditions met — send!
+      console.log('Auto-send conditions met for ' + o.num + ' — sending');
+      addLog({ type: 'auto', icon: '🤖', msg: o.num + ' auto-send triggered', det: 'Label confirmed in Blob, sending to warehouse...' });
+      sendOrder(o);
+    })
+    .catch(function(err){
+      console.log('Auto-send check failed:', err.message);
+    });
+}
+
+function updateUI(){
+  var email = getEmail();
+  var isLive = mode === "live" && !customEmail;
+  // Mode buttons removed
+  var addr = el("activeAddr");
+  addr.textContent = email;
+  addr.className = "email-show-addr live";
+  // Banner removed
+  // Sync green dot pill in topbar with current sending email
+  var pill = el("gmailPill");
+  if (pill) {
+    pill.textContent = email; // Full email address
+  }
+}
+
+function loadOrders(){
+  el("tbody").innerHTML = "<tr><td colspan='7'><div class='empty'><div class='empty-title'>Loading Shopify orders...</div></div></td></tr>";
+  el("shopPill").textContent = "Loading...";
+  fetch("/api/orders")
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.success && data.orders && data.orders.length > 0){
+        orders = data.orders;
+        el("shopPill").textContent = SHOPIFY_DOM;
+        renderTable(); updateStats(); updateCountryCounts();
+        setTimeout(function(){ checkLabelStatuses(orders.slice(0,30)); }, 500);
+        showToast("Loaded " + orders.length + " orders", "success");
+      } else {
+        el("shopPill").textContent = "Connected";
+        el("tbody").innerHTML = "<tr><td colspan='7'><div class='empty'><div class='empty-title'>No orders found</div></div></td></tr>";
+        showToast("No orders found", "info");
+      }
+    })
+    .catch(function(err){
+      el("shopPill").textContent = "Error";
+      el("tbody").innerHTML = "<tr><td colspan='7'><div class='empty'><div class='empty-title'>Connection failed: " + err.message + "</div></div></td></tr>";
+      showToast("Connection failed", "error");
+    });
+}
+
+function checkLabelStatuses(pageOrders) {
+  // Check each order's label status in Blob and grey out button if already uploaded
+  pageOrders.forEach(function(o) {
+    var btn = el('lblbtn-' + o.id);
+    if (!btn) return;
+    var name = (o.num || '').replace(/#/g, '');
+    fetch('/api/check-label?orderName=' + encodeURIComponent(name))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data.exists) {
+          btn.style.background = '#ddd';
+          btn.style.color = '#999';
+          btn.style.borderColor = '#ccc';
+          btn.style.cursor = 'not-allowed';
+          btn.textContent = '✓ Label Uploaded';
+          btn.onclick = null;
+          btn.disabled = true;
+        }
+      })
+      .catch(function(){});
+  });
+}
+
+function simulatePurchase(){
+  var o = {
+    id: "sim"+Date.now(), num: "#FC-SIM",
+    date: new Date().toISOString(), status: "unfulfilled",
+    customer: {name:"Test Customer", addr:"123 Main St, Los Angeles, CA 90001, USA"},
+    items: [{title:"Z Fold 7 Test Case", variant:"Black", qty:1, price:94.99}],
+    total:94.99, currency:"USD", carrier:"USPS", tracking:"TEST"+Date.now(),
+    shopifyOrderId:"TEST", shopifyFulfillmentId:"TEST", countryCode:"US"
+  };
+  orders.unshift(o); renderTable(); updateStats(); updateCountryCounts();
+  showToast("Simulated order added", "info");
+  if(autoOn) setTimeout(function(){ autoSendIfReady(o); }, 800);
+}
+
+function sendOrder(o){
+  var toEmail = getEmail();
+  var isTest = false; // Always live mode
+  var btn = el("sendbtn-" + o.id);
+  if(btn){ btn.textContent = "Sending..."; btn.disabled = true; }
+  var payload = {
+    direct_send: true, to_email: toEmail, is_test: isTest,
+    order: {
+      id: o.shopifyOrderId, name: o.num,
+      shopifyOrderId: o.shopifyOrderId, shopifyFulfillmentId: o.shopifyFulfillmentId,
+      total_price: String(o.total), currency: o.currency,
+      fulfillments: [{id:o.shopifyFulfillmentId, tracking_number:o.tracking, tracking_company:o.carrier, label_url:o.labelUrl||''}],
+      shipping_address: {
+        name: o.customer.name,
+        address1: (o.customer.addr.split(",")[0]||"").trim(),
+        city: (o.customer.addr.split(",")[1]||"").trim(),
+        province: (o.customer.addr.split(",")[2]||"").trim(),
+        zip: (o.customer.addr.split(",")[3]||"").trim(),
+        country: (o.customer.addr.split(",")[4]||"USA").trim(),
+        country_code: o.countryCode||""
+      },
+      line_items: (o.items||[]).map(function(i){
+        return {title:i.title, variant_title:i.variant||"", quantity:i.qty||1, price:String(i.price||0), imageUrl:i.imageUrl||"", productUrl:i.productUrl||"", productId:i.productId||""};
+      })
+    }
+  };
+  fetch("/api/webhook", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload)})
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.success){
+      var ord = orders.find(function(x){ return x.id===o.id; });
+      if(ord) ord.status = "sent";
+      liveSent++;
+      // Live mode: persist sent status so auto-send won't resend after page refresh
+      if(!isTest) markOrderSent(o.shopifyOrderId || o.id);
+      renderTable(); updateStats();
+      addLog({type:"success", icon:"E", msg:o.num+" sent to "+toEmail, det:o.customer.name});
+      showToast(o.num+" emailed!", "success");
+    } else {
+      showToast("Failed: "+(data.error||"Unknown"), "error");
+      var b = el("sendbtn-"+o.id);
+      if(b){ b.textContent="Send Label"; b.disabled=false; }
+    }
+  })
+  .catch(function(err){
+    showToast("Error: "+err.message, "error");
+    var b = el("sendbtn-"+o.id);
+    if(b){ b.textContent="Send Label"; b.disabled=false; }
+  });
+}
+
+function sendOrderById(id){
+  var o = orders.find(function(x){ return x.id===id; });
+  if(o) sendOrder(o);
+}
+
+function getFiltered(){
+  var q = el("searchInput").value.toLowerCase();
+  var fromDate = el("dateFrom") ? el("dateFrom").value : '';
+  var toDate = el("dateTo") ? el("dateTo").value : '';
+  return orders.filter(function(o){
+    // Left sidebar filter (All/Unfulfilled/Fulfilled/Partial)
+    if(activeFilter !== "all" && o.status !== activeFilter) return false;
+    // Country filter
+    if(activeCountry !== "all" && (o.countryCode||"").toUpperCase() !== activeCountry) return false;
+    // Date range filter
+    if(fromDate || toDate) {
+      var orderDate = o.date ? o.date.substring(0,10) : '';
+      if(fromDate && orderDate < fromDate) return false;
+      if(toDate && orderDate > toDate) return false;
+    }
+    // Fulfilment status filter
+    if(activeStatus !== "all") {
+      if(activeStatus === "sent") {
+        var wasSent = o.status === "sent" || isOrderSentLive(o.shopifyOrderId || o.id);
+        if(!wasSent) return false;
+      } else if(activeStatus === "not_sent") {
+        var wasSentCheck = o.status === "sent" || isOrderSentLive(o.shopifyOrderId || o.id);
+        if(wasSentCheck) return false;
+      } else {
+        if(o.status !== activeStatus) return false;
+      }
+    }
+    // Order type filter (warehouse vs dropship)
+    if(activeOrderType !== "all") {
+      var carrier = (o.carrier || "").trim().toLowerCase();
+      var isWarehouse = carrier && carrier !== "other";
+      if(activeOrderType === "warehouse" && !isWarehouse) return false;
+      if(activeOrderType === "dropship" && isWarehouse) return false;
+    }
+    // Search
+    if(q && JSON.stringify(o).toLowerCase().indexOf(q) < 0) return false;
+    return true;
+  });
+}
+
+function renderTable(){
+  var filtered = getFiltered();
+  var tbody = el("tbody");
+  var pagBar = el("paginationBar");
+  if(!filtered.length){
+    tbody.innerHTML = "<tr><td colspan='7'><div class='empty'><div class='empty-title'>No orders found</div></div></td></tr>";
+    pagBar.style.display = "none"; return;
+  }
+  var totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  if(currentPage > totalPages) currentPage = totalPages;
+  var start = (currentPage-1)*PAGE_SIZE;
+  var pageEnd = Math.min(start+PAGE_SIZE, filtered.length);
+  var rows = filtered.slice(start, pageEnd);
+  tbody.innerHTML = rows.map(function(o){
+    var alreadySentSession = o.status === "sent";
+    // Also check persistent sentOrderIds (survives page refresh in Live mode)
+    var alreadySentPersist = isOrderSentLive(o.shopifyOrderId || o.id);
+    var alreadySent = alreadySentSession || alreadySentPersist;
+    var isCancelled = o.status === "cancelled";
+    var carrier = (o.carrier || "").trim();
+    // AliExpress: fulfilled but no real carrier (carrier is "Other" or empty)
+    var isAliExpress = o.status === "fulfilled" && (!carrier || carrier.toLowerCase() === "other");
+    // Not Ready: unfulfilled (label not yet purchased from Shopify)
+    var isNotReady = (o.status === "unfulfilled");
+    // Send Label: fulfilled with a real carrier name = Shopify label purchased
+    var isReadyToSend = (o.status === "fulfilled" || o.status === "partial") && carrier && carrier.toLowerCase() !== "other";
+    // canSend: ready orders can always be manually sent (even if previously sent = Re-send)
+    var canSend = isReadyToSend;
+    var statusLabel = {fulfilled:"Fulfilled", partial:"Partial", cancelled:"Cancelled", sent:"Label Sent", unfulfilled:"Unfulfilled"}[o.status] || "Unfulfilled";
+    var items = o.items || [];
+    return "<tr>"
+      +"<td style='padding-left:18px'><input type='checkbox' class='cb'></td>"
+      +"<td><div class='onum'>"+o.num+"</div><div class='odate'>"+fmtDate(o.date)+"</div></td>"
+      +"<td><div class='cname'>"+o.customer.name+"</div><div class='caddr'>"+o.customer.addr.split(",").slice(-3).join(",").trim()+"</div></td>"
+      +"<td>"+items.slice(0,2).map(function(i){ return "<span class='chip'>"+(i.qty||1)+"x "+(i.title||"").split(" ").slice(-2).join(" ")+"</span>"; }).join("")+"</td>"
+      +"<td><span class='badge "+o.status+"'><span class='bdot'></span>"+statusLabel+"</span></td>"
+      +"<td><div class='amt'>"+o.total.toFixed(2)+"<span class='amtc'> "+o.currency+"</span></div></td>"
+      +"<td><button class='btn-send "+(isNotReady?"not-ready":isAliExpress?"no-label":alreadySent?"resend":"")+"' id='sendbtn-"+o.id+"' data-oid='"+o.id+"' "+(canSend?"":"disabled")+">"+(alreadySent?"Re-send ↺":isAliExpress?"No Label":isNotReady?"Not Ready":"Send Label")+"</button>"
+      +"<br><button id='lblbtn-"+o.id+"' data-oid='"+encodeURIComponent(o.shopifyOrderId||o.id)+"' data-oname='"+encodeURIComponent(o.num||'')+"' style='margin-top:5px;width:100%;padding:5px 8px;background:#F5F3E9;border:1.5px solid #C8A96E;border-radius:5px;font-size:10px;font-weight:600;color:#A6873A;cursor:pointer;' onclick='uploadLabelPDF(this,this.getAttribute(\"data-oid\"),this.getAttribute(\"data-oname\"))'>&#128206; Upload Label PDF</button></td>"
+      +"</tr>";
+  }).join("");
+  // Wire up send buttons via delegation - avoids inline onclick and Cloudflare issues
+  // Check label upload status for visible orders
+  setTimeout(function(){ checkLabelStatuses(rows); }, 300);
+  tbody.onclick = function(e){
+    var b = e.target;
+    if(b && b.className && b.className.indexOf("btn-send") >= 0 && !b.disabled){
+      sendOrderById(b.getAttribute("data-oid"));
+    }
+  };
+  pagBar.style.display = "flex";
+  el("pagInfo").textContent = "Showing "+(start+1)+"-"+pageEnd+" of "+filtered.length+" orders";
+  el("pagPrev").disabled = currentPage === 1;
+  el("pagNext").disabled = currentPage === totalPages;
+
+  // Dynamic page buttons - show window of pages around current page
+  var container = el("pagBtnContainer");
+  container.innerHTML = "";
+
+  // Build page number list to show (max 7 visible at a time)
+  var pages = [];
+  if (totalPages <= 7) {
+    // Show all pages if 7 or fewer
+    for (var i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    // Always show first, last, current, and neighbours
+    var start2 = Math.max(2, currentPage - 2);
+    var end2 = Math.min(totalPages - 1, currentPage + 2);
+    pages.push(1);
+    if (start2 > 2) pages.push('...');
+    for (var i = start2; i <= end2; i++) pages.push(i);
+    if (end2 < totalPages - 1) pages.push('...');
+    pages.push(totalPages);
+  }
+
+  pages.forEach(function(p) {
+    if (p === '...') {
+      var span = document.createElement('span');
+      span.style.cssText = 'display:flex;align-items:center;padding:0 4px;color:rgba(26,26,24,.35);font-size:13px;';
+      span.textContent = '...';
+      container.appendChild(span);
+    } else {
+      var btn = document.createElement('button');
+      btn.className = 'pag-btn' + (p === currentPage ? ' active' : '');
+      btn.textContent = p;
+      btn.onclick = (function(pg) { return function() { goPage(pg); }; })(p);
+      container.appendChild(btn);
+    }
+  });
+}
+
+function changePage(dir){
+  var total = Math.ceil(getFiltered().length/PAGE_SIZE);
+  currentPage = Math.max(1, Math.min(total, currentPage+dir));
+  renderTable(); window.scrollTo(0,0);
+}
+
+function goPage(p){ currentPage=p; renderTable(); window.scrollTo(0,0); }
+
+function updateStats(){
+  var uf=orders.filter(function(o){return o.status==="unfulfilled";}).length;
+  var fl=orders.filter(function(o){return o.status==="fulfilled";}).length;
+  var pt=orders.filter(function(o){return o.status==="partial";}).length;
+  el("stTotal").textContent=orders.length;
+  el("stPending").textContent=uf;
+  el("stSent").textContent=liveSent;
+  // testSent stat removed
+  el("fcAll").textContent=orders.length;
+  el("fcUF").textContent=uf;
+  el("fcFul").textContent=fl;
+  el("fcPart").textContent=pt;
+  // US Shipped: fulfilled/sent US orders within active date filter
+  var fromDate = el('dateFrom') ? el('dateFrom').value : '';
+  var toDate = el('dateTo') ? el('dateTo').value : '';
+  var usShipped = orders.filter(function(o) {
+    // Must be US order
+    if ((o.countryCode || '').toUpperCase() !== 'US') return false;
+    // Must have a real carrier - includes fulfilled AND partial (partially shipped from US)
+    // Excludes dropship orders (carrier empty or "Other")
+    var carrier = (o.carrier || '').trim().toLowerCase();
+    var hasRealCarrier = carrier && carrier !== 'other';
+    if (!hasRealCarrier) return false;
+    // Must be fulfilled, partial, sent, or previously sent via hub
+    var isShipped = o.status === 'fulfilled'
+      || o.status === 'partial'
+      || o.status === 'sent'
+      || isOrderSentLive(o.shopifyOrderId || o.id);
+    if (!isShipped) return false;
+    // Apply active date range filter
+    if (fromDate || toDate) {
+      var d = o.date ? o.date.substring(0,10) : '';
+      if (fromDate && d < fromDate) return false;
+      if (toDate && d > toDate) return false;
+    }
+    return true;
+  }).length;
+  var stUS = el('stUSShipped');
+  if (stUS) stUS.textContent = usShipped;
+  // Update period label
+  var period = el('stUSPeriod');
+  if (period) {
+    if (fromDate && toDate) {
+      period.textContent = fromDate + ' → ' + toDate;
+    } else if (fromDate) {
+      period.textContent = 'from ' + fromDate;
+    } else if (toDate) {
+      period.textContent = 'up to ' + toDate;
+    } else {
+      period.textContent = 'last 4 months';
+    }
+  }
+}
+
+function setFilter(f,btn){
+  activeFilter=f; currentPage=1;
+  document.querySelectorAll(".fbtn").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");
+  updateCountryCounts(); renderTable();
+}
+
+// setCountry replaced by setCountryFilter in dropdown
+
+function updateCountryCounts(){
+  var base=orders.filter(function(o){return activeFilter==="all"||o.status===activeFilter;});
+  var ccAll=el("ccAll"); if(ccAll) ccAll.textContent=base.length;
+  var ccUS=el("ccUS"); if(ccUS) ccUS.textContent=base.filter(function(o){return(o.countryCode||"").toUpperCase()==="US";}).length;
+  var ccAU=el("ccAU"); if(ccAU) ccAU.textContent=base.filter(function(o){return(o.countryCode||"").toUpperCase()==="AU";}).length;
+  var ccUK=el("ccUK"); if(ccUK) ccUK.textContent=base.filter(function(o){return(o.countryCode||"").toUpperCase()==="GB";}).length;
+}
+
+function toggleSelAll(cb){
+  document.querySelectorAll(".cb[data-id]").forEach(function(box){box.checked=cb.checked;});
+}
+
+function addLog(item){
+  logItems.unshift(Object.assign({},item,{time:new Date()}));
+  var e=el("actLog");
+  e.innerHTML=logItems.slice(0,100).map(function(l){
+    return "<div class='log-item'><div class='log-dot "+l.type+"'>"+l.icon+"</div><div><div class='log-msg'>"+l.msg+"</div><div class='log-det'>"+l.det+" | "+l.time.toLocaleTimeString()+"</div></div></div>";
+  }).join("");
+  // Auto-expand log when new entry arrives
+  showLog();
+}
+
+function clearLog(){
+  logItems=[];
+  el("actLog").innerHTML="<div class='log-empty'>Log cleared.</div>";
+}
+
+var logVisible = false;
+function toggleLog() {
+  logVisible = !logVisible;
+  el("actLog").style.display = logVisible ? "block" : "none";
+  el("logToggleIcon").textContent = logVisible ? "▼ Hide" : "▶ Show";
+}
+
+function showLog() {
+  if (!logVisible) {
+    logVisible = true;
+    el("actLog").style.display = "block";
+    el("logToggleIcon").textContent = "▼ Hide";
+  }
+}
+
+function fmtDate(iso){return new Date(iso).toLocaleDateString("en-AU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});}
+
+function showToast(msg,type){
+  var t=el("toast");
+  el("tIcon").textContent=type==="error"?"!":"ok";
+  el("tMsg").textContent=msg;
+  t.className="toast "+(type||"success")+" show";
+  setTimeout(function(){t.classList.remove("show");},3600);
+}
+
+// Init - runs after page loads
+window.onload = function(){
+  // Set email displays
+  el("gmailPill").textContent = LIVE_EMAIL;
+  el("activeAddr").textContent = LIVE_EMAIL;
+  el("emailHints").innerHTML = "Warehouse: "+LIVE_EMAIL;
+
+  // Dropdown options are now static HTML - no JS building needed
+  // Stop dropdown menu clicks from bubbling to document (prevents premature close)
+  var dropMenu = el('dropdownMenu');
+  if (dropMenu) {
+    dropMenu.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+    dropMenu.addEventListener('click', function(e) { e.stopPropagation(); });
+  }
+
+  // Date filters start blank - shows all orders loaded (last 2 months from API)
+  // User can narrow by selecting a date range
+
+  updateUI();
+  loadSentOrdersFromBlob(); // Load sent history from blob first
+  // Pre-fill email from settings panel if saved
+  try{
+    var savedEmail = localStorage.getItem('fc_email_us_warehouse') || '';
+    if(savedEmail){
+      customEmail = savedEmail;
+      var inp = el('customInput');
+      if(inp) inp.value = savedEmail;
+      updateUI();
+    }
+  }catch(e){}
+  loadOrders();
+};
+
+// Inline label PDF upload - triggers file picker and uploads directly to blob
+function uploadLabelPDF(btn, orderId, orderName) {
+  var inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/pdf,.pdf';
+  inp.onchange = function() {
+    var file = inp.files[0];
+    if (!file) return;
+    var originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.textContent = '⏳ Uploading...';
+    btn.style.color = '#888';
+    var fd = new FormData();
+    fd.append('label', file);
+    fd.append('orderId', decodeURIComponent(orderId));
+    fd.append('orderName', decodeURIComponent(orderName));
+    fetch('/api/upload-label?orderId=' + orderId + '&orderName=' + orderName, {
+      method: 'POST',
+      body: fd
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d.success) {
+        btn.textContent = '✓ Label Uploaded';
+        btn.style.background = '#ddd';
+        btn.style.color = '#999';
+        btn.style.borderColor = '#ccc';
+        btn.style.cursor = 'not-allowed';
+        btn.onclick = null;
+        btn.disabled = true;
+      } else {
+        btn.textContent = '✗ Upload Failed';
+        btn.style.color = '#e74c3c';
+        btn.disabled = false;
+        setTimeout(function() { btn.innerHTML = originalHTML; btn.style = ''; btn.disabled = false; }, 3000);
+      }
+    })
+    .catch(function() {
+      btn.textContent = '✗ Error';
+      btn.style.color = '#e74c3c';
+      btn.disabled = false;
+      setTimeout(function() { btn.innerHTML = originalHTML; btn.style = ''; btn.disabled = false; }, 3000);
+    });
+  };
+  inp.click();
+}
+</script>
+
+<script>
+window.addEventListener('message',function(e){
+  if(!e.data)return;
+  var d=e.data;
+
+  // Email settings
+  if(d.type==='FC_EMAIL_SETTINGS'){
+    try{
+      if(d.usWarehouseEmail){localStorage.setItem('fc_email_us_warehouse',d.usWarehouseEmail);customEmail=d.usWarehouseEmail;var inp=el('customInput');if(inp)inp.value=d.usWarehouseEmail;if(typeof updateUI==='function')updateUI();}
+    }catch(x){}
+  }
+
+  // Auto-send
+  if(d.type==='FC_AUTOSEND_SETTINGS'){
+    try{
+      autoOn=d.autoSend;
+      var cb=document.getElementById('autoChk');
+      if(cb)cb.checked=d.autoSend;
+      localStorage.setItem('fc_auto_send',d.autoSend?'true':'false');
+    }catch(x){}
+  }
+
+  // Display settings
+  if(d.type==='FC_DISPLAY_SETTINGS'){
+    try{localStorage.setItem('fc_orders_per_page',d.ordersPerPage);localStorage.setItem('fc_date_range',d.dateRange);}catch(x){}
+  }
+
+  // Sync trigger
+  if(d.type==='FC_SYNC_TRIGGER'&&d.hub==='fulfillment'){
+    try{if(typeof loadOrders==='function')loadOrders();}catch(x){}
+  }
+});
+
+// On load: apply saved settings
+window.addEventListener('load',function(){
+  try{
+    var u=localStorage.getItem('fc_email_us_warehouse');
+    if(u){customEmail=u;var inp=el('customInput');if(inp)inp.value=u;if(typeof updateUI==='function')updateUI();}
+    var auto=localStorage.getItem('fc_auto_send')==='true';
+    if(auto){autoOn=true;var cb=document.getElementById('autoChk');if(cb)cb.checked=true;}
+  }catch(x){}
+});
+</script>
+</body>
+</html>

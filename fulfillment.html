@@ -184,26 +184,7 @@ html.in-iframe .layout{min-height:calc(100vh);}
 </header>
 <div class="layout">
   <aside class="sidebar">
-    <div class="email-box">
-      <div class="eb-title">Email Destination</div>
-      
-
-      <div class="email-show">
-        <div class="email-show-lbl">Currently sending to</div>
-        <div class="email-show-addr" id="activeAddr">Loading...</div>
-      </div>
-      <div style="font-size:9px;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Custom address</div>
-      <div class="custom-row">
-        <input class="custom-input" type="email" id="customInput" placeholder="any@email.com">
-        <button class="btn-set" onclick="setCustom()">Set</button>
-      </div>
-      <div id="emailHints" style="margin-top:9px;font-size:10px;color:rgba(255,255,255,.28);line-height:1.7;"></div>
-    </div>
     <div class="sb-sec">
-      <div class="auto-row">
-        <div class="auto-txt"><strong>Auto-Send</strong>On every label purchase</div>
-        <label class="tog"><input type="checkbox" id="autoChk" onchange="toggleAuto(this)"><span class="tog-sl"></span></label>
-      </div>
       <div class="sb-lbl">Stats</div>
       <div class="stats">
         <div class="stat"><div class="stat-n" id="stTotal">0</div><div class="stat-l">Orders</div></div>
@@ -214,6 +195,10 @@ html.in-iframe .layout{min-height:calc(100vh);}
           <div class="stat-n" id="stUSShipped" style="color:#C8A96E">0</div>
           <div class="stat-l" style="color:rgba(200,169,110,.8);">Shipped from US Warehouse <span style="font-size:9px;color:rgba(255,255,255,.3);display:block;margin-top:1px;" id="stUSPeriod">last 2 months</span></div>
         </div>
+      </div>
+      <div class="auto-row">
+        <div class="auto-txt"><strong>Auto-Send</strong>On every label purchase</div>
+        <label class="tog"><input type="checkbox" id="autoChk" onchange="toggleAuto(this)"><span class="tog-sl"></span></label>
       </div>
     </div>
     <div class="divider"></div>

@@ -637,10 +637,6 @@ html.in-iframe .layout{height:100vh;}
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
         Thresholds
       </button>
-      <button class="nav-btn" onclick="setView('email-settings',this)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12a1 1 0 011 1v8a1 1 0 01-1 1H2a1 1 0 01-1-1V4a1 1 0 011-1zm0 0l6 5 6-5"/></svg>
-        Email
-      </button>
     </div>
   </div>
 
@@ -935,93 +931,8 @@ html.in-iframe .layout{height:100vh;}
     </div>
 
     <!-- TAG SETUP -->
-    <div class="view" id="view-email-settings">
-      <div class="page-hdr">
-        <div>
-          <div class="page-title">EMAIL <em>SETTINGS</em></div>
-          <div class="page-sub">Configure default email addresses used across the app</div>
-        </div>
-      </div>
 
-      <!-- SUPPLIER EMAIL -->
-      <div class="card" style="margin-bottom:12px">
-        <div class="card-hdr">
-          <div>
-            <div class="card-title">DEFAULT SUPPLIER EMAIL</div>
-            <div class="card-sub">Pre-filled in every new restock order — save time so you don't type it each time</div>
-          </div>
-        </div>
-        <div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
-          <div>
-            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">Supplier Email Address</label>
-            <input type="email" id="defaultSupplierEmail" placeholder="supplier@company.com"
-              style="width:100%;max-width:400px;padding:8px 12px;font-size:13px;border:1.5px solid var(--border2);border-radius:7px;outline:none;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);transition:border-color .15s"
-              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"
-              oninput="emailSettingsDirty()" onkeydown="if(event.key==='Enter')saveEmailSettings()">
-          </div>
-          <div>
-            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">Supplier / Company Name</label>
-            <input type="text" id="defaultSupplierName" placeholder="e.g. Shenzhen Tech Co."
-              style="width:100%;max-width:400px;padding:8px 12px;font-size:13px;border:1.5px solid var(--border2);border-radius:7px;outline:none;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);transition:border-color .15s"
-              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"
-              oninput="emailSettingsDirty()" onkeydown="if(event.key==='Enter')saveEmailSettings()">
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <button class="btn-sol gold" id="saveEmailSettingsBtn" onclick="saveEmailSettings()" style="opacity:.4;pointer-events:none">Save</button>
-            <span id="emailSettingsSaved" style="font-size:11px;color:var(--green);display:none">✓ Saved</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- US WAREHOUSE EMAIL -->
-      <div class="card" style="margin-bottom:12px">
-        <div class="card-hdr">
-          <div>
-            <div class="card-title">US WAREHOUSE EMAIL</div>
-            <div class="card-sub">Email address of the US warehouse team — notified on delivery confirmations and stock alerts</div>
-          </div>
-        </div>
-        <div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
-          <div>
-            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">US Warehouse Email</label>
-            <input type="email" id="usWarehouseEmail" placeholder="us-warehouse@foldifycase.com"
-              style="width:100%;max-width:400px;padding:8px 12px;font-size:13px;border:1.5px solid var(--border2);border-radius:7px;outline:none;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);transition:border-color .15s"
-              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"
-              oninput="emailSettingsDirty()" onkeydown="if(event.key==='Enter')saveEmailSettings()">
-          </div>
-          <div style="font-size:11px;color:rgba(26,26,24,.4);line-height:1.5">
-            Used as the default notification email when confirming deliveries to the US warehouse.
-          </div>
-        </div>
-      </div>
-
-      <!-- FROM EMAIL -->
-      <div class="card">
-        <div class="card-hdr">
-          <div>
-            <div class="card-title">SENDING EMAIL ADDRESS</div>
-            <div class="card-sub">The "From" address used for stock alert emails and supplier purchase orders</div>
-          </div>
-        </div>
-        <div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
-          <div>
-            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">From Name</label>
-            <input class="field-input" type="text" id="fromName" value="FoldifyCase Warehouse" placeholder="FoldifyCase Warehouse"
-              style="max-width:400px" oninput="saveRecipients()">
-          </div>
-          <div>
-            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">From Email</label>
-            <input class="field-input" type="email" id="fromEmail" placeholder="warehouse@foldifycase.com.au"
-              style="max-width:400px" oninput="saveRecipients()">
-          </div>
-          <div style="font-size:11px;color:rgba(26,26,24,.4);line-height:1.5">
-            Must be a verified sending domain in your Resend account. Currently verified: <strong>foldifycase.com.au</strong>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
+</div>
 </div>
 
 <div class="toast" id="toast"><span id="tMsg"></span></div>

@@ -163,7 +163,17 @@ td:first-child{padding-left:18px;}
 .toast.error{border-left:4px solid var(--red);}
 .toast.info{border-left:4px solid var(--gold);}
 .toast.test{border-left:4px solid var(--blue);}
+
+/* Hide topbar when loaded inside parent iframe */
+html.in-iframe .topbar { display: none !important; }
+html.in-iframe .layout { min-height: 100vh; }
 </style>
+
+<script>
+if(window.self !== window.top){
+  document.documentElement.classList.add('in-iframe');
+}
+</script>
 </head>
 <body>
 <header class="topbar">

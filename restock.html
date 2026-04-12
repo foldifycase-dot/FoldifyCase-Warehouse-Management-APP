@@ -242,7 +242,17 @@ td:first-child{padding-left:18px;}
 .toast.show{opacity:1;transform:translateY(0);}
 .toast.ok{border-left-color:var(--green);}
 .toast.err{border-left-color:var(--red);}
+
+/* Hide topbar when loaded inside parent iframe */
+html.in-iframe .topbar { display: none !important; }
+html.in-iframe .layout { min-height: 100vh; }
 </style>
+
+<script>
+if(window.self !== window.top){
+  document.documentElement.classList.add('in-iframe');
+}
+</script>
 </head>
 <body>
 
@@ -902,7 +912,13 @@ async function sendToSupplier(order){
 
   const emailBody=`<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+if(window.self !== window.top){
+  document.documentElement.classList.add('in-iframe');
+}
+</script>
+</head>
 <body style="margin:0;padding:0;background:#E8E5DB;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#E8E5DB;padding:32px 0">
 <tr><td align="center">
@@ -1276,7 +1292,13 @@ async function emailWarehouse(orderId){
 
   const emailHtml=`<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+if(window.self !== window.top){
+  document.documentElement.classList.add('in-iframe');
+}
+</script>
+</head>
 <body style="margin:0;padding:0;background:#E8E5DB;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#E8E5DB;padding:32px 0">
 <tr><td align="center">
@@ -2693,6 +2715,12 @@ function generatePrintableHTML(order){
     thead th:last-child{text-align:right;}
     .footer-note{padding:20px 40px;text-align:center;font-size:11px;color:#BBB;border-top:1px solid #F0EDE8;letter-spacing:.04em;}
   </style>
+
+<script>
+if(window.self !== window.top){
+  document.documentElement.classList.add('in-iframe');
+}
+</script>
 </head>
 <body>
 <div class="page">

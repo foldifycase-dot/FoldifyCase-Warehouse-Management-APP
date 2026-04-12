@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoldifyCase — Warehouse</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",sans-serif;}
+.tabbar{display:flex;align-items:center;height:48px;background:#1A1A18;border-bottom:3px solid #C8A96E;padding:0 20px;gap:4px;position:fixed;top:0;left:0;right:0;z-index:9999;}
+.tabbar-logo{display:flex;align-items:center;gap:10px;margin-right:16px;}
+.tabbar-logo-name{font-family:"Syne",sans-serif;font-weight:800;font-size:13px;color:#fff;letter-spacing:.06em;}
+.tab-divider{width:1px;height:20px;background:rgba(255,255,255,.12);margin:0 6px;}
+.tab{display:flex;align-items:center;gap:6px;padding:0 16px;height:36px;border-radius:7px;border:1px solid transparent;background:transparent;color:rgba(255,255,255,.5);font-family:"Inter",sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.tab:hover{background:rgba(255,255,255,.07);color:#fff;}
+.tab.active{background:rgba(200,169,110,.15);border-color:rgba(200,169,110,.3);color:#C8A96E;font-weight:600;}
+.tab svg{opacity:.6;flex-shrink:0;}
+.tab.active svg{opacity:1;}
+.app-wrap{position:fixed;top:48px;left:0;right:0;bottom:0;}
+.app-frame{width:100%;height:100%;border:none;display:none;}
+.app-frame.active{display:block;}
+</style>
+</head>
+<body>
+<div class="tabbar">
+  <div class="tabbar-logo">
+    <div class="tabbar-logo-name">FOLDIFYCASE</div>
+  </div>
+  <div class="tab-divider"></div>
+  <button class="tab active" id="tab-fulfillment" onclick="switchTab('fulfillment')">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12l1 3H1L2 2zm-1 4h14v7a1 1 0 01-1 1H2a1 1 0 01-1-1V6z"/></svg>
+    Fulfillment Hub
+  </button>
+  <button class="tab" id="tab-restock" onclick="switchTab('restock')">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h6v6H1V1zm8 0h6v6H9V1zM1 9h6v6H1V9zm8 0h6v6H9V9z"/></svg>
+    Restock Manager
+  </button>
+</div>
+<div class="app-wrap">
+  <iframe id="frame-fulfillment" class="app-frame active" src="/fulfillment.html" title="Fulfillment Hub"></iframe>
+  <iframe id="frame-restock" class="app-frame" src="/restock.html" title="Restock Manager"></iframe>
+</div>
+<script>
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.app-frame').forEach(f=>f.classList.remove('active'));
+  document.getElementById('frame-'+name).classList.add('active');
+  try{localStorage.setItem('fc_active_tab',name);}catch(e){}
+}
+window.onload=function(){
+  try{const last=localStorage.getItem('fc_active_tab');if(last==='restock')switchTab('restock');}catch(e){}
+};
+</script>
+</body>
+</html>

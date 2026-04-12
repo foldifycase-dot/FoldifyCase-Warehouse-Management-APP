@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "routes": [
+    { "src": "/api/proxy", "dest": "/api/proxy.js" },
+    { "src": "/api/order-view", "dest": "/api/order-view.js" },
+    { "src": "/api/orders", "dest": "/api/orders.js" },
+    { "src": "/api/webhook", "dest": "/api/webhook.js" },
+    { "src": "/api/packing-slip", "dest": "/api/packing-slip.js" },
+    { "src": "/api/label-proxy", "dest": "/api/label-proxy.js" },
+    { "src": "/api/upload-image", "dest": "/api/upload-image.js" },
+    { "src": "/api/upload-label", "dest": "/api/upload-label.js" },
+    { "src": "/api/check-label", "dest": "/api/check-label.js" },
+    { "src": "/api/print-label", "dest": "/api/print-label.js" },
+    { "src": "/api/sent-orders", "dest": "/api/sent-orders.js" },
+    { "src": "/api/fulfillment-webhook", "dest": "/api/fulfillment-webhook.js" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
+    }
+  ]
+}

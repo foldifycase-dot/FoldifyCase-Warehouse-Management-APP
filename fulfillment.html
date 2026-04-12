@@ -41,6 +41,8 @@ body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;fon
 .stat-n{font-family:"Inter",sans-serif;font-weight:700;font-size:17px;color:var(--gold);line-height:1;}
 .stat-l{font-size:10px;color:rgba(255,255,255,.35);margin-top:3px;}
 .divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:8px 14px;}
+.sb-divider-gap{border:none;border-top:1px solid rgba(255,255,255,.07);margin:10px 14px 16px;}
+.sb-section-hdr{padding:12px 14px 0;}
 .auto-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:7px 10px;margin:0 14px 8px;}
 .auto-txt{font-size:10px;color:rgba(255,255,255,.35);}
 .auto-txt strong{color:#6fd6a0;display:inline;font-size:11px;font-weight:600;margin-right:5px;}
@@ -199,9 +201,11 @@ html.in-iframe .layout{min-height:calc(100vh);}
         <label class="tog"><input type="checkbox" id="autoChk" onchange="toggleAuto(this)"><span class="tog-sl"></span></label>
       </div>
     </div>
-    <div class="divider"></div>
+    <div class="sb-divider-gap"></div>
     <div class="filters">
-      <div class="sb-lbl">Filter Orders</div>
+      <div class="sb-section-hdr">
+        <div class="sb-lbl">Filter Orders</div>
+      </div>
       <button class="fbtn active" onclick="setFilter('all',this)">
         <span style="display:flex;align-items:center;gap:8px;"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="opacity:.7;flex-shrink:0"><path d="M1 1h14v2H1V1zm2 4h10v2H3V5zm2 4h6v2H5V9zm1 4h4v2H6v-2z"/></svg>All Orders</span>
         <span class="fc" id="fcAll">0</span>

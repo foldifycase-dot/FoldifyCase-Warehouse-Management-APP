@@ -13,6 +13,9 @@
     { "src": "/api/print-label", "dest": "/api/print-label.js" },
     { "src": "/api/sent-orders", "dest": "/api/sent-orders.js" },
     { "src": "/api/fulfillment-webhook", "dest": "/api/fulfillment-webhook.js" },
+    { "src": "/fulfillment.html", "dest": "/fulfillment.html" },
+    { "src": "/restock.html", "dest": "/restock.html" },
+    { "src": "/", "dest": "/index.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
   "headers": [

@@ -110,7 +110,6 @@ body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;fon
 .chip.active{background:var(--ink);color:var(--cream);border-color:var(--ink);}
 
 /* TABLE */
-.tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
 thead th{padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,24,.4);background:#EAE7D8;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap;}
 thead th:first-child{padding-left:18px;}
@@ -245,6 +244,41 @@ td:first-child{padding-left:18px;}
 
 html.in-iframe .topbar{display:none!important;}
 html.in-iframe .layout{min-height:100vh;}
+
+/* ── PRODUCT TABLE ─────────────────────────────────────────────── */
+.prod-img-wrap{display:flex;align-items:center;gap:10px;min-width:0;}
+.prod-img{width:44px;height:44px;border-radius:6px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;display:block;}
+.prod-img-placeholder{width:44px;height:44px;border-radius:6px;background:var(--cream);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.pname{font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;}
+.pmeta{font-size:11px;color:rgba(26,26,24,.4);margin-top:2px;}
+.prod-expand-arrow{font-size:9px;color:var(--gold);transition:transform .2s;display:inline-block;}
+.variant-name{font-size:12px;color:rgba(26,26,24,.65);}
+.variant-row td{background:rgba(245,243,233,.5);}
+.variant-rows{border-top:none;}
+.btn-restock{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(200,169,110,.12);border:1.5px solid rgba(200,169,110,.3);border-radius:5px;color:var(--gold);font-size:10px;font-weight:600;font-family:"Inter",sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-restock:hover{background:var(--gold);color:var(--ink);}
+.tbl-wrap{overflow-x:auto;}
+.variant-row td{padding:8px 14px;}
+.bar-wrap{width:60px;height:5px;background:rgba(26,26,24,.08);border-radius:2px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:2px;transition:width .3s;}
+.fill-ok{background:var(--green);}
+.fill-low{background:var(--gold);}
+.fill-crit{background:var(--red);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;font-size:10px;font-weight:600;}
+.bdot{width:5px;height:5px;border-radius:50%;}
+.b-crit{background:rgba(201,64,64,.1);color:var(--red);}
+.b-crit .bdot{background:var(--red);}
+.b-low{background:rgba(200,169,110,.15);color:#8a6920;}
+.b-low .bdot{background:var(--gold);}
+.b-ok{background:rgba(61,122,90,.1);color:var(--green);}
+.b-ok .bdot{background:var(--green);}
+.empty-state{padding:48px 24px;text-align:center;color:rgba(26,26,24,.35);font-size:13px;}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+/* ── LAYOUT FIX FOR IFRAME ─────────────────────────────────────── */
+html,body{height:100%;}
+html.in-iframe body{overflow:hidden;}
+html.in-iframe .layout{height:100vh;}
 </style>
 <script>
 if(window.self !== window.top){

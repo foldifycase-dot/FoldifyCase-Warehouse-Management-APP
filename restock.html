@@ -243,11 +243,9 @@ td:first-child{padding-left:18px;}
 .toast.ok{border-left-color:var(--green);}
 .toast.err{border-left-color:var(--red);}
 
-/* Hide topbar when loaded inside parent iframe */
-html.in-iframe .topbar { display: none !important; }
-html.in-iframe .layout { min-height: 100vh; }
+html.in-iframe .topbar{display:none!important;}
+html.in-iframe .layout{min-height:100vh;}
 </style>
-
 <script>
 if(window.self !== window.top){
   document.documentElement.classList.add('in-iframe');
@@ -913,13 +911,7 @@ async function sendToSupplier(order){
 
   const emailBody=`<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script>
-if(window.self !== window.top){
-  document.documentElement.classList.add('in-iframe');
-}
-</script>
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#E8E5DB;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#E8E5DB;padding:32px 0">
 <tr><td align="center">
@@ -997,7 +989,8 @@ if(window.self !== window.top){
   <!-- CONFIRM ACTION BANNER — replaces "Upload Packing Image" -->
   <tr><td style="background:#F5F3E9;padding:24px 32px;text-align:center;border-top:1px solid #EDEAE0">
     <div style="font-size:13px;color:#555;margin-bottom:14px">📬 Please confirm you have received this order and can fulfil the quantities listed above.</div>
-    <a href="/cdn-cgi/l/email-protection#5d79263b2f323018303c343120622e283f37383e29600f18677d0d282f3e353c2e387d122f39382f7d7926322f39382f733439207dbfddc97d1e32333b342f3038397b3f3239246015347d1b323139343b241e3c2e387d29383c3071786d1c786d1c147d3e32333b342f307d2f383e38342d297d323b7d0d282f3e353c2e387d122f39382f7d7926322f39382f733439207d3c33397d3e3c337d3b28313b34317d3c31317d31342e2938397d2c283c3329342934382e73786d1c786d1c18252d383e2938397d39342e2d3c293e35677d786d1c786d1c0f383a3c2f392e71" style="display:inline-block;background:#1A1A18;color:#C8A96E;font-size:13px;font-weight:700;letter-spacing:.06em;padding:14px 32px;border-radius:8px;text-decoration:none;font-family:Arial,sans-serif">
+    <a href="mailto:${fromEmail}?subject=RE: Purchase Order ${order.id} — Confirmed&body=Hi FoldifyCase team,%0A%0AI confirm receipt of Purchase Order ${order.id} and can fulfil all listed quantities.%0A%0AExpected dispatch: %0A%0ARegards," 
+       style="display:inline-block;background:#1A1A18;color:#C8A96E;font-size:13px;font-weight:700;letter-spacing:.06em;padding:14px 32px;border-radius:8px;text-decoration:none;font-family:Arial,sans-serif">
       ✅ &nbsp;CONFIRM THIS ORDER
     </a>
   </td></tr>
@@ -1013,10 +1006,10 @@ if(window.self !== window.top){
 </table>
 </td></tr>
 </table>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body></html>`;
+</body></html>`;
 
   try{
-    const fromEmail=document.getElementById('fromEmail')?.value||'<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0f786e7d6a67607a7c6a4f6960636b6669766c6e7c6a216c6062216e7a">[email&#160;protected]</a>';
+    const fromEmail=document.getElementById('fromEmail')?.value||'warehouse@foldifycase.com.au';
     const payload={
       to:[order.supplierEmail],
       from_name:'FoldifyCase Warehouse',
@@ -1046,7 +1039,7 @@ if(window.self !== window.top){
       const errMsg=result.error||result.message||result.raw||'Unknown error — check Vercel logs';
       console.error('[PO Email] Failed:',result);
       showToast('Email failed: '+errMsg,'err');
-      alert('Supplier email failed:\n\n'+errMsg+'\n\nCheck that:\n1. RESEND_API_KEY is set in Vercel env vars\n2. From email uses verified domain (foldifycase.com.au)\n3. Vercel function logs for details');
+      alert('Supplier email failed:\n\n'+errMsg+'\n\nCheck browser console (F12) and Vercel function logs for details.');
     }
   }catch(e){
     console.error('[PO Email] Network error:',e);
@@ -1264,7 +1257,7 @@ async function emailWarehouse(orderId){
     return;
   }
 
-  const fromEmail=document.getElementById('fromEmail')?.value||'<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c1b6a0b3a4a9aeb4b2a481a7aeada5a8a7b8a2a0b2a4efa2aeacefa0b4">[email&#160;protected]</a>';
+  const fromEmail=document.getElementById('fromEmail')?.value||'warehouse@foldifycase.com.au';
   const fromName=document.getElementById('fromName')?.value||'FoldifyCase';
   const totalQty=order.lines.reduce((s,l)=>s+l.qty,0);
   const shipLabel=order.ship==='air'?'✈ Air — Express':'⛵ Sea — Standard';
@@ -1292,13 +1285,7 @@ async function emailWarehouse(orderId){
 
   const emailHtml=`<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-if(window.self !== window.top){
-  document.documentElement.classList.add('in-iframe');
-}
-</script>
-</head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#E8E5DB;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#E8E5DB;padding:32px 0">
 <tr><td align="center">
@@ -1411,7 +1398,6 @@ if(window.self !== window.top){
   }catch(e){
     showToast('Email failed: '+e.message,'err');
     console.error('[emailWarehouse]',e);
-    alert('Warehouse email failed:\n\n'+e.message+'\n\nCheck browser console (F12) → Network tab for details.');
   }
 }
 
@@ -2715,12 +2701,6 @@ function generatePrintableHTML(order){
     thead th:last-child{text-align:right;}
     .footer-note{padding:20px 40px;text-align:center;font-size:11px;color:#BBB;border-top:1px solid #F0EDE8;letter-spacing:.04em;}
   </style>
-
-<script>
-if(window.self !== window.top){
-  document.documentElement.classList.add('in-iframe');
-}
-</script>
 </head>
 <body>
 <div class="page">
@@ -2746,4 +2726,33 @@ if(window.self !== window.top){
       <div class="info-val">${shipLabel}</div>
       <div class="info-chip">ETA ${order.eta}</div>
     </div>
-    ${order.tracking?`<div class="info-col"><div class="info-label">Tracking</div><div class="info-val" s
+    ${order.tracking?`<div class="info-col"><div class="info-label">Tracking</div><div class="info-val" style="font-family:'Courier New',monospace;font-size:12px;color:#2D5FA6">${order.tracking}</div></div>`:''}
+  </div>
+  <div class="items-count">${order.lines.length} item${order.lines.length!==1?'s':''} to receive</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:72px">IMAGE</th>
+        <th>PRODUCT</th>
+        <th style="text-align:right">QTY</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="footer-note">FOLDIFYCASE — Please verify all items upon arrival and update inventory in Shopify.</div>
+</div>
+</body></html>`;
+}
+
+function showPrintableOrder(order){
+  window.open(`/api/order-view?id=${order.id}`,'_blank');
+}
+
+
+startLoad();
+
+
+
+</script>
+</body>
+</html>

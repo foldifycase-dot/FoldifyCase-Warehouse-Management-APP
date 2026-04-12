@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FoldifyCase — Warehouse</title>
+<title>FoldifyCase Warehouse</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -33,16 +33,16 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
   <div class="tab-divider"></div>
   <button class="tab active" id="tab-fulfillment" onclick="switchTab('fulfillment')">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h12l1 3H1L2 2zm-1 4h14v7a1 1 0 01-1 1H2a1 1 0 01-1-1V6z"/></svg>
-    Fulfillment Hub
+    Fulfillment Management Hub
   </button>
   <button class="tab" id="tab-restock" onclick="switchTab('restock')">
     <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h6v6H1V1zm8 0h6v6H9V1zM1 9h6v6H1V9zm8 0h6v6H9V9z"/></svg>
-    Restock Manager
+    Stock Management Hub
   </button>
 </div>
 <div class="app-wrap">
-  <iframe id="frame-fulfillment" class="app-frame active" src="/fulfillment.html" title="Fulfillment Hub"></iframe>
-  <iframe id="frame-restock" class="app-frame" src="/restock.html" title="Restock Manager"></iframe>
+  <iframe id="frame-fulfillment" class="app-frame active" src="/fulfillment.html" title="Fulfillment Management Hub"></iframe>
+  <iframe id="frame-restock" class="app-frame" src="/restock.html" title="Stock Management Hub"></iframe>
 </div>
 <script>
 function switchTab(name){

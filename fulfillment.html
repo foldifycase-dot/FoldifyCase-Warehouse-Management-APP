@@ -501,7 +501,12 @@ function setCountryFilter(code, btn) {
   currentPage = 1;
   renderTable();
 }
-function getEmail(){ return customEmail || LIVE_EMAIL; }
+function getEmail(){
+  // Check settings panel email first, then customEmail, then hardcoded
+  var settingsEmail = '';
+  try{ settingsEmail = localStorage.getItem('fc_email_us_warehouse') || ''; }catch(e){}
+  return customEmail || settingsEmail || LIVE_EMAIL;
+}
 
 function setCustom(){
   var v = el("customInput").value.trim();
@@ -1047,7 +1052,18 @@ window.onload = function(){
   // User can narrow by selecting a date range
 
   updateUI();
-  loadSentOrdersFromBlob(); // Load sent history from blob first
+  loadSentOrdersFromBlob(); // Load sent history fro
+  // Pre-fill email from settings panel if saved
+  try{
+    var savedEmail = localStorage.getItem('fc_email_us_warehouse') || '';
+    if(savedEmail){
+      customEmail = savedEmail;
+      var inp = el('customInput');
+      if(inp) inp.value = savedEmail;
+      updateUI();
+    }
+  }catch(e){}
+m blob first
   loadOrders();
 };
 

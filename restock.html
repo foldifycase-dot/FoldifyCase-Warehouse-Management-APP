@@ -1182,7 +1182,7 @@ function openRestock(){
   document.getElementById('restockOrderDate').value=todayStr();
   document.getElementById('restockNotes').value='';
   // Pre-fill from saved default supplier email
-  const defEmail=localStorage.getItem('fc_default_supplier_email')||'';
+  const defEmail=localStorage.getItem('fc_email_supplier')||localStorage.getItem('fc_default_supplier_email')||'';
   const defName=localStorage.getItem('fc_default_supplier_name')||'';
   document.getElementById('supplierEmail').value=defEmail;
   document.getElementById('supplierName').value=defName;
@@ -1790,7 +1790,8 @@ async function emailWarehouse(orderId){
   if(!order)return;
 
   // Get warehouse email from settings
-  const warehouseEmail=localStorage.getItem('fc_delivery_notify')||'';
+  // Read warehouse email - check settings panel key first, then legacy key
+  const warehouseEmail=localStorage.getItem('fc_email_us_warehouse')||localStorage.getItem('fc_delivery_notify')||(document.getElementById('usWarehouseEmail')?.value||'').trim();
   if(!warehouseEmail){
     showToast('Set a US Warehouse email in Settings → Email first','err');
     // Switch to email settings view
@@ -3302,7 +3303,12 @@ startLoad();
 window.addEventListener('message',function(e){
   if(!e.data||e.data.type!=='FC_EMAIL_SETTINGS')return;
   try{
-    if(e.data.usWarehouseEmail){localStorage.setItem('fc_email_us_warehouse',e.data.usWarehouseEmail);var a=document.getElementById('usWarehouseEmail');if(a&&!a.value)a.value=e.data.usWarehouseEmail;}
+    if(e.data.usWarehouseEmail){
+      localStorage.setItem('fc_email_us_warehouse',e.data.usWarehouseEmail);
+      localStorage.setItem('fc_delivery_notify',e.data.usWarehouseEmail);
+      var a=document.getElementById('usWarehouseEmail');
+      if(a)a.value=e.data.usWarehouseEmail;
+    }
     if(e.data.supplierEmail){localStorage.setItem('fc_email_supplier',e.data.supplierEmail);localStorage.setItem('fc_default_supplier_email',e.data.supplierEmail);var b=document.getElementById('defaultSupplierEmail');if(b&&!b.value)b.value=e.data.supplierEmail;var c=document.getElementById('supplierEmail');if(c&&!c.value)c.value=e.data.supplierEmail;}
   }catch(x){}
 });

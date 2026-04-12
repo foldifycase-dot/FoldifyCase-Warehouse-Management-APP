@@ -239,8 +239,11 @@ const EMAIL_KEYS = {
 
 function loadEmailSettings(){
   try{
-    document.getElementById('sp-usEmail').value = localStorage.getItem(EMAIL_KEYS.usWarehouse)||'';
-    document.getElementById('sp-supplierEmail').value = localStorage.getItem(EMAIL_KEYS.supplier)||'';
+    // Read from our key first, fall back to legacy keys from individual hubs
+    var us = localStorage.getItem(EMAIL_KEYS.usWarehouse) || localStorage.getItem('fc_delivery_notify') || '';
+    var sup = localStorage.getItem(EMAIL_KEYS.supplier) || localStorage.getItem('fc_default_supplier_email') || '';
+    document.getElementById('sp-usEmail').value = us;
+    document.getElementById('sp-supplierEmail').value = sup;
   }catch(e){}
 }
 
@@ -248,10 +251,16 @@ function saveEmailSettings(){
   const usEmail = document.getElementById('sp-usEmail').value.trim();
   const supplierEmail = document.getElementById('sp-supplierEmail').value.trim();
 
-  // Save to localStorage
+  // Save to localStorage - write all key variants so both hubs pick it up
   try{
-    if(usEmail) localStorage.setItem(EMAIL_KEYS.usWarehouse, usEmail);
-    if(supplierEmail) localStorage.setItem(EMAIL_KEYS.supplier, supplierEmail);
+    if(usEmail){
+      localStorage.setItem(EMAIL_KEYS.usWarehouse, usEmail);   // fc_email_us_warehouse
+      localStorage.setItem('fc_delivery_notify', usEmail);      // restock legacy key
+    }
+    if(supplierEmail){
+      localStorage.setItem(EMAIL_KEYS.supplier, supplierEmail);         // fc_email_supplier
+      localStorage.setItem('fc_default_supplier_email', supplierEmail); // restock legacy key
+    }
   }catch(e){}
 
   // Broadcast to both iframes
@@ -259,6 +268,9 @@ function saveEmailSettings(){
     type: 'FC_EMAIL_SETTINGS',
     usWarehouseEmail: usEmail,
     supplierEmail: supplierEmail,
+    // Include legacy key values for compatibility
+    fc_delivery_notify: usEmail,
+    fc_default_supplier_email: supplierEmail,
   };
   ['frame-fulfillment','frame-restock'].forEach(id=>{
     try{

@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
   if (!orderName) return res.status(400).json({ exists: false, error: 'No orderName' });
 
   const nameClean = orderName.replace(/#/g, '').trim();
-  const prefix = 'Shipping Labels/Order ' + nameClean;
+  const prefix = 'Shipping Labels/Order_' + nameClean.replace(/\s+/g,'_');
 
   console.log('Checking blob prefix:', prefix);
   const blobs = await listBlob(prefix);

@@ -218,7 +218,11 @@ const handler = async (req, res) => {
 
     // Match existing naming: "Shipping Label/Order 2162.pdf"
     const nameClean = (orderName || orderId || 'unknown').replace(/[^a-z0-9 ]/gi, ' ').trim();
-    const blobPath = 'Shipping Labels/Order ' + nameClean + '.pdf';
+    const nowL = new Date();
+    const dayL = String(nowL.getDate()).padStart(2,'0');
+    const monthL = String(nowL.getMonth()+1).padStart(2,'0');
+    const yearL = nowL.getFullYear();
+    const blobPath = 'Shipping Labels/Order_' + nameClean.replace(/\s+/g,'_') + '_' + dayL + '_' + monthL + '_' + yearL + '.pdf';
     console.log('Saving to blob:', blobPath);
 
     const result = await uploadBlob(blobPath, 'application/pdf', labelPart.data);

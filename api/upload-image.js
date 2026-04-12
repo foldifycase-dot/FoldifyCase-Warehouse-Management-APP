@@ -244,6 +244,7 @@ const handler = async (req, res) => {
     const day = String(now.getDate()).padStart(2,'0');
     const month = String(now.getMonth()+1).padStart(2,'0');
     const year = now.getFullYear();
+    // Filename: OrderNumber_DD_MM_YYYY - blob browser sorts by Modified Date (newest first by default)
     const blobPath = 'Packing_Images/Order_' + nameClean + '_' + day + '_' + month + '_' + year + '.' + ext;
     console.log('Saving as:', blobPath);
 

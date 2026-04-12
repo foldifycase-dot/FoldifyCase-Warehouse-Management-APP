@@ -56,7 +56,7 @@ const FROM_EMAIL = process.env.FROM_EMAIL || 'warehouse@foldifycase.com.au';
 const SHOPIFY_DOMAIN = process.env.SHOPIFY_DOMAIN || '';
 const SHOPIFY_TOKEN = process.env.SHOPIFY_TOKEN || '';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
-const VERCEL_URL = 'https://warehouse-stock-management-app.vercel.app';
+const VERCEL_URL = process.env.APP_URL || '';
 
 function getCountryCode(addr) {
   if (addr.country_code) return addr.country_code.toUpperCase();
@@ -132,9 +132,14 @@ function buildEmailHTML(order, labelURL, isTest, toEmail, packingSlipURL, items,
 
   const itemRows = items.map(i => {
     // Get image URL - check all possible field names
-    const rawImg = i.imageUrl || i.image_url || (i.image && i.image.src) || '';
+    // Get image - try all possible field names from different data sources
+    let rawImg = i.imageUrl || i.image_url || '';
+    if (!rawImg && i.image) rawImg = (typeof i.image === 'string') ? i.image : (i.image.src || '');
+    // Ensure URL is absolute (starts with https)
+    if (rawImg && !rawImg.startsWith('http')) rawImg = 'https:' + rawImg;
     // Strip size suffix only (e.g. _600x600) - keep ?v= param intact
-    const fullImg = rawImg ? rawImg.replace(/_\d+x\d*/g, '') : '';
+    // Strip _600x600 style suffixes but preserve ?v= cache busting
+    const fullImg = rawImg ? rawImg.replace(/_\d+x(\d+)?/g, '') : '';
     const itemUrl = i.productUrl || '';
     const itemVariant = i.variant_title || i.variant || '';
     const itemQty = i.quantity || i.qty || 1;

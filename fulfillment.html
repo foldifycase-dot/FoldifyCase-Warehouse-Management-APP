@@ -42,9 +42,9 @@ body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;fon
 .stat-n{font-family:"Inter",sans-serif;font-weight:700;font-size:17px;color:var(--gold);line-height:1;}
 .stat-l{font-size:10px;color:rgba(255,255,255,.35);margin-top:3px;}
 .divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:10px 14px;}
-.auto-row{display:flex;align-items:center;justify-content:space-between;background:rgba(61,122,90,.13);border:1px solid rgba(61,122,90,.25);border-radius:8px;padding:7px 10px;margin:0 0 8px;}
-.auto-txt{font-size:10px;color:rgba(255,255,255,.6);}
-.auto-txt strong{color:#6fd6a0;display:block;font-size:12px;font-weight:700;margin-bottom:1px;}
+.auto-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:7px 10px;margin:0 0 8px;}
+.auto-txt{font-size:10px;color:rgba(255,255,255,.35);}
+.auto-txt strong{color:#6fd6a0;display:inline;font-size:11px;font-weight:600;margin-right:5px;}
 .tog{position:relative;width:34px;height:19px;}
 .tog input{opacity:0;width:0;height:0;}
 .tog-sl{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:22px;cursor:pointer;transition:background .25s;}
@@ -190,10 +190,9 @@ html.in-iframe .layout{min-height:calc(100vh);}
         <div class="stat"><div class="stat-n" id="stTotal">0</div><div class="stat-l">Orders</div></div>
         <div class="stat"><div class="stat-n" id="stPending" style="color:#C94040">0</div><div class="stat-l">Pending</div></div>
         <div class="stat"><div class="stat-n" id="stSent" style="color:#3D7A5A">0</div><div class="stat-l">Sent</div></div>
-
-        <div class="stat" style="grid-column:span 2;background:rgba(200,169,110,.1);border-color:rgba(200,169,110,.25);">
+        <div class="stat" style="background:rgba(200,169,110,.1);border-color:rgba(200,169,110,.25);">
           <div class="stat-n" id="stUSShipped" style="color:#C8A96E">0</div>
-          <div class="stat-l" style="color:rgba(200,169,110,.7);">Shipped from US Warehouse<span style="font-size:9px;color:rgba(255,255,255,.2);display:block;margin-top:1px;" id="stUSPeriod">last 2 months</span></div>
+          <div class="stat-l" style="color:rgba(200,169,110,.7);">US Shipped<span style="font-size:9px;color:rgba(255,255,255,.2);display:block;margin-top:1px;" id="stUSPeriod">last 2 months</span></div>
         </div>
       </div>
       <div class="auto-row">

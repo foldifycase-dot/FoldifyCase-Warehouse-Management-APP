@@ -1,7 +1,7 @@
 import { list } from '@vercel/blob';
 
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
-const PO_BLOB_KEY = 'History of restock/po_orders.json';
+const PO_BLOB_KEY = 'History Of Restock/po_orders.json';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

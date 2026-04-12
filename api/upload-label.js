@@ -1,7 +1,7 @@
 const https = require('https');
 
 const BLOB_TOKEN = process.env.PUBLIC_BLOB_READ_WRITE_TOKEN || '';
-const VERCEL_URL = 'https://warehouse-stock-management-app.vercel.app';
+const VERCEL_URL = process.env.APP_URL || '';
 
 function uploadBlob(pathname, contentType, data) {
   return new Promise((resolve, reject) => {

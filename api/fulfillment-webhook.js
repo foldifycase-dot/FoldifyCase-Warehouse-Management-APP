@@ -6,7 +6,7 @@ const BLOB_TOKEN = process.env.PUBLIC_BLOB_READ_WRITE_TOKEN || '';
 const WAREHOUSE_EMAIL = process.env.WAREHOUSE_EMAIL || '';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
-const VERCEL_URL = 'https://warehouse-stock-management-app.vercel.app';
+const VERCEL_URL = process.env.APP_URL || '';
 
 // Download a URL following redirects, return buffer + content-type
 function downloadURL(urlStr, reqHeaders, maxRedirects) {
@@ -80,7 +80,7 @@ function saveToBlob(pathname, contentType, buffer) {
 function checkLabelInBlob(orderName, token) {
   return new Promise((resolve) => {
     const nameClean = (orderName || '').replace(/#/g, '').trim();
-    const prefix = 'Shipping Label/Order ' + nameClean;
+    const prefix = 'Shipping Labels/Order ' + nameClean;
     const req = https.request({
       hostname: 'blob.vercel-storage.com',
       path: '/?prefix=' + encodeURIComponent(prefix) + '&limit=1',

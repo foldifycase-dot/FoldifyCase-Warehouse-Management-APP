@@ -5,7 +5,7 @@ const TOKEN = process.env.SHOPIFY_TOKEN;
 const RESEND_KEY = process.env.RESEND_API_KEY;
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const API_VERSION = '2024-01';
-const PO_BLOB_KEY = 'History of restock/po_orders.json';
+const PO_BLOB_KEY = 'History Of Restock/po_orders.json';
 
 const shopifyHeaders = {
   'X-Shopify-Access-Token': TOKEN,
@@ -239,7 +239,7 @@ module.exports = async function handler(req, res) {
         if (!BLOB_TOKEN) return res.status(500).json({ error: 'BLOB_TOKEN not configured' });
 
         try {
-          const blob = await put(`Restock Order List/${filename}`, content, {
+          const blob = await put(`Restock Order Lists/${filename}`, content, {
             access: 'public',
             addRandomSuffix: false,
             allowOverwrite: true,

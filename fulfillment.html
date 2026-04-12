@@ -164,16 +164,12 @@ td:first-child{padding-left:18px;}
 .toast.info{border-left:4px solid var(--gold);}
 .toast.test{border-left:4px solid var(--blue);}
 
-/* Hide topbar when loaded inside parent iframe */
-html.in-iframe .topbar { display: none !important; }
-html.in-iframe .layout { min-height: 100vh; }
+/* Hide topbar when embedded in combined app */
+html.in-iframe .topbar{display:none!important;}
+html.in-iframe .layout{min-height:calc(100vh);}
 </style>
 
-<script>
-if(window.self !== window.top){
-  document.documentElement.classList.add('in-iframe');
-}
-</script>
+<script>if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}</script>
 </head>
 <body>
 <header class="topbar">

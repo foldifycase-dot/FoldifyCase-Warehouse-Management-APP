@@ -243,6 +243,7 @@ td:first-child{padding-left:18px;}
 .toast.ok{border-left-color:var(--green);}
 .toast.err{border-left-color:var(--red);}
 
+/* Hide topbar when in combined app iframe */
 html.in-iframe .topbar{display:none!important;}
 html.in-iframe .layout{height:100vh;}
 
@@ -346,11 +347,7 @@ html.in-iframe .topbar{display:none!important;}
 html.in-iframe .layout{height:100vh;}
 </style>
 
-<script>
-if(window.self!==window.top){
-  document.documentElement.classList.add('in-iframe');
-}
-</script>
+<script>if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}</script>
 </head>
 <body>
 
@@ -375,7 +372,25 @@ if(window.self!==window.top){
   </div>
 </div>
 
-
+<!-- WAREHOUSE TABS -->
+<div class="wh-bar">
+  <button class="whtab active-us" id="tab-us" onclick="setWarehouse('us')">
+    <div class="wh-bar-dot" style="background:rgba(255,255,255,.6)"></div>
+    US Warehouse <span class="whtab-count" id="cnt-us">—</span>
+  </button>
+  <button class="whtab" id="tab-uk" onclick="setWarehouse('uk')">
+    <div class="wh-bar-dot" style="background:var(--c-uk)"></div>
+    UK Warehouse <span class="whtab-count" id="cnt-uk">—</span>
+  </button>
+  <button class="whtab" id="tab-au" onclick="setWarehouse('au')">
+    <div class="wh-bar-dot" style="background:var(--c-au)"></div>
+    AU Warehouse <span class="whtab-count" id="cnt-au">—</span>
+  </button>
+  <button class="whtab" id="tab-all" onclick="setWarehouse('all')">
+    <div class="wh-bar-dot" style="background:rgba(26,26,24,.3)"></div>
+    All Warehouses <span class="whtab-count" id="cnt-all">—</span>
+  </button>
+</div>
 
 <div class="layout">
 
@@ -464,26 +479,6 @@ if(window.self!==window.top){
           <div class="page-sub" id="whSub">Loading stock data from Shopify…</div>
         </div>
       </div>
-
-      <!-- WAREHOUSE TABS -->
-<div class="wh-bar">
-  <button class="whtab active-us" id="tab-us" onclick="setWarehouse('us')">
-    <div class="wh-bar-dot" style="background:rgba(255,255,255,.6)"></div>
-    US Warehouse <span class="whtab-count" id="cnt-us">—</span>
-  </button>
-  <button class="whtab" id="tab-uk" onclick="setWarehouse('uk')">
-    <div class="wh-bar-dot" style="background:var(--c-uk)"></div>
-    UK Warehouse <span class="whtab-count" id="cnt-uk">—</span>
-  </button>
-  <button class="whtab" id="tab-au" onclick="setWarehouse('au')">
-    <div class="wh-bar-dot" style="background:var(--c-au)"></div>
-    AU Warehouse <span class="whtab-count" id="cnt-au">—</span>
-  </button>
-  <button class="whtab" id="tab-all" onclick="setWarehouse('all')">
-    <div class="wh-bar-dot" style="background:rgba(26,26,24,.3)"></div>
-    All Warehouses <span class="whtab-count" id="cnt-all">—</span>
-  </button>
-</div>
 
       <div class="alert-banner" id="alertBanner">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0"><path d="M8 1L15 14H1L8 1z"/><rect x="7.3" y="5.5" width="1.4" height="4" fill="white"/><circle cx="8" cy="11.5" r=".9" fill="white"/></svg>
@@ -1272,13 +1267,13 @@ function renderPOLog(){
   }
   el.innerHTML=poOrders.map(o=>{
     const sendBtn=o.sent
-      ?`<button class="po-group-send" onclick="resendToSupplier('${o.id}')" title="Resend to supplier">↺ Resend to Supplier</button>`
-      :`<button class="po-group-send" onclick="resendToSupplier('${o.id}')">✉ Send to Supplier</button>`;
+      ?`<span class="po-group-sent">✓ Sent to supplier</span>`
+      :`<button class="po-group-send" onclick="resendToSupplier('${o.id}')">✉ Send to supplier</button>`;
     const deliverBtn=o.delivered
       ?`<span class="po-group-delivered">✓ Delivered ${o.deliveredDate}</span>`
       :`<button class="po-group-deliver" onclick="confirmDelivery('${o.id}')">📦 Confirm Delivery</button>`;
     const warehouseBtn=o.warehouseEmailed
-      ?`<button class="po-group-warehouse" onclick="emailWarehouse('${o.id}')" title="Resend warehouse notification">↺ Resend to Warehouse</button>`
+      ?`<span class="po-group-warehouse-sent">✓ Warehouse notified</span>`
       :`<button class="po-group-warehouse" onclick="emailWarehouse('${o.id}')">🏭 Email Warehouse</button>`;
 
     // Tracking number row
@@ -1382,8 +1377,8 @@ async function emailWarehouse(orderId){
       </td>
     </tr>`).join('');
 
-  // Use dedicated API route — opens directly in browser, no download
-  const orderLink=`${window.location.origin}/api/order-view?id=${order.id}`;
+  // PDF link — direct link to the app filtered to this order
+  const appUrl=window.location.origin+window.location.pathname+'?order='+order.id;
 
   const emailHtml=`<!DOCTYPE html>
 <html lang="en">
@@ -1456,10 +1451,9 @@ async function emailWarehouse(orderId){
   <!-- CTA — VIEW ORDER -->
   <tr><td style="background:#F5F3E9;padding:20px 32px;text-align:center;border-top:1px solid #EDEAE0">
     <div style="font-size:12px;color:#555;margin-bottom:14px">Open the warehouse app to view the full order details and confirm delivery when stock arrives.</div>
-    <a href="${orderLink}" style="display:inline-block;background:#1A1A18;color:#C8A96E;font-size:12px;font-weight:700;letter-spacing:.05em;padding:12px 28px;border-radius:7px;text-decoration:none">
-      📋 View Restock Order List
+    <a href="${appUrl}" style="display:inline-block;background:#1A1A18;color:#C8A96E;font-size:12px;font-weight:700;letter-spacing:.05em;padding:12px 28px;border-radius:7px;text-decoration:none;margin-right:8px">
+      → View Order in App
     </a>
-    <div style="font-size:10px;color:rgba(26,26,24,.4);margin-top:10px">Opens in your browser — no download required</div>
   </td></tr>
 
   <!-- FOOTER -->
@@ -1985,8 +1979,6 @@ async function saveQty(input){
 }
 
 async function startLoad(){
-  // Check if this is a printable order view request
-  if(checkOrderViewParam())return;
   const dot=document.getElementById('syncDot');
   dot.className='dot-warn';
   document.getElementById('syncInfo').textContent='Syncing…';
@@ -2718,138 +2710,6 @@ function showToast(msg,type){
   t.className='toast '+(type||'ok')+' show';
   setTimeout(()=>t.classList.remove('show'),3200);
 }
-
-// ── PRINTABLE ORDER VIEW ───────────────────────────────────────────────────
-// Triggered when URL has ?view=order&id=PO-XXXXX
-// Shows a clean printable page and auto-prints on desktop
-function checkOrderViewParam(){
-  const params=new URLSearchParams(window.location.search);
-  const view=params.get('view');
-  const orderId=params.get('id');
-  if(view==='order'&&orderId){
-    // Load orders from blob first, then show the order
-    loadPOOrders().then(()=>{
-      const order=poOrders.find(o=>o.id===orderId);
-      if(order){
-        showPrintableOrder(order);
-      } else {
-        // Orders not in memory yet — show loading then retry
-        document.body.innerHTML=`<div style="font-family:Arial,sans-serif;padding:40px;text-align:center;color:#888">
-          <div style="font-size:14px">Loading order ${orderId}…</div>
-        </div>`;
-        setTimeout(()=>{
-          const o2=poOrders.find(o=>o.id===orderId);
-          if(o2)showPrintableOrder(o2);
-          else document.body.innerHTML=`<div style="font-family:Arial,sans-serif;padding:40px;text-align:center;color:#888">
-            <div style="font-size:18px;margin-bottom:8px">Order not found</div>
-            <div style="font-size:13px">Order ${orderId} could not be found.</div>
-          </div>`;
-        },3000);
-      }
-    });
-    return true; // handled
-  }
-  return false;
-}
-
-function generatePrintableHTML(order){
-  const totalQty=order.lines.reduce((s,l)=>s+l.qty,0);
-  const shipLabel=order.ship==='air'?'Air — Express':'Sea — Standard';
-  const shipColor=order.ship==='air'?'#2D5FA6':'#3D7A5A';
-  const date=order.orderDate||new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
-
-  const rows=order.lines.map(l=>`
-    <tr>
-      <td style="padding:14px 20px;border-bottom:1px solid #F0EDE8;vertical-align:middle;width:72px">
-        ${l.image
-          ?`<img src="${l.image}" width="52" height="52" style="border-radius:6px;object-fit:cover;display:block;border:1px solid #EEE">`
-          :`<div style="width:52px;height:52px;border-radius:6px;background:#F5F3EE;border:1px solid #EEE"></div>`}
-      </td>
-      <td style="padding:14px 20px;border-bottom:1px solid #F0EDE8;vertical-align:middle">
-        <div style="font-size:14px;font-weight:600;color:#1A1A18">${l.product}</div>
-        <div style="font-size:12px;color:#999;margin-top:3px">${l.variant}</div>
-      </td>
-      <td style="padding:14px 20px;border-bottom:1px solid #F0EDE8;vertical-align:middle;text-align:right;width:60px">
-        <span style="font-size:22px;font-weight:800;color:#1A1A18;font-family:'Georgia',serif">${l.qty}</span>
-      </td>
-    </tr>`).join('');
-
-  return`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Restock Order ${order.id} — FoldifyCase</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F0EDE8;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;}
-    .page{background:#fff;border-radius:12px;max-width:680px;width:100%;box-shadow:0 2px 24px rgba(0,0,0,.08);overflow:hidden;}
-    .top{padding:32px 40px 24px;display:flex;justify-content:space-between;align-items:flex-start;}
-    .brand{font-size:26px;font-weight:900;letter-spacing:.06em;color:#1A1A18;font-family:'Arial Black',Arial,sans-serif;}
-    .brand-sub{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#999;margin-top:3px;}
-    .order-num{text-align:right;}
-    .order-id{font-size:26px;font-weight:800;color:#C8A96E;font-family:'Courier New',monospace;}
-    .order-date{font-size:12px;color:#999;margin-top:4px;}
-    .divider{height:2px;background:#1A1A18;margin:0 40px 28px;}
-    .info{display:flex;gap:0;padding:0 40px 28px;}
-    .info-col{flex:1;}
-    .info-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#AAA;margin-bottom:8px;font-weight:600;}
-    .info-val{font-size:13px;font-weight:600;color:#1A1A18;line-height:1.5;}
-    .info-chip{display:inline-block;background:${shipColor};color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;margin-top:4px;}
-    .items-count{font-size:12px;color:#AAA;padding:0 40px 12px;}
-    table{width:100%;border-collapse:collapse;}
-    thead tr{background:#F5F3EE;}
-    thead th{padding:10px 20px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#AAA;text-align:left;font-weight:600;}
-    thead th:last-child{text-align:right;}
-    .footer-note{padding:20px 40px;text-align:center;font-size:11px;color:#BBB;border-top:1px solid #F0EDE8;letter-spacing:.04em;}
-  </style>
-</head>
-<body>
-<div class="page">
-  <div class="top">
-    <div>
-      <div class="brand">FOLDIFYCASE</div>
-      <div class="brand-sub">Restock Order</div>
-    </div>
-    <div class="order-num">
-      <div class="order-id">${order.id}</div>
-      <div class="order-date">${date}</div>
-    </div>
-  </div>
-  <div class="divider"></div>
-  <div class="info">
-    <div class="info-col">
-      <div class="info-label">Order Details</div>
-      <div class="info-val">${order.lines.length} SKU${order.lines.length!==1?'s':''} · ${totalQty} units total</div>
-      ${order.notes?`<div style="font-size:12px;color:#777;margin-top:4px">${order.notes}</div>`:''}
-    </div>
-    <div class="info-col">
-      <div class="info-label">Shipping Method</div>
-      <div class="info-val">${shipLabel}</div>
-      <div class="info-chip">ETA ${order.eta}</div>
-    </div>
-    ${order.tracking?`<div class="info-col"><div class="info-label">Tracking</div><div class="info-val" style="font-family:'Courier New',monospace;font-size:12px;color:#2D5FA6">${order.tracking}</div></div>`:''}
-  </div>
-  <div class="items-count">${order.lines.length} item${order.lines.length!==1?'s':''} to receive</div>
-  <table>
-    <thead>
-      <tr>
-        <th style="width:72px">IMAGE</th>
-        <th>PRODUCT</th>
-        <th style="text-align:right">QTY</th>
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  </table>
-  <div class="footer-note">FOLDIFYCASE — Please verify all items upon arrival and update inventory in Shopify.</div>
-</div>
-</body></html>`;
-}
-
-function showPrintableOrder(order){
-  window.open(`/api/order-view?id=${order.id}`,'_blank');
-}
-
 
 startLoad();
 

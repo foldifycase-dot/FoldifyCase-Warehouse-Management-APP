@@ -18,7 +18,7 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
 .tab svg{opacity:.6;flex-shrink:0;}
 .tab.active svg{opacity:1;}
 .app-wrap{position:fixed;top:48px;left:0;right:0;bottom:0;overflow:hidden;}
-.app-frame{width:100%;height:100%;border:none;display:none;}
+.app-frame{width:100%;height:calc(100% + 63px);margin-top:-63px;border:none;display:none;}
 .app-frame.active{display:block;}
 </style>
 </head>
@@ -40,8 +40,8 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
   </button>
 </div>
 <div class="app-wrap">
-  <iframe id="frame-fulfillment" class="app-frame active" src="/fulfillment.html" title="Fulfillment Management Hub"></iframe>
-  <iframe id="frame-restock" class="app-frame" src="/restock.html" title="Stock Management Hub"></iframe>
+  <iframe id="frame-fulfillment" class="app-frame active" src="https://foldifycase-hub-for-u-swarehouse.vercel.app" title="Fulfillment Management Hub"></iframe>
+  <iframe id="frame-restock" class="app-frame" src="https://warehouse-stock-management-app.vercel.app" title="Stock Management Hub"></iframe>
 </div>
 <script>
 function switchTab(name){

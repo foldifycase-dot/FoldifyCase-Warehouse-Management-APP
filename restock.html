@@ -18,7 +18,7 @@ body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;fon
 /* TOP BAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;background:var(--ink);border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:100;flex-shrink:0;}
 .logo{display:flex;align-items:center;gap:12px;}
-.logo-icon{width:34px;height:34px;border:2px solid var(--gold);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.logo-icon{width:34px;height:34px;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .logo-text{display:flex;flex-direction:column;}
 .logo-name{font-family:"Syne",sans-serif;font-weight:800;font-size:14px;color:#fff;letter-spacing:.06em;}
 .logo-sub{font-size:9px;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;}
@@ -31,8 +31,8 @@ body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;fon
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* WAREHOUSE TABS — like country tabs in fulfilment */
-.wh-bar{display:flex;gap:8px;padding:14px 24px;background:var(--cream);border-bottom:1px solid var(--border);flex-wrap:wrap;flex-shrink:0;}
-.whtab{display:flex;align-items:center;gap:7px;padding:8px 16px;border:1.5px solid var(--border2);border-radius:30px;background:#fff;font-family:"Inter",sans-serif;font-size:12px;font-weight:500;color:rgba(26,26,24,.6);cursor:pointer;transition:all .18s;white-space:nowrap;}
+.wh-bar{display:flex;gap:6px;padding:0 0 12px 0;background:var(--cream);flex-wrap:wrap;margin-bottom:12px;}
+.whtab{display:flex;align-items:center;gap:6px;padding:6px 13px;border:1.5px solid var(--border2);border-radius:30px;background:#fff;font-family:"Inter",sans-serif;font-size:12px;font-weight:500;color:rgba(26,26,24,.6);cursor:pointer;transition:all .18s;white-space:nowrap;}
 .whtab:hover{border-color:var(--ink);color:var(--ink);}
 .whtab.active{background:var(--ink);color:var(--cream);border-color:var(--ink);}
 .whtab.active-us{background:var(--c-us);color:#fff;border-color:var(--c-us);}
@@ -48,58 +48,59 @@ body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;fon
 
 /* SIDEBAR */
 .sidebar{background:#3D3D38;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;overflow-y:auto;}
-.sb-section{padding:16px 18px 0;}
+.sb-section{padding:12px 14px 0;}
 .sb-lbl{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;font-family:"Syne",sans-serif;}
-.nav-btn{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:7px;border:1px solid transparent;background:transparent;color:rgba(255,255,255,.55);font-family:"Inter",sans-serif;font-size:12px;cursor:pointer;transition:all .18s;width:100%;text-align:left;margin-bottom:2px;}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;border:1px solid transparent;background:transparent;color:rgba(255,255,255,.55);font-family:"Inter",sans-serif;font-size:12px;cursor:pointer;transition:all .18s;width:100%;text-align:left;margin-bottom:1px;}
 .nav-btn:hover{background:rgba(255,255,255,.07);color:#fff;}
 .nav-btn.active{background:rgba(200,169,110,.14);border-color:rgba(200,169,110,.28);color:var(--gold);}
 .nav-btn svg{opacity:.6;flex-shrink:0;}
 .nav-btn.active svg{opacity:1;}
 .nav-alert-dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:#C94040;display:none;flex-shrink:0;}
-.sb-divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:12px 18px;}
+.sb-divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:8px 14px;}
 
 /* STATS in sidebar */
-.sb-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 18px 14px;}
-.sb-stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px 8px;text-align:center;}
-.sb-stat-n{font-family:"Inter",sans-serif;font-weight:700;font-size:19px;color:var(--gold);line-height:1;}
+.sb-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:0 14px 10px;}
+.sb-stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:8px 6px;text-align:center;}
+.sb-stat-n{font-family:"Inter",sans-serif;font-weight:700;font-size:17px;color:var(--gold);line-height:1;}
 .sb-stat-n.red{color:#e07070;}
 .sb-stat-n.green{color:#6fd6a0;}
 .sb-stat-l{font-size:10px;color:rgba(255,255,255,.35);margin-top:3px;}
 
 /* SYNC button in sidebar */
-.sync-box{padding:0 18px 16px;}
+.sync-box{padding:0 14px 10px;}
 .btn-sync{width:100%;padding:9px;background:var(--gold);color:var(--ink);border:none;border-radius:7px;font-family:"Syne",sans-serif;font-weight:700;font-size:11px;letter-spacing:.05em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .18s;}
 .btn-sync:hover{background:var(--gold-d);color:#fff;}
 .sync-time{font-size:10px;color:rgba(255,255,255,.3);text-align:center;margin-top:5px;}
 
 /* MAIN CONTENT */
-.main{padding:26px;overflow-y:auto;background:var(--cream);}
+.main{padding:18px;overflow-y:auto;background:var(--cream);}
 .view{display:none;}.view.active{display:block;}
 
 /* PAGE HEADER */
-.page-hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;}
+.page-hdr{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:10px;}
 .page-title{font-family:"DM Mono",monospace;font-weight:500;font-size:20px;letter-spacing:.1em;text-transform:uppercase;}
-.page-title em{font-style:normal;color:var(--gold);}
+.page-title em{font-style:normal;color:var(--ink);}
+.page-title em#whTitle{color:var(--gold);}
 .page-sub{font-size:12px;color:rgba(26,26,24,.45);margin-top:4px;line-height:1.5;}
 
 /* ALERT BANNER */
-.alert-banner{display:none;align-items:center;gap:10px;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:12px;background:rgba(201,64,64,.08);border:1px solid rgba(201,64,64,.2);color:#8B2020;}
+.alert-banner{display:none;align-items:center;gap:10px;padding:10px 14px;border-radius:9px;margin-bottom:10px;font-size:12px;background:rgba(201,64,64,.08);border:1px solid rgba(201,64,64,.2);color:#8B2020;}
 
 /* STATS ROW */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
-.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;}
 .stat-card-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.4);font-weight:600;margin-bottom:6px;}
-.stat-card-value{font-family:"Syne",sans-serif;font-weight:700;font-size:26px;color:var(--ink);line-height:1;}
+.stat-card-value{font-family:"Syne",sans-serif;font-weight:700;font-size:22px;color:var(--ink);line-height:1;}
 .stat-card-value.warn{color:#B87D2A;}
 .stat-card-value.danger{color:var(--red);}
 .stat-card-sub{font-size:10px;color:rgba(26,26,24,.35);margin-top:4px;}
 
 /* TWO COL */
-.two-col{display:grid;grid-template-columns:1fr 240px;gap:14px;margin-bottom:20px;}
+.two-col{display:grid;grid-template-columns:1fr 220px;gap:10px;margin-bottom:12px;}
 
 /* CARD */
-.card{background:#fff;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;}
-.card-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#EAE7D8;}
+.card{background:#fff;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.card-hdr{padding:9px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#EAE7D8;}
 .card-title{font-family:"Syne",sans-serif;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);}
 .card-sub{font-size:10px;color:rgba(26,26,24,.45);margin-top:2px;font-weight:400;text-transform:none;letter-spacing:0;}
 
@@ -112,13 +113,13 @@ body{background:var(--cream);color:var(--ink);font-family:"Inter",sans-serif;fon
 /* TABLE */
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
-thead th{padding:10px 14px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,24,.4);background:#EAE7D8;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap;}
-thead th:first-child{padding-left:18px;}
+thead th{padding:8px 12px;text-align:left;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,24,.4);background:#EAE7D8;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap;}
+thead th:first-child{padding-left:16px;}
 tbody tr{border-bottom:1px solid var(--border);transition:background .12s;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:#fafaf5;}
-td{padding:11px 14px;vertical-align:middle;}
-td:first-child{padding-left:18px;}
+td{padding:8px 12px;vertical-align:middle;}
+td:first-child{padding-left:16px;}
 .pname{font-weight:600;font-size:12px;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
 .pmeta{font-size:10px;color:rgba(26,26,24,.4);margin-top:2px;}
 .bar-wrap{display:flex;align-items:center;gap:8px;}
@@ -146,7 +147,7 @@ td:first-child{padding-left:18px;}
 
 /* PRIORITY PANEL */
 .pri-list{display:flex;flex-direction:column;}
-.pri-row{display:flex;align-items:center;gap:9px;padding:9px 14px;border-bottom:1px solid var(--border);}
+.pri-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border);}
 .pri-row:last-child{border-bottom:none;}
 .pri-row:hover{background:#fafaf5;}
 .pri-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;background:#EAE7D8;color:rgba(26,26,24,.5);font-family:"Syne",sans-serif;}
@@ -158,15 +159,15 @@ td:first-child{padding-left:18px;}
 .pri-det{font-size:10px;color:rgba(26,26,24,.4);margin-top:1px;}
 
 /* SEARCH */
-.search-wrap{position:relative;margin-bottom:12px;}
+.search-wrap{position:relative;margin-bottom:8px;}
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.3;font-size:14px;pointer-events:none;}
 .search-input{width:100%;padding:10px 13px 10px 36px;background:#fff;border:1.5px solid var(--border);border-radius:7px;font-family:"Inter",sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .15s;}
 .search-input:focus{border-color:var(--ink);}
 .search-input::placeholder{color:rgba(26,26,24,.3);}
 
 /* EMAIL ALERTS */
-.alert-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
-.alert-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;}
+.alert-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;}
+.alert-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;}
 .alert-card-title{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;color:var(--ink);margin-bottom:3px;letter-spacing:.02em;}
 .alert-card-sub{font-size:11px;color:rgba(26,26,24,.45);margin-bottom:16px;line-height:1.55;}
 .field-lbl{font-size:11px;font-weight:600;color:rgba(26,26,24,.7);margin-bottom:5px;letter-spacing:.02em;}
@@ -213,7 +214,7 @@ td:first-child{padding-left:18px;}
 .log-msg{color:var(--ink);flex:1;}
 
 /* THRESHOLD */
-.thresh-item{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff;border:1.5px solid var(--border);border-radius:9px;margin-bottom:10px;}
+.thresh-item{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:#fff;border:1.5px solid var(--border);border-radius:9px;margin-bottom:7px;}
 .thresh-label{font-size:13px;font-weight:600;color:var(--ink);}
 .thresh-sub{font-size:11px;color:rgba(26,26,24,.45);margin-top:2px;}
 .thresh-ctrl{display:flex;align-items:center;gap:7px;}
@@ -221,8 +222,8 @@ td:first-child{padding-left:18px;}
 .thresh-ctrl span{font-size:11px;color:rgba(26,26,24,.4);}
 
 /* SETUP */
-.setup-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
-.setup-title{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;color:var(--ink);margin-bottom:14px;letter-spacing:.02em;}
+.setup-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
+.setup-title{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;letter-spacing:.02em;}
 .tag-row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);}
 .tag-row:last-child{border-bottom:none;}
 .tag-code{font-family:"DM Mono",monospace;font-size:11px;background:#EAE7D8;border-radius:4px;padding:3px 9px;color:var(--ink);min-width:130px;flex-shrink:0;font-weight:500;}
@@ -232,8 +233,308 @@ td:first-child{padding-left:18px;}
 .step-text{font-size:12px;color:rgba(26,26,24,.6);line-height:1.6;padding-top:3px;}
 .inline-code{font-family:"DM Mono",monospace;font-size:11px;background:#EAE7D8;padding:1px 5px;border-radius:3px;color:var(--ink);}
 
+
+/* PRODUCT IMAGE THUMBNAIL */
+.prod-img{width:36px;height:36px;border-radius:5px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;background:#EAE7D8;display:block;}
+.prod-img-wrap{display:flex;align-items:center;gap:10px;}
+.prod-img-placeholder{width:36px;height:36px;border-radius:5px;background:#EAE7D8;border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+
+/* VARIANT DROPDOWN */
+.prod-expand{cursor:pointer;user-select:none;}
+.prod-expand-arrow{display:inline-block;margin-left:5px;font-size:9px;color:rgba(26,26,24,.35);transition:transform .18s;}
+.prod-expand-arrow.open{transform:rotate(90deg);}
+.variant-rows{display:none;background:#fafaf5;}
+.variant-rows.open{display:table-row-group;}
+.variant-row td{padding:6px 12px;font-size:11px;border-bottom:1px solid var(--border);color:rgba(26,26,24,.7);background:#fafaf5;}
+.variant-row:last-child td{border-bottom:none;}
+.variant-name{font-weight:500;color:var(--ink);}
+.variant-qty{font-family:"DM Mono",monospace;font-weight:600;font-size:12px;}
+
+/* PERIOD TABS for Top Sellers */
+.period-tabs{display:flex;gap:4px;margin-bottom:12px;}
+.period-tab{padding:5px 14px;border:1.5px solid var(--border2);border-radius:20px;font-size:12px;font-weight:500;font-family:"Inter",sans-serif;color:rgba(26,26,24,.55);cursor:pointer;transition:all .15s;background:#fff;}
+.period-tab:hover{border-color:var(--ink);color:var(--ink);}
+.period-tab.active{background:var(--ink);color:var(--cream);border-color:var(--ink);}
+
+
+/* VARIANT IMAGE */
+.var-img{width:28px;height:28px;border-radius:4px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;display:block;}
+.var-img-ph{width:28px;height:28px;border-radius:4px;background:#EAE7D8;border:1px solid var(--border);flex-shrink:0;}
+
+/* ETA CALCULATOR */
+.eta-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.eta-hdr{padding:9px 14px;border-bottom:1px solid var(--border);background:#EAE7D8;display:flex;align-items:center;justify-content:space-between;}
+.eta-title{font-family:"Syne",sans-serif;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);}
+.eta-body{padding:14px;}
+.eta-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.eta-mode{background:var(--cream);border:1.5px solid var(--border);border-radius:9px;padding:12px 14px;}
+.eta-mode-hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.eta-mode-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.eta-mode-icon.air{background:rgba(45,95,166,.12);}
+.eta-mode-icon.sea{background:rgba(61,122,90,.12);}
+.eta-mode-label{font-family:"Syne",sans-serif;font-weight:700;font-size:11px;letter-spacing:.04em;color:var(--ink);}
+.eta-mode-sub{font-size:10px;color:rgba(26,26,24,.4);}
+.eta-input-row{display:flex;align-items:center;gap:6px;}
+.eta-input{width:60px;padding:6px 8px;font-size:13px;font-family:"DM Mono",monospace;font-weight:600;border:1.5px solid var(--border2);border-radius:6px;background:#fff;color:var(--ink);text-align:center;outline:none;}
+.eta-input:focus{border-color:var(--ink);}
+.eta-input-unit{font-size:11px;color:rgba(26,26,24,.45);}
+.eta-result{display:flex;align-items:center;gap:6px;margin-top:8px;padding:8px 10px;background:#fff;border:1px solid var(--border);border-radius:6px;}
+.eta-result-label{font-size:10px;color:rgba(26,26,24,.45);flex:1;}
+.eta-result-date{font-family:"DM Mono",monospace;font-size:12px;font-weight:600;color:var(--ink);}
+.eta-result-date.air-col{color:var(--blue);}
+.eta-result-date.sea-col{color:var(--green);}
+.eta-order-date{display:flex;align-items:center;gap:8px;padding:10px 0 0;}
+.eta-order-label{font-size:11px;color:rgba(26,26,24,.45);}
+.eta-order-input{padding:5px 9px;font-size:12px;border:1.5px solid var(--border2);border-radius:6px;background:#fff;color:var(--ink);outline:none;font-family:"Inter",sans-serif;}
+.eta-order-input:focus{border-color:var(--ink);}
+
+
+/* RESTOCK MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,24,.45);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:14px;width:560px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;border:1.5px solid var(--border);}
+.modal-box{background:#fff;border-radius:12px;box-shadow:0 8px 40px rgba(26,26,24,.22);display:flex;flex-direction:column;overflow:hidden;max-height:90vh;}
+.modal-hdr{padding:14px 18px;border-bottom:1px solid var(--border);background:#EAE7D8;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-title{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);}
+.modal-close{width:26px;height:26px;border-radius:6px;background:transparent;border:1px solid var(--border2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:rgba(26,26,24,.5);line-height:1;}
+.modal-close:hover{background:var(--border);color:var(--ink);}
+.modal-body{padding:18px;overflow-y:auto;flex:1;}
+.modal-section{margin-bottom:14px;}
+.modal-label{font-size:11px;font-weight:600;color:rgba(26,26,24,.6);margin-bottom:5px;letter-spacing:.02em;}
+.modal-search{width:100%;padding:8px 11px;font-size:13px;border:1.5px solid var(--border2);border-radius:7px;background:#fff;color:var(--ink);outline:none;font-family:"Inter",sans-serif;}
+.modal-search:focus{border-color:var(--ink);}
+.modal-search::placeholder{color:rgba(26,26,24,.3);}
+.modal-dropdown{border:1.5px solid var(--border2);border-radius:7px;overflow:hidden;max-height:180px;overflow-y:auto;display:none;}
+.modal-dropdown.open{display:block;}
+.modal-opt{padding:9px 12px;cursor:pointer;font-size:12px;color:var(--ink);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);transition:background .1s;}
+.modal-opt:last-child{border-bottom:none;}
+.modal-opt:hover{background:var(--cream);}
+.modal-opt img{width:32px;height:32px;border-radius:4px;object-fit:cover;flex-shrink:0;border:1px solid var(--border);}
+.modal-opt-ph{width:32px;height:32px;border-radius:4px;background:#EAE7D8;flex-shrink:0;border:1px solid var(--border);}
+.modal-opt-name{font-weight:500;font-size:12px;}
+.modal-opt-meta{font-size:10px;color:rgba(26,26,24,.4);}
+.selected-product{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--cream);border:1.5px solid var(--border);border-radius:7px;margin-bottom:10px;}
+.selected-product img{width:36px;height:36px;border-radius:5px;object-fit:cover;border:1px solid var(--border);}
+.selected-product-ph{width:36px;height:36px;border-radius:5px;background:#EAE7D8;border:1px solid var(--border);flex-shrink:0;}
+.selected-name{font-weight:600;font-size:12px;color:var(--ink);flex:1;}
+.selected-clear{font-size:11px;color:rgba(26,26,24,.4);cursor:pointer;padding:2px 6px;border-radius:4px;}
+.selected-clear:hover{color:var(--red);}
+.variant-select-grid{display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto;}
+.var-select-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1.5px solid var(--border);border-radius:7px;cursor:pointer;transition:border-color .15s,background .15s;}
+.var-select-row:hover{border-color:var(--border2);background:#fafaf5;}
+.var-select-row.selected{border-color:var(--gold);background:rgba(200,169,110,.06);}
+.var-select-row img{width:28px;height:28px;border-radius:4px;object-fit:cover;border:1px solid var(--border);}
+.var-select-ph{width:28px;height:28px;border-radius:4px;background:#EAE7D8;border:1px solid var(--border);flex-shrink:0;}
+.var-select-name{font-size:12px;font-weight:500;color:var(--ink);flex:1;}
+.var-select-qty{font-size:11px;color:rgba(26,26,24,.4);}
+.qty-row{display:flex;align-items:center;gap:10px;}
+.qty-input{width:80px;padding:7px 10px;font-size:16px;font-weight:700;font-family:"DM Mono",monospace;border:1.5px solid var(--border2);border-radius:7px;text-align:center;background:#fff;color:var(--ink);outline:none;}
+.qty-input:focus{border-color:var(--ink);}
+.qty-btn{width:32px;height:32px;border:1.5px solid var(--border2);border-radius:7px;background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink);line-height:1;}
+.qty-btn:hover{background:var(--cream);}
+.ship-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.ship-opt{padding:9px 12px;border:1.5px solid var(--border2);border-radius:7px;cursor:pointer;transition:all .15s;background:#fff;}
+.ship-opt:hover{border-color:var(--border2);background:#fafaf5;}
+.ship-opt.selected{border-color:var(--gold);background:rgba(200,169,110,.06);}
+.ship-opt-label{font-size:11px;font-weight:700;font-family:"Syne",sans-serif;color:var(--ink);margin-bottom:2px;}
+.ship-opt-eta{font-family:"DM Mono",monospace;font-size:12px;font-weight:600;}
+.ship-opt-eta.air{color:#2D5FA6;}
+.ship-opt-eta.sea{color:#3D7A5A;}
+.modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;}
+
+/* PURCHASE ORDER LOG */
+.po-log{display:flex;flex-direction:column;gap:0;}
+.po-row{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.po-row:last-child{border-bottom:none;}
+.po-img{width:32px;height:32px;border-radius:5px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.po-img-ph{width:32px;height:32px;border-radius:5px;background:#EAE7D8;border:1px solid var(--border);flex-shrink:0;}
+.po-info{flex:1;min-width:0;}
+.po-product{font-weight:600;font-size:12px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.po-variant{font-size:10px;color:rgba(26,26,24,.45);margin-top:1px;}
+.po-qty{font-family:"DM Mono",monospace;font-weight:700;font-size:13px;color:var(--ink);flex-shrink:0;}
+.po-ship{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;flex-shrink:0;}
+.po-ship.air{background:#E6F1FB;color:#185FA5;}
+.po-ship.sea{background:#E1F5EE;color:#0F6E56;}
+.po-eta{font-family:"DM Mono",monospace;font-size:11px;font-weight:600;flex-shrink:0;}
+.po-eta.air{color:#2D5FA6;}
+.po-eta.sea{color:#3D7A5A;}
+.po-date{font-size:10px;color:rgba(26,26,24,.35);flex-shrink:0;}
+
+
+/* ORDER LINE ITEMS in modal */
+.order-lines{display:flex;flex-direction:column;gap:0;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;}
+.order-line{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);background:#fff;}
+.order-line:last-child{border-bottom:none;}
+.order-line:hover{background:#fafaf8;}
+.ol-img{width:30px;height:30px;border-radius:4px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.ol-img-ph{width:30px;height:30px;border-radius:4px;background:#EAE7D8;border:1px solid var(--border);flex-shrink:0;}
+.ol-info{flex:1;min-width:0;}
+.ol-product{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ol-variant{font-size:10px;color:rgba(26,26,24,.4);margin-top:1px;}
+.ol-qty{font-family:"DM Mono",monospace;font-weight:700;font-size:12px;color:var(--ink);background:#EAE7D8;padding:2px 8px;border-radius:4px;flex-shrink:0;}
+.ol-remove{width:20px;height:20px;border-radius:4px;background:transparent;border:none;cursor:pointer;color:rgba(26,26,24,.3);font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ol-remove:hover{background:#FCEBEB;color:var(--red);}
+.add-line-btn{width:100%;padding:8px;background:var(--cream);border:1.5px dashed var(--border2);border-radius:8px;font-family:"Inter",sans-serif;font-size:12px;color:rgba(26,26,24,.5);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;transition:all .15s;}
+.add-line-btn:hover{border-color:var(--gold);color:var(--gold-d);background:rgba(200,169,110,.05);}
+.modal-divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.supplier-section{background:var(--cream);border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;}
+.supplier-title{font-family:"Syne",sans-serif;font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);margin-bottom:8px;}
+.supplier-input{width:100%;padding:7px 10px;font-size:12px;border:1.5px solid var(--border2);border-radius:6px;background:#fff;color:var(--ink);outline:none;font-family:"Inter",sans-serif;margin-bottom:6px;}
+.supplier-input:focus{border-color:var(--ink);}
+.supplier-input::placeholder{color:rgba(26,26,24,.3);}
+.supplier-hint{font-size:10px;color:rgba(26,26,24,.4);line-height:1.5;}
+.po-group{background:#fff;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+.po-group-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#EAE7D8;border-bottom:1px solid var(--border);}
+.po-group-id{font-family:"DM Mono",monospace;font-weight:700;font-size:11px;color:var(--ink);}
+.po-group-date{font-size:10px;color:rgba(26,26,24,.45);margin-top:2px;}
+.po-group-ship{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;}
+.po-group-ship.air{background:#E6F1FB;color:#185FA5;}
+.po-group-ship.sea{background:#E1F5EE;color:#0F6E56;}
+.po-group-eta{font-family:"DM Mono",monospace;font-size:11px;font-weight:600;}
+.po-group-eta.air{color:#2D5FA6;}
+.po-group-eta.sea{color:#3D7A5A;}
+.po-group-send{font-size:10px;padding:3px 9px;border:1px solid var(--border2);border-radius:5px;background:#fff;cursor:pointer;color:var(--ink);font-family:"Inter",sans-serif;font-weight:500;transition:all .15s;}
+.po-group-send:hover{background:var(--ink);color:#fff;border-color:var(--ink);}
+.po-group-sent{font-size:10px;color:var(--green);font-weight:600;}
+.po-line{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--border);}
+.po-line:last-child{border-bottom:none;}
+.po-line-img{width:28px;height:28px;border-radius:4px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.po-line-img-ph{width:28px;height:28px;border-radius:4px;background:#EAE7D8;border:1px solid var(--border);flex-shrink:0;}
+.po-line-info{flex:1;min-width:0;}
+.po-line-product{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.po-line-variant{font-size:10px;color:rgba(26,26,24,.4);}
+.po-line-qty{font-family:"DM Mono",monospace;font-weight:700;font-size:12px;color:var(--ink);background:#EAE7D8;padding:2px 7px;border-radius:4px;flex-shrink:0;}
+
+
+/* STOCK FILTER BAR */
+.stock-filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.filter-select{padding:8px 12px;font-size:12px;border:1.5px solid var(--border2);border-radius:7px;background:#fff;color:var(--ink);outline:none;font-family:"Inter",sans-serif;cursor:pointer;transition:border-color .15s;}
+.filter-select:focus{border-color:var(--ink);}
+.filter-select option{color:var(--ink);}
+.filter-divider{width:1px;height:24px;background:var(--border);flex-shrink:0;}
+.filter-clear{font-size:11px;color:rgba(26,26,24,.4);cursor:pointer;padding:4px 8px;border-radius:5px;transition:all .15s;background:transparent;border:none;font-family:"Inter",sans-serif;}
+.filter-clear:hover{color:var(--red);background:rgba(201,64,64,.06);}
+.filter-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:12px;font-size:10px;font-weight:600;background:rgba(200,169,110,.12);color:var(--gold-d);border:1px solid rgba(200,169,110,.25);}
+
+
+/* DELIVERY CONFIRM */
+.po-group-deliver{font-size:10px;padding:3px 9px;border:1px solid rgba(61,122,90,.35);border-radius:5px;background:rgba(61,122,90,.06);cursor:pointer;color:var(--green);font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:4px;}
+.po-group-deliver:hover{background:var(--green);color:#fff;border-color:var(--green);}
+.po-group-delivered{font-size:10px;color:rgba(26,26,24,.35);font-weight:500;margin-left:4px;font-style:italic;}
+
+
+/* QUICK RESTOCK BUTTON in tables */
+.btn-restock{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1.5px solid rgba(200,169,110,.4);border-radius:6px;background:rgba(200,169,110,.08);color:var(--gold-d);font-size:10px;font-weight:600;font-family:"Inter",sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-restock:hover{background:var(--gold);color:#fff;border-color:var(--gold);}
+.btn-restock svg{flex-shrink:0;}
+
+/* FLOATING ACTION BUTTON */
+.fab{position:fixed;bottom:28px;right:28px;width:52px;height:52px;border-radius:50%;background:var(--ink);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,26,24,.25);z-index:150;transition:all .2s;}
+.fab:hover{background:var(--gold);transform:scale(1.08);}
+.fab-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;font-weight:700;display:none;align-items:center;justify-content:center;font-family:"Syne",sans-serif;border:2px solid var(--cream);}
+.fab-badge.show{display:flex;}
+
+/* CART PANEL (slide up from bottom-right) */
+.cart-panel{position:fixed;bottom:90px;right:28px;width:340px;max-width:95vw;background:#fff;border:1.5px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(26,26,24,.18);z-index:149;display:none;flex-direction:column;overflow:hidden;max-height:70vh;}
+.cart-panel.open{display:flex;}
+.cart-panel-hdr{padding:12px 14px;background:#EAE7D8;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.cart-panel-title{font-family:"Syne",sans-serif;font-weight:700;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink);}
+.cart-panel-body{overflow-y:auto;flex:1;}
+.cart-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);}
+.cart-item:last-child{border-bottom:none;}
+.cart-item-img{width:30px;height:30px;border-radius:4px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.cart-item-img-ph{width:30px;height:30px;border-radius:4px;background:#EAE7D8;flex-shrink:0;}
+.cart-item-info{flex:1;min-width:0;}
+.cart-item-name{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cart-item-variant{font-size:10px;color:rgba(26,26,24,.4);}
+.cart-item-qty{display:flex;align-items:center;gap:4px;}
+.cart-qty-btn{width:22px;height:22px;border-radius:4px;border:1px solid var(--border2);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--ink);line-height:1;transition:background .12s;}
+.cart-qty-btn:hover{background:var(--cream);}
+.cart-qty-num{font-family:"DM Mono",monospace;font-weight:700;font-size:12px;min-width:24px;text-align:center;}
+.cart-item-remove{width:18px;height:18px;border:none;background:transparent;cursor:pointer;color:rgba(26,26,24,.25);font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cart-item-remove:hover{color:var(--red);}
+.cart-panel-ftr{padding:10px 12px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:6px;}
+.cart-empty{padding:24px;text-align:center;font-size:12px;color:rgba(26,26,24,.35);}
+
+
+/* REORDER QUEUE — collapsible rows */
+.rq-list{display:flex;flex-direction:column;gap:0;}
+.rq-row{border-bottom:1px solid var(--border);}
+.rq-row:last-child{border-bottom:none;}
+.rq-header{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .12s;user-select:none;}
+.rq-header:hover{background:#fafaf5;}
+.rq-rank{font-family:"DM Mono",monospace;font-size:11px;color:rgba(26,26,24,.3);width:18px;flex-shrink:0;text-align:right;}
+.rq-arrow{font-size:9px;color:rgba(26,26,24,.3);transition:transform .18s;flex-shrink:0;margin-right:2px;}
+.rq-arrow.open{transform:rotate(90deg);}
+.rq-title{font-size:12px;font-weight:600;color:var(--ink);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rq-body{display:none;padding:10px 14px 12px 46px;background:#fafaf8;border-top:1px solid var(--border);}
+.rq-body.open{display:block;}
+.rq-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+.rq-cell{background:#fff;border:1px solid var(--border);border-radius:7px;padding:8px 10px;}
+.rq-cell-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(26,26,24,.4);margin-bottom:4px;font-weight:600;}
+.rq-cell-value{font-family:"DM Mono",monospace;font-size:13px;font-weight:700;color:var(--ink);}
+.rq-cell-value.air{color:#2D5FA6;}
+.rq-cell-value.sea{color:#3D7A5A;}
+
+
+/* EDITABLE QTY in variant rows */
+.qty-edit-wrap{display:inline-flex;align-items:center;gap:4px;}
+.qty-edit-input{width:52px;padding:3px 6px;font-family:"DM Mono",monospace;font-weight:700;font-size:12px;border:1.5px solid var(--border2);border-radius:5px;text-align:center;background:#fff;color:var(--ink);outline:none;transition:border-color .15s;}
+.qty-edit-input:focus{border-color:var(--gold);}
+.qty-save-btn{padding:3px 8px;font-size:10px;font-weight:600;font-family:"Inter",sans-serif;border:1.5px solid var(--green);border-radius:5px;background:rgba(61,122,90,.08);color:var(--green);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.qty-save-btn:hover{background:var(--green);color:#fff;}
+.qty-save-btn:disabled{opacity:.4;cursor:not-allowed;}
+.qty-saving{font-size:10px;color:rgba(26,26,24,.4);font-style:italic;}
+
+
+/* TREND INDICATOR — inline pill with arrow + % change + mini dots */
+.trend-cell{display:flex;align-items:center;gap:5px;}
+.trend-arrow{font-size:13px;line-height:1;flex-shrink:0;}
+.trend-pct{font-family:"DM Mono",monospace;font-size:11px;font-weight:700;}
+.trend-dots{display:flex;gap:2px;align-items:center;}
+.trend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.t-hot .trend-pct{color:#C0392B;} .t-hot .trend-arrow{color:#C0392B;}
+.t-rising .trend-pct{color:#2E7D32;} .t-rising .trend-arrow{color:#2E7D32;}
+.t-stable .trend-pct{color:#7D6608;} .t-stable .trend-arrow{color:#A0936B;}
+.t-cooling .trend-pct{color:#E65100;} .t-cooling .trend-arrow{color:#E65100;}
+.t-fading .trend-pct{color:#6A1B9A;} .t-fading .trend-arrow{color:#6A1B9A;}
+.t-new .trend-pct{color:#1565C0;} .t-new .trend-arrow{color:#1565C0;}
+
+
+/* TREND INDICATOR */
+.trend-cell{display:flex;align-items:center;gap:5px;}
+.trend-arrow{font-size:13px;line-height:1;flex-shrink:0;}
+.trend-pct{font-family:"DM Mono",monospace;font-size:11px;font-weight:700;}
+.trend-dots{display:flex;gap:2px;align-items:center;}
+.trend-dot{border-radius:50%;flex-shrink:0;}
+.t-hot .trend-pct,.t-hot .trend-arrow{color:#C0392B;}
+.t-rising .trend-pct,.t-rising .trend-arrow{color:#2E7D32;}
+.t-stable .trend-pct,.t-stable .trend-arrow{color:#A0936B;}
+.t-cooling .trend-pct,.t-cooling .trend-arrow{color:#E65100;}
+.t-fading .trend-pct,.t-fading .trend-arrow{color:#6A1B9A;}
+.t-new .trend-pct,.t-new .trend-arrow{color:#1565C0;}
+
+
+/* TRACKING NUMBER in PO */
+.po-tracking{display:flex;align-items:center;gap:6px;padding:6px 14px;border-top:1px solid var(--border);background:#fafaf8;}
+.po-tracking-label{font-size:10px;color:rgba(26,26,24,.4);font-weight:600;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;}
+.po-tracking-input{flex:1;padding:4px 8px;font-size:11px;font-family:"DM Mono",monospace;border:1.5px solid var(--border2);border-radius:5px;outline:none;background:#fff;color:var(--ink);transition:border-color .15s;}
+.po-tracking-input:focus{border-color:var(--gold);}
+.po-tracking-val{font-family:"DM Mono",monospace;font-size:11px;font-weight:600;color:#2D5FA6;flex:1;}
+.po-tracking-save{padding:4px 10px;font-size:10px;font-weight:600;font-family:"Inter",sans-serif;border:1.5px solid var(--gold);border-radius:5px;background:rgba(200,169,110,.1);color:var(--gold-d);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.po-tracking-save:hover{background:var(--gold);color:#fff;}
+
+
+.po-group-delete{width:22px;height:22px;border:none;background:transparent;cursor:pointer;color:rgba(26,26,24,.2);font-size:15px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s;flex-shrink:0;padding:0;margin-left:2px;}
+.po-group-delete:hover{background:rgba(201,64,64,.1);color:var(--red);}
+
+
+.po-group-warehouse{font-size:10px;padding:3px 9px;border:1px solid rgba(45,95,166,.35);border-radius:5px;background:rgba(45,95,166,.06);cursor:pointer;color:#2D5FA6;font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:4px;}
+.po-group-warehouse:hover{background:#2D5FA6;color:#fff;border-color:#2D5FA6;}
+.po-group-warehouse-sent{font-size:10px;color:rgba(26,26,24,.35);font-weight:500;margin-left:4px;font-style:italic;}
+
 /* EMPTY / LOADING */
-.empty-state{padding:40px;text-align:center;font-size:12px;color:rgba(26,26,24,.4);}
+.empty-state{padding:28px;text-align:center;font-size:12px;color:rgba(26,26,24,.4);}
 .spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:rgba(26,26,24,.4);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px;}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -243,105 +544,6 @@ td:first-child{padding-left:18px;}
 .toast.ok{border-left-color:var(--green);}
 .toast.err{border-left-color:var(--red);}
 
-html.in-iframe .topbar{display:none!important;}
-html.in-iframe .layout{height:100vh;}
-
-/* PO LOG */
-.po-group{background:#fff;border:1.5px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;}
-.po-group-hdr{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#EAE7D8;flex-wrap:wrap;}
-.po-group-id{font-family:"DM Mono",monospace;font-weight:700;font-size:13px;color:var(--ink);}
-.po-group-date{font-size:11px;color:rgba(26,26,24,.45);margin-top:2px;}
-.po-group-send{font-size:10px;padding:3px 9px;border:1px solid rgba(61,122,90,.35);border-radius:5px;background:rgba(61,122,90,.06);cursor:pointer;color:var(--green);font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:auto;}
-.po-group-send:hover{background:var(--green);color:#fff;border-color:var(--green);}
-.po-group-warehouse{font-size:10px;padding:3px 9px;border:1px solid rgba(45,95,166,.35);border-radius:5px;background:rgba(45,95,166,.06);cursor:pointer;color:#2D5FA6;font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:4px;}
-.po-group-warehouse:hover{background:#2D5FA6;color:#fff;}
-.po-group-deliver{font-size:10px;padding:3px 9px;border:1px solid rgba(200,169,110,.35);border-radius:5px;background:rgba(200,169,110,.06);cursor:pointer;color:var(--gold-d);font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:4px;}
-.po-group-deliver:hover{background:var(--gold);color:var(--ink);}
-.po-group-delivered{font-size:10px;color:var(--green);font-weight:600;margin-left:4px;}
-.po-group-delete{font-size:14px;padding:2px 7px;border:1px solid rgba(201,64,64,.25);border-radius:5px;background:transparent;cursor:pointer;color:rgba(201,64,64,.5);font-family:"Inter",sans-serif;margin-left:4px;line-height:1;transition:all .15s;}
-.po-group-delete:hover{background:var(--red);color:#fff;}
-.po-group-sent{font-size:10px;color:rgba(26,26,24,.35);font-weight:500;margin-left:4px;font-style:italic;}
-.po-line{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);}
-.po-line:last-child{border-bottom:none;}
-.po-line-img{width:40px;height:40px;border-radius:5px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
-.po-line-img-ph{width:40px;height:40px;border-radius:5px;background:var(--cream);border:1px solid var(--border);flex-shrink:0;}
-.po-line-info{flex:1;min-width:0;}
-.po-line-product{font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.po-line-variant{font-size:11px;color:rgba(26,26,24,.4);margin-top:1px;}
-.po-line-qty{font-family:"DM Mono",monospace;font-weight:700;font-size:14px;color:var(--ink);flex-shrink:0;}
-.po-tracking{display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(245,243,233,.7);border-top:1px solid var(--border);}
-.po-tracking-label{font-size:10px;color:rgba(26,26,24,.4);text-transform:uppercase;letter-spacing:.08em;min-width:56px;}
-.po-tracking-val{font-family:"DM Mono",monospace;font-size:12px;font-weight:600;color:var(--ink);flex:1;}
-.po-tracking-input{flex:1;padding:5px 8px;font-size:12px;border:1.5px solid var(--border2);border-radius:5px;background:#fff;color:var(--ink);outline:none;font-family:"DM Mono",monospace;}
-.po-tracking-save{padding:4px 10px;font-size:10px;font-weight:600;border:1.5px solid var(--gold);border-radius:5px;background:transparent;color:var(--gold-d);cursor:pointer;font-family:"Inter",sans-serif;transition:all .15s;}
-.po-tracking-save:hover{background:var(--gold);color:var(--ink);}
-/* CART FAB */
-.cart-fab{position:fixed;bottom:28px;right:28px;width:52px;height:52px;border-radius:50%;background:var(--ink);border:2px solid var(--gold);box-shadow:0 4px 16px rgba(0,0,0,.25);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:200;transition:all .2s;}
-.cart-fab:hover{background:var(--gold);transform:scale(1.06);}
-.cart-fab:hover svg path{stroke:var(--ink);}
-.cart-fab-badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center;}
-.cart-fab-badge.show{display:flex;}
-.cart-panel{position:fixed;bottom:92px;right:28px;width:340px;background:#fff;border:1.5px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:199;display:none;flex-direction:column;max-height:70vh;}
-.cart-panel.open{display:flex;}
-.cart-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:#EAE7D8;border-radius:14px 14px 0 0;}
-.cart-title{font-family:"Syne",sans-serif;font-weight:700;font-size:12px;letter-spacing:.06em;color:var(--ink);}
-.cart-count{font-size:11px;color:rgba(26,26,24,.45);}
-.cart-body{flex:1;overflow-y:auto;padding:8px 0;}
-.cart-empty{padding:24px;text-align:center;font-size:12px;color:rgba(26,26,24,.35);}
-.cart-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border);}
-.cart-item:last-child{border-bottom:none;}
-.cart-item-img{width:36px;height:36px;border-radius:5px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
-.cart-item-img-ph{width:36px;height:36px;border-radius:5px;background:var(--cream);border:1px solid var(--border);flex-shrink:0;}
-.cart-item-info{flex:1;min-width:0;}
-.cart-item-name{font-size:11px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cart-item-variant{font-size:10px;color:rgba(26,26,24,.4);margin-top:1px;}
-.cart-item-qty{display:flex;align-items:center;gap:5px;flex-shrink:0;}
-.cart-qty-btn{width:22px;height:22px;border-radius:4px;border:1px solid var(--border2);background:transparent;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--ink);transition:all .12s;}
-.cart-qty-btn:hover{background:var(--ink);color:#fff;}
-.cart-qty-num{font-family:"DM Mono",monospace;font-weight:700;font-size:13px;min-width:28px;text-align:center;}
-.cart-item-remove{background:none;border:none;cursor:pointer;font-size:16px;color:rgba(26,26,24,.3);padding:2px;transition:color .12s;}
-.cart-item-remove:hover{color:var(--red);}
-.cart-ftr{padding:12px 14px;border-top:1px solid var(--border);}
-.cart-checkout-btn{width:100%;padding:10px;background:var(--gold);border:none;border-radius:7px;font-family:"Syne",sans-serif;font-weight:700;font-size:12px;letter-spacing:.04em;color:var(--ink);cursor:pointer;transition:all .18s;}
-.cart-checkout-btn:hover{background:var(--gold-d);color:#fff;}
-/* EDITABLE QTY */
-.qty-edit-wrap{display:inline-flex;align-items:center;gap:4px;}
-.qty-edit-input{width:52px;padding:3px 6px;font-family:"DM Mono",monospace;font-weight:700;font-size:12px;border:1.5px solid var(--border2);border-radius:5px;text-align:center;background:#fff;color:var(--ink);outline:none;transition:border-color .15s;}
-.qty-edit-input:focus{border-color:var(--gold);}
-.qty-save-btn{padding:3px 8px;font-size:10px;font-weight:600;font-family:"Inter",sans-serif;border:1.5px solid var(--green);border-radius:5px;background:rgba(61,122,90,.08);color:var(--green);cursor:pointer;transition:all .15s;white-space:nowrap;}
-.qty-save-btn:hover{background:var(--green);color:#fff;}
-.qty-save-btn:disabled{opacity:.4;cursor:not-allowed;}
-/* PRODUCT IMAGE */
-.prod-img-wrap{display:flex;align-items:center;gap:10px;min-width:0;}
-.prod-img{width:44px;height:44px;border-radius:6px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;display:block;}
-.prod-img-placeholder{width:44px;height:44px;border-radius:6px;background:var(--cream);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-/* RESTOCK BUTTON */
-.btn-restock{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(200,169,110,.12);border:1.5px solid rgba(200,169,110,.3);border-radius:5px;color:var(--gold-d);font-size:10px;font-weight:600;font-family:"Inter",sans-serif;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.btn-restock:hover{background:var(--gold);color:var(--ink);}
-/* RESTOCK MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:none;align-items:center;justify-content:center;}
-.modal-overlay.open{display:flex;}
-.modal-box{background:#fff;border-radius:14px;width:min(580px,96vw);max-height:85vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 16px 48px rgba(0,0,0,.2);}
-.modal-hdr{padding:16px 20px;border-bottom:1px solid var(--border);background:#EAE7D8;display:flex;align-items:center;justify-content:space-between;}
-.modal-title{font-family:"Syne",sans-serif;font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--ink);}
-.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:rgba(26,26,24,.4);padding:0 4px;line-height:1;}
-.modal-close:hover{color:var(--red);}
-.modal-body{flex:1;overflow-y:auto;padding:20px;}
-.modal-ftr{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
-.order-line{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
-.order-line:last-child{border-bottom:none;}
-.ol-img{width:36px;height:36px;border-radius:5px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
-.ol-img-ph{width:36px;height:36px;border-radius:5px;background:var(--cream);border:1px solid var(--border);flex-shrink:0;}
-.ol-info{flex:1;min-width:0;}
-.ol-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ol-var{font-size:11px;color:rgba(26,26,24,.4);}
-.ol-qty{display:flex;align-items:center;gap:6px;}
-.ol-qty-btn{width:24px;height:24px;border-radius:4px;border:1.5px solid var(--border2);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
-.ol-qty-btn:hover{background:var(--ink);color:#fff;border-color:var(--ink);}
-.ol-qty-num{font-family:"DM Mono",monospace;font-weight:700;font-size:14px;min-width:28px;text-align:center;}
-.ol-remove{background:none;border:none;cursor:pointer;font-size:16px;color:rgba(26,26,24,.25);transition:color .12s;}
-.ol-remove:hover{color:var(--red);}
-/* IFRAME MODE */
 html.in-iframe .topbar{display:none!important;}
 html.in-iframe .layout{height:100vh;}
 </style>
@@ -354,11 +556,7 @@ html.in-iframe .layout{height:100vh;}
 <div class="topbar">
   <div class="logo">
     <div class="logo-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path d="M5 4h14l-2 4H7L5 4z" fill="#C8A96E"/>
-        <path d="M7 10h10l-2 4H9l-2-4z" fill="#C8A96E"/>
-        <path d="M9 16h6l-3 4-3-4z" fill="#C8A96E"/>
-      </svg>
+      <img src="data:image/png;base64,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" alt="FoldifyCase" style="width:30px;height:30px;object-fit:contain;display:block;">
     </div>
     <div class="logo-text">
       <div class="logo-name">FOLDIFYCASE</div>
@@ -370,8 +568,6 @@ html.in-iframe .layout{height:100vh;}
     <div class="pill"><div class="dot-gold"></div><span id="storePill">scnd9y-a1.myshopify.com</span></div>
   </div>
 </div>
-
-
 
 <div class="layout">
 
@@ -409,13 +605,13 @@ html.in-iframe .layout{height:100vh;}
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="14" height="2" rx="1"/><rect x="1" y="7" width="14" height="2" rx="1"/><rect x="1" y="11" width="14" height="2" rx="1"/></svg>
         All Stock
       </button>
+      <button class="nav-btn" onclick="setView('popular',this)">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 13l2-5 2 2 2-4 2 3 2-6 2 10H2z"/></svg>
+        Top Sellers
+      </button>
       <button class="nav-btn" onclick="setView('reorder',this)">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2l1.8 3.6L14 6.3l-3 2.9.7 4.1L8 11.4l-3.7 1.9.7-4.1-3-2.9 4.2-.7z"/></svg>
         Reorder Queue
-      </button>
-      <button class="nav-btn" onclick="setView('popular',this)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 13l2-5 2 2 2-4 2 3 2-6 2 10H2z"/></svg>
-        Top Sellers <span style="font-size:9px;color:rgba(255,255,255,.3);margin-left:3px">90d</span>
       </button>
     </div>
 
@@ -442,9 +638,9 @@ html.in-iframe .layout{height:100vh;}
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="2"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
         Thresholds
       </button>
-      <button class="nav-btn" onclick="setView('setup',this)">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zM2 7h8v2H2zM2 11h5v2H2z"/></svg>
-        Tag Setup Guide
+      <button class="nav-btn" onclick="setView('email-settings',this)">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12a1 1 0 011 1v8a1 1 0 01-1 1H2a1 1 0 01-1-1V4a1 1 0 011-1zm0 0l6 5 6-5"/></svg>
+        Email
       </button>
     </div>
   </div>
@@ -462,24 +658,24 @@ html.in-iframe .layout{height:100vh;}
       </div>
 
       <!-- WAREHOUSE TABS -->
-<div class="wh-bar">
-  <button class="whtab active-us" id="tab-us" onclick="setWarehouse('us')">
-    <div class="wh-bar-dot" style="background:rgba(255,255,255,.6)"></div>
-    US Warehouse <span class="whtab-count" id="cnt-us">—</span>
-  </button>
-  <button class="whtab" id="tab-uk" onclick="setWarehouse('uk')">
-    <div class="wh-bar-dot" style="background:var(--c-uk)"></div>
-    UK Warehouse <span class="whtab-count" id="cnt-uk">—</span>
-  </button>
-  <button class="whtab" id="tab-au" onclick="setWarehouse('au')">
-    <div class="wh-bar-dot" style="background:var(--c-au)"></div>
-    AU Warehouse <span class="whtab-count" id="cnt-au">—</span>
-  </button>
-  <button class="whtab" id="tab-all" onclick="setWarehouse('all')">
-    <div class="wh-bar-dot" style="background:rgba(26,26,24,.3)"></div>
-    All Warehouses <span class="whtab-count" id="cnt-all">—</span>
-  </button>
-</div>
+      <div class="wh-bar">
+        <button class="whtab active-us" id="tab-us" onclick="setWarehouse('us')">
+          <div class="wh-bar-dot" style="background:rgba(59,79,140,.5)"></div>
+          US Warehouse <span class="whtab-count" id="cnt-us">—</span>
+        </button>
+        <button class="whtab" id="tab-uk" onclick="setWarehouse('uk')">
+          <div class="wh-bar-dot" style="background:var(--c-uk)"></div>
+          UK Warehouse <span class="whtab-count" id="cnt-uk">—</span>
+        </button>
+        <button class="whtab" id="tab-au" onclick="setWarehouse('au')">
+          <div class="wh-bar-dot" style="background:var(--c-au)"></div>
+          AU Warehouse <span class="whtab-count" id="cnt-au">—</span>
+        </button>
+        <button class="whtab" id="tab-all" onclick="setWarehouse('all')">
+          <div class="wh-bar-dot" style="background:rgba(26,26,24,.3)"></div>
+          All Warehouses <span class="whtab-count" id="cnt-all">—</span>
+        </button>
+      </div>
 
       <div class="alert-banner" id="alertBanner">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0"><path d="M8 1L15 14H1L8 1z"/><rect x="7.3" y="5.5" width="1.4" height="4" fill="white"/><circle cx="8" cy="11.5" r=".9" fill="white"/></svg>
@@ -524,10 +720,35 @@ html.in-iframe .layout{height:100vh;}
           <div class="page-sub" id="stockSub">—</div>
         </div>
       </div>
-      <div class="search-wrap">
-        <span class="search-icon">⌕</span>
-        <input type="text" class="search-input" placeholder="Search products…" oninput="doSearch(this.value)">
+      <div class="stock-filter-bar">
+        <div class="search-wrap" style="flex:1;min-width:200px;margin-bottom:0">
+          <span class="search-icon">⌕</span>
+          <input type="text" class="search-input" id="stockSearchInput" placeholder="Search products…" oninput="applyStockFilters()">
+        </div>
+        <select class="filter-select" id="sfStatus" onchange="applyStockFilters()">
+          <option value="">All status</option>
+          <option value="critical">🔴 Critical</option>
+          <option value="low">🟡 Low stock</option>
+          <option value="ok">🟢 OK</option>
+        </select>
+        <select class="filter-select" id="sfWarehouse" onchange="applyStockFilters()">
+          <option value="">All warehouses</option>
+          <option value="us">🇺🇸 US</option>
+          <option value="uk">🇬🇧 UK</option>
+          <option value="au">🇦🇺 AU</option>
+        </select>
+        <select class="filter-select" id="sfSort" onchange="applyStockFilters()">
+          <option value="default">Sort: Default</option>
+          <option value="qty_asc">Stock: Low → High</option>
+          <option value="qty_desc">Stock: High → Low</option>
+          <option value="sold_desc">Best selling first</option>
+          <option value="name_asc">Name: A → Z</option>
+          <option value="name_desc">Name: Z → A</option>
+        </select>
+        <div class="filter-divider"></div>
+        <button class="filter-clear" onclick="clearStockFilters()" title="Clear all filters">✕ Clear</button>
       </div>
+      <div id="stockFilterTags" style="display:none;margin-bottom:6px;display:flex;gap:4px;flex-wrap:wrap"></div>
       <div class="card"><div id="fullTable"><div class="empty-state"><div class="spinner"></div></div></div></div>
     </div>
 
@@ -538,8 +759,59 @@ html.in-iframe .layout{height:100vh;}
           <div class="page-title">REORDER <em>QUEUE</em></div>
           <div class="page-sub" id="reorderSub">Sorted by urgency — most critical first</div>
         </div>
+        <button class="btn-sol gold" onclick="openRestock()" style="display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;min-width:180px">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+          Create Restock Order
+        </button>
       </div>
-      <div class="card"><div id="reorderTable"><div class="empty-state"><div class="spinner"></div></div></div></div>
+
+      <!-- ETA CALCULATOR — compact single row -->
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);flex-shrink:0">ETA Calculator</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <span style="font-size:10px;color:rgba(26,26,24,.4)">Order date</span>
+          <input type="date" class="eta-order-input" id="etaOrderDate" oninput="calcETA()" style="padding:4px 8px;font-size:11px;border:1.5px solid var(--border2);border-radius:5px;background:#fff;color:var(--ink);outline:none;font-family:'Inter',sans-serif">
+        </div>
+        <div style="width:1px;height:24px;background:var(--border);flex-shrink:0"></div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2D5FA6" stroke-width="2" stroke-linecap="round"><path d="M21 16l-9-5-9 5M3 8l9-5 9 5M12 3v18"/></svg>
+          <span style="font-size:11px;font-weight:600;color:#2D5FA6">Air</span>
+          <input type="number" class="eta-input" id="etaAirDays" value="7" min="1" max="60" oninput="calcETA()" style="width:46px;padding:4px 6px;font-size:12px;font-family:'DM Mono',monospace;font-weight:600;border:1.5px solid var(--border2);border-radius:5px;background:#fff;color:var(--ink);text-align:center;outline:none">
+          <span style="font-size:10px;color:rgba(26,26,24,.4)">days</span>
+          <span style="font-size:11px;font-weight:600;color:#2D5FA6;font-family:'DM Mono',monospace" id="etaAirResult">—</span>
+        </div>
+        <div style="width:1px;height:24px;background:var(--border);flex-shrink:0"></div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3D7A5A" stroke-width="2" stroke-linecap="round"><path d="M3 17l3-8 6 4 6-4 3 8M2 20h20"/><path d="M12 9V5M9 5h6"/></svg>
+          <span style="font-size:11px;font-weight:600;color:#3D7A5A">Sea</span>
+          <input type="number" class="eta-input" id="etaSeaDays" value="30" min="1" max="120" oninput="calcETA()" style="width:46px;padding:4px 6px;font-size:12px;font-family:'DM Mono',monospace;font-weight:600;border:1.5px solid var(--border2);border-radius:5px;background:#fff;color:var(--ink);text-align:center;outline:none">
+          <span style="font-size:10px;color:rgba(26,26,24,.4)">days</span>
+          <span style="font-size:11px;font-weight:600;color:#3D7A5A;font-family:'DM Mono',monospace" id="etaSeaResult">—</span>
+        </div>
+      </div>
+
+      <!-- Collapsible reorder list -->
+      <div class="card" style="overflow:visible">
+        <div class="card-hdr" onclick="toggleReorderList()" style="cursor:pointer;user-select:none">
+          <div>
+            <div class="card-title">PRODUCTS TO REORDER <span id="reorderCount" style="font-size:10px;background:rgba(26,26,24,.08);padding:1px 7px;border-radius:10px;font-weight:400;letter-spacing:0;text-transform:none;margin-left:6px">—</span></div>
+            <div class="card-sub">Click to show / hide the reorder list</div>
+          </div>
+          <span id="reorderArrow" style="font-size:11px;color:rgba(26,26,24,.35);transition:transform .18s;display:inline-block">▶</span>
+        </div>
+        <div id="reorderTableWrap" style="display:none">
+          <div id="reorderTable"><div class="empty-state"><div class="spinner"></div></div></div>
+        </div>
+      </div>
+
+      <!-- PURCHASE ORDER LOG -->
+      <div class="page-hdr" style="margin-top:16px">
+        <div>
+          <div class="page-title" style="font-size:16px">PURCHASE <em>ORDERS</em></div>
+          <div class="page-sub">History of restock orders placed</div>
+        </div>
+      </div>
+      <div class="card"><div class="po-log" id="poLog"><div class="empty-state" style="color:rgba(26,26,24,.3)">No restock orders placed yet — click Create Restock Order to get started.</div></div></div>
     </div>
 
     <!-- TOP SELLERS -->
@@ -547,10 +819,15 @@ html.in-iframe .layout{height:100vh;}
       <div class="page-hdr">
         <div>
           <div class="page-title">TOP <em>SELLERS</em></div>
-          <div class="page-sub" id="popularSub">Ranked by units sold — last 90 days · live from Shopify orders</div>
+          <div class="page-sub" id="popularSub">Ranked by units sold · live from Shopify orders</div>
         </div>
       </div>
-      <div class="card"><div id="popularTable"><div class="empty-state"><div class="spinner"></div>Fetching 90-day sales data…</div></div></div>
+      <div class="period-tabs">
+        <button class="period-tab" onclick="setPeriod(30,this)">30 days</button>
+        <button class="period-tab" onclick="setPeriod(60,this)">60 days</button>
+        <button class="period-tab active" onclick="setPeriod(90,this)">90 days</button>
+      </div>
+      <div class="card"><div id="popularTable"><div class="empty-state"><div class="spinner"></div>Fetching sales data…</div></div></div>
     </div>
 
     <!-- EMAIL ALERTS -->
@@ -570,11 +847,8 @@ html.in-iframe .layout{height:100vh;}
           <div class="email-tag-wrap" id="emailTagWrap" onclick="document.getElementById('emailTagInput').focus()">
             <input type="text" class="email-tag-input" id="emailTagInput" placeholder="name@company.com" onkeydown="handleEmailKey(event)">
           </div>
-          <div class="field-lbl">From name</div>
-          <input class="field-input" type="text" id="fromName" value="FoldifyCase Warehouse" placeholder="FoldifyCase Warehouse">
-          <div class="field-lbl">From email <span style="font-size:10px;color:rgba(26,26,24,.4)">(must be verified in Resend)</span></div>
-          <input class="field-input" type="email" id="fromEmail" placeholder="alerts@yourdomain.com">
           <button class="btn-sol" style="width:100%" onclick="saveRecipients()">Save Recipients</button>
+          <div style="font-size:11px;color:rgba(26,26,24,.4);margin-top:8px">From name &amp; email can be configured in Settings → Email</div>
           <div id="recipSaved" style="display:none;font-size:11px;color:var(--green);margin-top:8px;font-weight:500">✓ Recipients saved</div>
         </div>
 
@@ -635,7 +909,7 @@ html.in-iframe .layout{height:100vh;}
         <div class="send-status" id="sendStatus"></div>
       </div>
 
-      <div class="page-hdr" style="margin-bottom:10px">
+      <div class="page-hdr">
         <div class="page-title" style="font-size:16px">ALERT <em>HISTORY</em></div>
       </div>
       <div class="card"><div id="alertLog"><div class="log-row"><span class="log-time">—</span><span class="log-msg" style="color:rgba(26,26,24,.35)">No alerts sent yet</span></div></div></div>
@@ -662,29 +936,89 @@ html.in-iframe .layout{height:100vh;}
     </div>
 
     <!-- TAG SETUP -->
-    <div class="view" id="view-setup">
+    <div class="view" id="view-email-settings">
       <div class="page-hdr">
         <div>
-          <div class="page-title">TAG <em>SETUP</em></div>
-          <div class="page-sub">Add these tags in Shopify so each product appears in the correct warehouse view</div>
+          <div class="page-title">EMAIL <em>SETTINGS</em></div>
+          <div class="page-sub">Configure default email addresses used across the app</div>
         </div>
       </div>
-      <div class="setup-card">
-        <div class="setup-title">Your Tag System</div>
-        <div class="tag-row"><span class="tag-code">warehouse:us</span><span style="font-size:12px;color:rgba(26,26,24,.55);flex:1">Stocked in US warehouse</span><span class="badge b-info"><div class="bdot"></div>Active</span></div>
-        <div class="tag-row"><span class="tag-code">warehouse:uk</span><span style="font-size:12px;color:rgba(26,26,24,.55);flex:1">Stocked in UK warehouse</span><span class="badge b-info"><div class="bdot"></div>Active</span></div>
-        <div class="tag-row"><span class="tag-code">warehouse:au</span><span style="font-size:12px;color:rgba(26,26,24,.55);flex:1">Stocked in AU warehouse</span><span class="badge b-info"><div class="bdot"></div>Active</span></div>
-        <div class="tag-row"><span class="tag-code">dropship</span><span style="font-size:12px;color:rgba(26,26,24,.55);flex:1">Supplier ships direct — hidden from all views</span><span class="badge b-crit"><div class="bdot"></div>Excluded</span></div>
+
+      <!-- SUPPLIER EMAIL -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hdr">
+          <div>
+            <div class="card-title">DEFAULT SUPPLIER EMAIL</div>
+            <div class="card-sub">Pre-filled in every new restock order — save time so you don't type it each time</div>
+          </div>
+        </div>
+        <div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">Supplier Email Address</label>
+            <input type="email" id="defaultSupplierEmail" placeholder="supplier@company.com"
+              style="width:100%;max-width:400px;padding:8px 12px;font-size:13px;border:1.5px solid var(--border2);border-radius:7px;outline:none;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);transition:border-color .15s"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"
+              oninput="emailSettingsDirty()" onkeydown="if(event.key==='Enter')saveEmailSettings()">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">Supplier / Company Name</label>
+            <input type="text" id="defaultSupplierName" placeholder="e.g. Shenzhen Tech Co."
+              style="width:100%;max-width:400px;padding:8px 12px;font-size:13px;border:1.5px solid var(--border2);border-radius:7px;outline:none;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);transition:border-color .15s"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"
+              oninput="emailSettingsDirty()" onkeydown="if(event.key==='Enter')saveEmailSettings()">
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button class="btn-sol gold" id="saveEmailSettingsBtn" onclick="saveEmailSettings()" style="opacity:.4;pointer-events:none">Save</button>
+            <span id="emailSettingsSaved" style="font-size:11px;color:var(--green);display:none">✓ Saved</span>
+          </div>
+        </div>
       </div>
-      <div class="setup-card">
-        <div class="setup-title">How to Bulk-Tag in Shopify</div>
-        <div class="step-row"><div class="step-num">1</div><div class="step-text">Go to <strong>Shopify Admin → Products</strong>. Filter to your US warehouse products and select all with the checkbox.</div></div>
-        <div class="step-row"><div class="step-num">2</div><div class="step-text">Click <strong>Actions → Add tags</strong>. Type <span class="inline-code">warehouse:us</span> and save. Repeat for UK with <span class="inline-code">warehouse:uk</span> and AU with <span class="inline-code">warehouse:au</span>.</div></div>
-        <div class="step-row"><div class="step-num">3</div><div class="step-text">For dropship-only products add tag <span class="inline-code">dropship</span>. These are automatically hidden from every warehouse view.</div></div>
+
+      <!-- US WAREHOUSE EMAIL -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-hdr">
+          <div>
+            <div class="card-title">US WAREHOUSE EMAIL</div>
+            <div class="card-sub">Email address of the US warehouse team — notified on delivery confirmations and stock alerts</div>
+          </div>
+        </div>
+        <div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">US Warehouse Email</label>
+            <input type="email" id="usWarehouseEmail" placeholder="us-warehouse@foldifycase.com"
+              style="width:100%;max-width:400px;padding:8px 12px;font-size:13px;border:1.5px solid var(--border2);border-radius:7px;outline:none;font-family:'Inter',sans-serif;background:#fff;color:var(--ink);transition:border-color .15s"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'"
+              oninput="emailSettingsDirty()" onkeydown="if(event.key==='Enter')saveEmailSettings()">
+          </div>
+          <div style="font-size:11px;color:rgba(26,26,24,.4);line-height:1.5">
+            Used as the default notification email when confirming deliveries to the US warehouse.
+          </div>
+        </div>
       </div>
-      <div class="setup-card" style="margin-bottom:0">
-        <div class="setup-title">Adding a New Market Later</div>
-        <div style="font-size:12px;color:rgba(26,26,24,.55);line-height:1.6">Tag products with <span class="inline-code">warehouse:xx</span> in Shopify, then update this app to add a new tab. No other code changes needed.</div>
+
+      <!-- FROM EMAIL -->
+      <div class="card">
+        <div class="card-hdr">
+          <div>
+            <div class="card-title">SENDING EMAIL ADDRESS</div>
+            <div class="card-sub">The "From" address used for stock alert emails and supplier purchase orders</div>
+          </div>
+        </div>
+        <div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">From Name</label>
+            <input class="field-input" type="text" id="fromName" value="FoldifyCase Warehouse" placeholder="FoldifyCase Warehouse"
+              style="max-width:400px" oninput="saveRecipients()">
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(26,26,24,.5);display:block;margin-bottom:6px">From Email</label>
+            <input class="field-input" type="email" id="fromEmail" placeholder="warehouse@foldifycase.com.au"
+              style="max-width:400px" oninput="saveRecipients()">
+          </div>
+          <div style="font-size:11px;color:rgba(26,26,24,.4);line-height:1.5">
+            Must be a verified sending domain in your Resend account. Currently verified: <strong>foldifycase.com.au</strong>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -693,9 +1027,493 @@ html.in-iframe .layout{height:100vh;}
 
 <div class="toast" id="toast"><span id="tMsg"></span></div>
 
+<!-- FLOATING RESTOCK CART -->
+<button class="fab" id="restockFab" onclick="toggleCart()" title="Restock order">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+  <span class="fab-badge" id="fabBadge">0</span>
+</button>
+
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel-hdr">
+    <div class="cart-panel-title">Restock Order <span id="cartCount" style="font-size:10px;background:rgba(26,26,24,.1);padding:1px 7px;border-radius:10px;font-weight:400;margin-left:4px">0 items</span></div>
+    <button class="modal-close" onclick="toggleCart()">×</button>
+  </div>
+  <div class="cart-panel-body" id="cartBody">
+    <div class="cart-empty">No items yet — hit + Restock on any product</div>
+  </div>
+  <div class="cart-panel-ftr">
+    <button class="btn-out" style="flex:1;font-size:11px" onclick="clearCart()">Clear</button>
+    <button class="btn-sol gold" style="flex:2;font-size:11px" onclick="checkoutCart()">Create Restock Order →</button>
+  </div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="modal-overlay" id="restockModal">
+  <div class="modal" style="width:620px;max-width:96vw">
+    <div class="modal-hdr">
+      <div class="modal-title">Create Restock Order</div>
+      <button class="modal-close" onclick="closeRestock()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- ORDER LINES -->
+      <div class="modal-section">
+        <div class="modal-label" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          Order lines
+          <span id="lineCountBadge" style="font-size:10px;background:#EAE7D8;padding:1px 7px;border-radius:10px;font-weight:400;color:rgba(26,26,24,.5)">0 items</span>
+        </div>
+        <div class="order-lines" id="orderLines" style="display:none"></div>
+        <button class="add-line-btn" id="addLineBtn" onclick="showAddLine()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+          Add product
+        </button>
+      </div>
+
+      <!-- ADD PRODUCT PANEL -->
+      <div id="addLinePanel" style="display:none">
+        <div class="modal-section">
+          <div class="modal-label">Search product</div>
+          <div id="selectedProductWrap" style="display:none"></div>
+          <input type="text" class="modal-search" id="productSearch" placeholder="Search products…" oninput="searchProducts(this.value)" autocomplete="off">
+          <div class="modal-dropdown" id="productDropdown"></div>
+        </div>
+        <div class="modal-section" id="variantSection" style="display:none">
+          <div class="modal-label">Select variant</div>
+          <div class="variant-select-grid" id="variantGrid"></div>
+        </div>
+        <div class="modal-section" id="qtySection" style="display:none">
+          <div class="modal-label">Quantity</div>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="adjQty(-10)">−</button>
+            <input type="number" class="qty-input" id="restockQty" value="50" min="1">
+            <button class="qty-btn" onclick="adjQty(10)">+</button>
+            <span style="font-size:12px;color:rgba(26,26,24,.4)">units</span>
+          </div>
+        </div>
+        <div class="modal-section" id="addLineBtnRow" style="display:none">
+          <div style="display:flex;gap:8px">
+            <button class="btn-sol gold" onclick="addLineToOrder()" style="flex:1">Add to order</button>
+            <button class="btn-out" onclick="cancelAddLine()" style="flex:1">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-divider" id="orderDivider" style="display:none"></div>
+
+      <!-- ORDER SETTINGS -->
+      <div id="orderSettings" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="modal-section" style="margin-bottom:0">
+            <div class="modal-label">Shipping method</div>
+            <div class="ship-toggle">
+              <div class="ship-opt selected" id="shipAir" onclick="selectShip('air')">
+                <div class="ship-opt-label">✈ By Air</div>
+                <div class="ship-opt-eta air" id="modalAirEta">—</div>
+              </div>
+              <div class="ship-opt" id="shipSea" onclick="selectShip('sea')">
+                <div class="ship-opt-label">⛵ By Sea</div>
+                <div class="ship-opt-eta sea" id="modalSeaEta">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-section" style="margin-bottom:0">
+            <div class="modal-label">Order date</div>
+            <input type="date" class="modal-search" id="restockOrderDate" oninput="updateModalETA()" style="margin-bottom:10px">
+            <div class="modal-label">Notes <span style="font-weight:400;color:rgba(26,26,24,.35)">(optional)</span></div>
+            <input type="text" class="modal-search" id="restockNotes" placeholder="e.g. urgent, check quality…">
+          </div>
+        </div>
+        <div class="supplier-section">
+          <div class="supplier-title">Send to supplier</div>
+          <input type="email" class="supplier-input" id="supplierEmail" placeholder="supplier@company.com">
+          <input type="text" class="supplier-input" id="supplierName" placeholder="Supplier / company name (optional)">
+          <div class="supplier-hint">A branded purchase order email will be sent to your supplier when you confirm.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-out" onclick="closeRestock()">Cancel</button>
+      <button class="btn-sol" id="confirmRestockBtn" onclick="confirmRestock()" style="opacity:.4;pointer-events:none">Place Order</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tMsg"></span></div>
+
+<!-- FLOATING RESTOCK CART -->
+<button class="fab" id="restockFab" onclick="toggleCart()" title="Restock order">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+  <span class="fab-badge" id="fabBadge">0</span>
+</button>
+
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel-hdr">
+    <div class="cart-panel-title">Restock Order <span id="cartCount" style="font-size:10px;background:rgba(26,26,24,.1);padding:1px 7px;border-radius:10px;font-weight:400;margin-left:4px">0 items</span></div>
+    <button class="modal-close" onclick="toggleCart()">×</button>
+  </div>
+  <div class="cart-panel-body" id="cartBody">
+    <div class="cart-empty">No items yet — hit + Restock on any product</div>
+  </div>
+  <div class="cart-panel-ftr">
+    <button class="btn-out" style="flex:1;font-size:11px" onclick="clearCart()">Clear</button>
+    <button class="btn-sol gold" style="flex:2;font-size:11px" onclick="checkoutCart()">Create Restock Order →</button>
+  </div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="modal-overlay" id="restockModal">
+  <div class="modal" style="width:620px;max-width:96vw">
+    <div class="modal-hdr">
+      <div class="modal-title">Create Restock Order</div>
+      <button class="modal-close" onclick="closeRestock()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- ORDER LINES -->
+      <div class="modal-section">
+        <div class="modal-label" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          Order lines
+          <span id="lineCountBadge" style="font-size:10px;background:#EAE7D8;padding:1px 7px;border-radius:10px;font-weight:400;color:rgba(26,26,24,.5)">0 items</span>
+        </div>
+        <div class="order-lines" id="orderLines" style="display:none"></div>
+        <button class="add-line-btn" id="addLineBtn" onclick="showAddLine()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+          Add product
+        </button>
+      </div>
+
+      <!-- ADD PRODUCT PANEL -->
+      <div id="addLinePanel" style="display:none">
+        <div class="modal-section">
+          <div class="modal-label">Search product</div>
+          <div id="selectedProductWrap" style="display:none"></div>
+          <input type="text" class="modal-search" id="productSearch" placeholder="Search products…" oninput="searchProducts(this.value)" autocomplete="off">
+          <div class="modal-dropdown" id="productDropdown"></div>
+        </div>
+        <div class="modal-section" id="variantSection" style="display:none">
+          <div class="modal-label">Select variant</div>
+          <div class="variant-select-grid" id="variantGrid"></div>
+        </div>
+        <div class="modal-section" id="qtySection" style="display:none">
+          <div class="modal-label">Quantity</div>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="adjQty(-10)">−</button>
+            <input type="number" class="qty-input" id="restockQty" value="50" min="1">
+            <button class="qty-btn" onclick="adjQty(10)">+</button>
+            <span style="font-size:12px;color:rgba(26,26,24,.4)">units</span>
+          </div>
+        </div>
+        <div class="modal-section" id="addLineBtnRow" style="display:none">
+          <div style="display:flex;gap:8px">
+            <button class="btn-sol gold" onclick="addLineToOrder()" style="flex:1">Add to order</button>
+            <button class="btn-out" onclick="cancelAddLine()" style="flex:1">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-divider" id="orderDivider" style="display:none"></div>
+
+      <!-- ORDER SETTINGS -->
+      <div id="orderSettings" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="modal-section" style="margin-bottom:0">
+            <div class="modal-label">Shipping method</div>
+            <div class="ship-toggle">
+              <div class="ship-opt selected" id="shipAir" onclick="selectShip('air')">
+                <div class="ship-opt-label">✈ By Air</div>
+                <div class="ship-opt-eta air" id="modalAirEta">—</div>
+              </div>
+              <div class="ship-opt" id="shipSea" onclick="selectShip('sea')">
+                <div class="ship-opt-label">⛵ By Sea</div>
+                <div class="ship-opt-eta sea" id="modalSeaEta">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-section" style="margin-bottom:0">
+            <div class="modal-label">Order date</div>
+            <input type="date" class="modal-search" id="restockOrderDate" oninput="updateModalETA()" style="margin-bottom:10px">
+            <div class="modal-label">Notes <span style="font-weight:400;color:rgba(26,26,24,.35)">(optional)</span></div>
+            <input type="text" class="modal-search" id="restockNotes" placeholder="e.g. urgent, check quality…">
+          </div>
+        </div>
+        <div class="supplier-section">
+          <div class="supplier-title">Send to supplier</div>
+          <input type="email" class="supplier-input" id="supplierEmail" placeholder="supplier@company.com">
+          <input type="text" class="supplier-input" id="supplierName" placeholder="Supplier / company name (optional)">
+          <div class="supplier-hint">A branded purchase order email will be sent to your supplier when you confirm.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-out" onclick="closeRestock()">Cancel</button>
+      <button class="btn-sol" id="confirmRestockBtn" onclick="confirmRestock()" style="opacity:.4;pointer-events:none">Place Order</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tMsg"></span></div>
+
+<!-- FLOATING RESTOCK CART -->
+<button class="fab" id="restockFab" onclick="toggleCart()" title="Restock order">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+  <span class="fab-badge" id="fabBadge">0</span>
+</button>
+
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel-hdr">
+    <div class="cart-panel-title">Restock Order <span id="cartCount" style="font-size:10px;background:rgba(26,26,24,.1);padding:1px 7px;border-radius:10px;font-weight:400;margin-left:4px">0 items</span></div>
+    <button class="modal-close" onclick="toggleCart()">×</button>
+  </div>
+  <div class="cart-panel-body" id="cartBody">
+    <div class="cart-empty">No items yet — hit + Restock on any product</div>
+  </div>
+  <div class="cart-panel-ftr">
+    <button class="btn-out" style="flex:1;font-size:11px" onclick="clearCart()">Clear</button>
+    <button class="btn-sol gold" style="flex:2;font-size:11px" onclick="checkoutCart()">Create Restock Order →</button>
+  </div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="modal-overlay" id="restockModal">
+  <div class="modal" style="width:620px;max-width:96vw">
+    <div class="modal-hdr">
+      <div class="modal-title">Create Restock Order</div>
+      <button class="modal-close" onclick="closeRestock()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- ORDER LINES -->
+      <div class="modal-section">
+        <div class="modal-label" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          Order lines
+          <span id="lineCountBadge" style="font-size:10px;background:#EAE7D8;padding:1px 7px;border-radius:10px;font-weight:400;color:rgba(26,26,24,.5)">0 items</span>
+        </div>
+        <div class="order-lines" id="orderLines" style="display:none"></div>
+        <button class="add-line-btn" id="addLineBtn" onclick="showAddLine()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+          Add product
+        </button>
+      </div>
+
+      <!-- ADD PRODUCT PANEL -->
+      <div id="addLinePanel" style="display:none">
+        <div class="modal-section">
+          <div class="modal-label">Search product</div>
+          <div id="selectedProductWrap" style="display:none"></div>
+          <input type="text" class="modal-search" id="productSearch" placeholder="Search products…" oninput="searchProducts(this.value)" autocomplete="off">
+          <div class="modal-dropdown" id="productDropdown"></div>
+        </div>
+        <div class="modal-section" id="variantSection" style="display:none">
+          <div class="modal-label">Select variant</div>
+          <div class="variant-select-grid" id="variantGrid"></div>
+        </div>
+        <div class="modal-section" id="qtySection" style="display:none">
+          <div class="modal-label">Quantity</div>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="adjQty(-10)">−</button>
+            <input type="number" class="qty-input" id="restockQty" value="50" min="1">
+            <button class="qty-btn" onclick="adjQty(10)">+</button>
+            <span style="font-size:12px;color:rgba(26,26,24,.4)">units</span>
+          </div>
+        </div>
+        <div class="modal-section" id="addLineBtnRow" style="display:none">
+          <div style="display:flex;gap:8px">
+            <button class="btn-sol gold" onclick="addLineToOrder()" style="flex:1">Add to order</button>
+            <button class="btn-out" onclick="cancelAddLine()" style="flex:1">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-divider" id="orderDivider" style="display:none"></div>
+
+      <!-- ORDER SETTINGS -->
+      <div id="orderSettings" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="modal-section" style="margin-bottom:0">
+            <div class="modal-label">Shipping method</div>
+            <div class="ship-toggle">
+              <div class="ship-opt selected" id="shipAir" onclick="selectShip('air')">
+                <div class="ship-opt-label">✈ By Air</div>
+                <div class="ship-opt-eta air" id="modalAirEta">—</div>
+              </div>
+              <div class="ship-opt" id="shipSea" onclick="selectShip('sea')">
+                <div class="ship-opt-label">⛵ By Sea</div>
+                <div class="ship-opt-eta sea" id="modalSeaEta">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-section" style="margin-bottom:0">
+            <div class="modal-label">Order date</div>
+            <input type="date" class="modal-search" id="restockOrderDate" oninput="updateModalETA()" style="margin-bottom:10px">
+            <div class="modal-label">Notes <span style="font-weight:400;color:rgba(26,26,24,.35)">(optional)</span></div>
+            <input type="text" class="modal-search" id="restockNotes" placeholder="e.g. urgent, check quality…">
+          </div>
+        </div>
+        <div class="supplier-section">
+          <div class="supplier-title">Send to supplier</div>
+          <input type="email" class="supplier-input" id="supplierEmail" placeholder="supplier@company.com">
+          <input type="text" class="supplier-input" id="supplierName" placeholder="Supplier / company name (optional)">
+          <div class="supplier-hint">A branded purchase order email will be sent to your supplier when you confirm.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-out" onclick="closeRestock()">Cancel</button>
+      <button class="btn-sol" id="confirmRestockBtn" onclick="confirmRestock()" style="opacity:.4;pointer-events:none">Place Order</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tMsg"></span></div>
+
+<!-- FLOATING RESTOCK CART -->
+<button class="fab" id="restockFab" onclick="toggleCart()" title="Restock order">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+  <span class="fab-badge" id="fabBadge">0</span>
+</button>
+
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel-hdr">
+    <div class="cart-panel-title">Restock Order <span id="cartCount" style="font-size:10px;background:rgba(26,26,24,.1);padding:1px 7px;border-radius:10px;font-weight:400;margin-left:4px">0 items</span></div>
+    <button class="modal-close" onclick="toggleCart()">×</button>
+  </div>
+  <div class="cart-panel-body" id="cartBody">
+    <div class="cart-empty">No items yet — hit + Restock on any product</div>
+  </div>
+  <div class="cart-panel-ftr">
+    <button class="btn-out" style="flex:1;font-size:11px" onclick="clearCart()">Clear</button>
+    <button class="btn-sol gold" style="flex:2;font-size:11px" onclick="checkoutCart()">Create Restock Order →</button>
+  </div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="modal-overlay" id="restockModal">
+  <div class="modal" style="width:620px;max-width:96vw">
+    <div class="modal-hdr">
+      <div class="modal-title">Create Restock Order</div>
+      <button class="modal-close" onclick="closeRestock()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- ORDER LINES -->
+      <div class="modal-section">
+        <div class="modal-label" style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          Order lines
+          <span id="lineCountBadge" style="font-size:10px;background:#EAE7D8;padding:1px 7px;border-radius:10px;font-weight:400;color:rgba(26,26,24,.5)">0 items</span>
+        </div>
+        <div class="order-lines" id="orderLines" style="display:none"></div>
+        <button class="add-line-btn" id="addLineBtn" onclick="showAddLine()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
+          Add product
+        </button>
+      </div>
+
+      <!-- ADD PRODUCT PANEL -->
+      <div id="addLinePanel" style="display:none">
+        <div class="modal-section">
+          <div class="modal-label">Search product</div>
+          <div id="selectedProductWrap" style="display:none"></div>
+          <input type="text" class="modal-search" id="productSearch" placeholder="Search products…" oninput="searchProducts(this.value)" autocomplete="off">
+          <div class="modal-dropdown" id="productDropdown"></div>
+        </div>
+        <div class="modal-section" id="variantSection" style="display:none">
+          <div class="modal-label">Select variant</div>
+          <div class="variant-select-grid" id="variantGrid"></div>
+        </div>
+        <div class="modal-section" id="qtySection" style="display:none">
+          <div class="modal-label">Quantity</div>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="adjQty(-10)">−</button>
+            <input type="number" class="qty-input" id="restockQty" value="50" min="1">
+            <button class="qty-btn" onclick="adjQty(10)">+</button>
+            <span style="font-size:12px;color:rgba(26,26,24,.4)">units</span>
+          </div>
+        </div>
+        <div class="modal-section" id="addLineBtnRow" style="display:none">
+          <div style="display:flex;gap:8px">
+            <button class="btn-sol gold" onclick="addLineToOrder()" style="flex:1">Add to order</button>
+            <button class="btn-out" onclick="cancelAddLine()" style="flex:1">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-divider" id="orderDivider" style="display:none"></div>
+
+      <!-- ORDER SETTINGS -->
+      <div id="orderSettings" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+          <div class="modal-section" style="margin-bottom:0">
+            <div class="modal-label">Shipping method</div>
+            <div class="ship-toggle">
+              <div class="ship-opt selected" id="shipAir" onclick="selectShip('air')">
+                <div class="ship-opt-label">✈ By Air</div>
+                <div class="ship-opt-eta air" id="modalAirEta">—</div>
+              </div>
+              <div class="ship-opt" id="shipSea" onclick="selectShip('sea')">
+                <div class="ship-opt-label">⛵ By Sea</div>
+                <div class="ship-opt-eta sea" id="modalSeaEta">—</div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-section" style="margin-bottom:0">
+            <div class="modal-label">Order date</div>
+            <input type="date" class="modal-search" id="restockOrderDate" oninput="updateModalETA()" style="margin-bottom:10px">
+            <div class="modal-label">Notes <span style="font-weight:400;color:rgba(26,26,24,.35)">(optional)</span></div>
+            <input type="text" class="modal-search" id="restockNotes" placeholder="e.g. urgent, check quality…">
+          </div>
+        </div>
+        <div class="supplier-section">
+          <div class="supplier-title">Send to supplier</div>
+          <input type="email" class="supplier-input" id="supplierEmail" placeholder="supplier@company.com">
+          <input type="text" class="supplier-input" id="supplierName" placeholder="Supplier / company name (optional)">
+          <div class="supplier-hint">A branded purchase order email will be sent to your supplier when you confirm.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn-out" onclick="closeRestock()">Cancel</button>
+      <button class="btn-sol" id="confirmRestockBtn" onclick="confirmRestock()" style="opacity:.4;pointer-events:none">Place Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELIVERY CONFIRMATION MODAL -->
+<div class="modal-overlay" id="deliveryModalOverlay" style="display:none" onclick="if(event.target===this)closeDeliveryModal()">
+  <div class="modal-box" style="max-width:560px;width:95vw">
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-title">CONFIRM DELIVERY</div>
+        <div class="modal-sub" id="deliveryModalSub">Check received quantities and update Shopify</div>
+      </div>
+      <button class="modal-close" onclick="closeDeliveryModal()">×</button>
+    </div>
+    <div style="padding:16px 20px;max-height:55vh;overflow-y:auto">
+      <div style="background:#EAF3DE;border:1px solid #C5DFA8;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:11px;color:#2A5C0A">
+        📦 Confirm quantities received. Adjust if delivery was short or damaged.
+      </div>
+      <div id="deliveryLineItems"></div>
+    </div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;font-size:10px;color:rgba(26,26,24,.4)" id="deliveryModalStatus">Ready</div>
+      <button class="btn-out" onclick="closeDeliveryModal()">Cancel</button>
+      <button class="btn-sol gold" id="deliveryConfirmBtn" onclick="submitDelivery()">✓ Confirm &amp; Update Shopify</button>
+    </div>
+  </div>
+</div>
 
 <script>
-
 
 
 const PROXY = '/api/proxy';
@@ -1104,99 +1922,6 @@ async function sendToSupplier(order){
 </table>
 </td></tr>
 </table>
-
-<!-- RESTOCK MODAL -->
-<div class="modal-overlay" id="restockModal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">CREATE RESTOCK ORDER</div>
-      <button class="modal-close" onclick="closeRestock()">×</button>
-    </div>
-    <div class="modal-body" id="restockBody">
-      <!-- Order lines -->
-      <div id="orderLines"></div>
-      <div id="addLinePanel">
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-          <div style="font-size:11px;font-weight:600;color:rgba(26,26,24,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Add Product</div>
-          <input type="text" class="search-input" id="productSearch" placeholder="Search products…" oninput="searchProducts(this.value)" style="margin-bottom:8px">
-          <div id="productResults"></div>
-        </div>
-      </div>
-      <div id="orderSettings" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div>
-            <div class="field-lbl">Shipping method</div>
-            <select class="select-input" id="shipMethod" style="margin-bottom:0">
-              <option value="sea">⛵ By Sea — Standard</option>
-              <option value="air">✈ By Air — Express</option>
-            </select>
-          </div>
-          <div>
-            <div class="field-lbl">ETA</div>
-            <input type="text" class="field-input" id="etaInput" placeholder="e.g. May 15 – May 30" style="margin-bottom:0">
-          </div>
-        </div>
-        <div>
-          <div class="field-lbl">Supplier email</div>
-          <input type="email" class="field-input" id="supplierEmailInput" placeholder="supplier@example.com" style="margin-bottom:0">
-        </div>
-        <div style="margin-top:10px">
-          <div class="field-lbl">Notes (optional)</div>
-          <input type="text" class="field-input" id="orderNotes" placeholder="Any special instructions…" style="margin-bottom:0">
-        </div>
-      </div>
-      <div id="orderDivider" style="display:none"></div>
-    </div>
-    <div class="modal-ftr">
-      <button class="btn-out" onclick="closeRestock()">Cancel</button>
-      <button class="btn-sol gold" id="confirmOrderBtn" onclick="placeOrder()" disabled>Place Order</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELIVERY CONFIRM MODAL -->
-<div class="modal-overlay" id="deliveryModalOverlay" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(26,26,24,.45);z-index:300">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">CONFIRM DELIVERY</div>
-      <button class="modal-close" onclick="closeDeliveryModal()">×</button>
-    </div>
-    <div class="modal-body" id="deliveryModalBody"></div>
-    <div class="modal-ftr">
-      <button class="btn-out" onclick="closeDeliveryModal()">Cancel</button>
-      <button class="btn-sol gold" onclick="submitDelivery()">Confirm & Update Shopify</button>
-    </div>
-  </div>
-</div>
-
-<!-- CART FAB -->
-<button class="cart-fab" id="cartFab" onclick="toggleCart()" title="Restock cart">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-  </svg>
-  <div class="cart-fab-badge" id="fabBadge">0</div>
-</button>
-
-<!-- CART PANEL -->
-<div class="cart-panel" id="cartPanel">
-  <div class="cart-hdr">
-    <div>
-      <div class="cart-title">RESTOCK CART</div>
-      <div class="cart-count" id="cartCount">0 items</div>
-    </div>
-    <button class="btn-out" style="font-size:11px;padding:5px 10px" onclick="checkoutCart()">Create Order →</button>
-  </div>
-  <div class="cart-body" id="cartBody">
-    <div class="cart-empty">No items yet — hit + Restock on any product</div>
-  </div>
-  <div class="cart-ftr">
-    <button class="cart-checkout-btn" onclick="checkoutCart()">Create Restock Order →</button>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"><span id="tMsg"></span></div>
-
 </body></html>`;
 
   try{
@@ -1561,99 +2286,6 @@ async function emailWarehouse(orderId){
 
 </table>
 </td></tr></table>
-
-<!-- RESTOCK MODAL -->
-<div class="modal-overlay" id="restockModal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">CREATE RESTOCK ORDER</div>
-      <button class="modal-close" onclick="closeRestock()">×</button>
-    </div>
-    <div class="modal-body" id="restockBody">
-      <!-- Order lines -->
-      <div id="orderLines"></div>
-      <div id="addLinePanel">
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-          <div style="font-size:11px;font-weight:600;color:rgba(26,26,24,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Add Product</div>
-          <input type="text" class="search-input" id="productSearch" placeholder="Search products…" oninput="searchProducts(this.value)" style="margin-bottom:8px">
-          <div id="productResults"></div>
-        </div>
-      </div>
-      <div id="orderSettings" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div>
-            <div class="field-lbl">Shipping method</div>
-            <select class="select-input" id="shipMethod" style="margin-bottom:0">
-              <option value="sea">⛵ By Sea — Standard</option>
-              <option value="air">✈ By Air — Express</option>
-            </select>
-          </div>
-          <div>
-            <div class="field-lbl">ETA</div>
-            <input type="text" class="field-input" id="etaInput" placeholder="e.g. May 15 – May 30" style="margin-bottom:0">
-          </div>
-        </div>
-        <div>
-          <div class="field-lbl">Supplier email</div>
-          <input type="email" class="field-input" id="supplierEmailInput" placeholder="supplier@example.com" style="margin-bottom:0">
-        </div>
-        <div style="margin-top:10px">
-          <div class="field-lbl">Notes (optional)</div>
-          <input type="text" class="field-input" id="orderNotes" placeholder="Any special instructions…" style="margin-bottom:0">
-        </div>
-      </div>
-      <div id="orderDivider" style="display:none"></div>
-    </div>
-    <div class="modal-ftr">
-      <button class="btn-out" onclick="closeRestock()">Cancel</button>
-      <button class="btn-sol gold" id="confirmOrderBtn" onclick="placeOrder()" disabled>Place Order</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELIVERY CONFIRM MODAL -->
-<div class="modal-overlay" id="deliveryModalOverlay" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(26,26,24,.45);z-index:300">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">CONFIRM DELIVERY</div>
-      <button class="modal-close" onclick="closeDeliveryModal()">×</button>
-    </div>
-    <div class="modal-body" id="deliveryModalBody"></div>
-    <div class="modal-ftr">
-      <button class="btn-out" onclick="closeDeliveryModal()">Cancel</button>
-      <button class="btn-sol gold" onclick="submitDelivery()">Confirm & Update Shopify</button>
-    </div>
-  </div>
-</div>
-
-<!-- CART FAB -->
-<button class="cart-fab" id="cartFab" onclick="toggleCart()" title="Restock cart">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-  </svg>
-  <div class="cart-fab-badge" id="fabBadge">0</div>
-</button>
-
-<!-- CART PANEL -->
-<div class="cart-panel" id="cartPanel">
-  <div class="cart-hdr">
-    <div>
-      <div class="cart-title">RESTOCK CART</div>
-      <div class="cart-count" id="cartCount">0 items</div>
-    </div>
-    <button class="btn-out" style="font-size:11px;padding:5px 10px" onclick="checkoutCart()">Create Order →</button>
-  </div>
-  <div class="cart-body" id="cartBody">
-    <div class="cart-empty">No items yet — hit + Restock on any product</div>
-  </div>
-  <div class="cart-ftr">
-    <button class="cart-checkout-btn" onclick="checkoutCart()">Create Restock Order →</button>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"><span id="tMsg"></span></div>
-
 </body></html>`;
 
   try{
@@ -3026,99 +3658,6 @@ function generatePrintableHTML(order){
   </table>
   <div class="footer-note">FOLDIFYCASE — Please verify all items upon arrival and update inventory in Shopify.</div>
 </div>
-
-<!-- RESTOCK MODAL -->
-<div class="modal-overlay" id="restockModal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">CREATE RESTOCK ORDER</div>
-      <button class="modal-close" onclick="closeRestock()">×</button>
-    </div>
-    <div class="modal-body" id="restockBody">
-      <!-- Order lines -->
-      <div id="orderLines"></div>
-      <div id="addLinePanel">
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-          <div style="font-size:11px;font-weight:600;color:rgba(26,26,24,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Add Product</div>
-          <input type="text" class="search-input" id="productSearch" placeholder="Search products…" oninput="searchProducts(this.value)" style="margin-bottom:8px">
-          <div id="productResults"></div>
-        </div>
-      </div>
-      <div id="orderSettings" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div>
-            <div class="field-lbl">Shipping method</div>
-            <select class="select-input" id="shipMethod" style="margin-bottom:0">
-              <option value="sea">⛵ By Sea — Standard</option>
-              <option value="air">✈ By Air — Express</option>
-            </select>
-          </div>
-          <div>
-            <div class="field-lbl">ETA</div>
-            <input type="text" class="field-input" id="etaInput" placeholder="e.g. May 15 – May 30" style="margin-bottom:0">
-          </div>
-        </div>
-        <div>
-          <div class="field-lbl">Supplier email</div>
-          <input type="email" class="field-input" id="supplierEmailInput" placeholder="supplier@example.com" style="margin-bottom:0">
-        </div>
-        <div style="margin-top:10px">
-          <div class="field-lbl">Notes (optional)</div>
-          <input type="text" class="field-input" id="orderNotes" placeholder="Any special instructions…" style="margin-bottom:0">
-        </div>
-      </div>
-      <div id="orderDivider" style="display:none"></div>
-    </div>
-    <div class="modal-ftr">
-      <button class="btn-out" onclick="closeRestock()">Cancel</button>
-      <button class="btn-sol gold" id="confirmOrderBtn" onclick="placeOrder()" disabled>Place Order</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELIVERY CONFIRM MODAL -->
-<div class="modal-overlay" id="deliveryModalOverlay" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(26,26,24,.45);z-index:300">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">CONFIRM DELIVERY</div>
-      <button class="modal-close" onclick="closeDeliveryModal()">×</button>
-    </div>
-    <div class="modal-body" id="deliveryModalBody"></div>
-    <div class="modal-ftr">
-      <button class="btn-out" onclick="closeDeliveryModal()">Cancel</button>
-      <button class="btn-sol gold" onclick="submitDelivery()">Confirm & Update Shopify</button>
-    </div>
-  </div>
-</div>
-
-<!-- CART FAB -->
-<button class="cart-fab" id="cartFab" onclick="toggleCart()" title="Restock cart">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-  </svg>
-  <div class="cart-fab-badge" id="fabBadge">0</div>
-</button>
-
-<!-- CART PANEL -->
-<div class="cart-panel" id="cartPanel">
-  <div class="cart-hdr">
-    <div>
-      <div class="cart-title">RESTOCK CART</div>
-      <div class="cart-count" id="cartCount">0 items</div>
-    </div>
-    <button class="btn-out" style="font-size:11px;padding:5px 10px" onclick="checkoutCart()">Create Order →</button>
-  </div>
-  <div class="cart-body" id="cartBody">
-    <div class="cart-empty">No items yet — hit + Restock on any product</div>
-  </div>
-  <div class="cart-ftr">
-    <button class="cart-checkout-btn" onclick="checkoutCart()">Create Restock Order →</button>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"><span id="tMsg"></span></div>
-
 </body></html>`;
 }
 
@@ -3130,100 +3669,6 @@ function showPrintableOrder(order){
 startLoad();
 
 
-
 </script>
-
-<!-- RESTOCK MODAL -->
-<div class="modal-overlay" id="restockModal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">CREATE RESTOCK ORDER</div>
-      <button class="modal-close" onclick="closeRestock()">×</button>
-    </div>
-    <div class="modal-body" id="restockBody">
-      <!-- Order lines -->
-      <div id="orderLines"></div>
-      <div id="addLinePanel">
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-          <div style="font-size:11px;font-weight:600;color:rgba(26,26,24,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Add Product</div>
-          <input type="text" class="search-input" id="productSearch" placeholder="Search products…" oninput="searchProducts(this.value)" style="margin-bottom:8px">
-          <div id="productResults"></div>
-        </div>
-      </div>
-      <div id="orderSettings" style="display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-          <div>
-            <div class="field-lbl">Shipping method</div>
-            <select class="select-input" id="shipMethod" style="margin-bottom:0">
-              <option value="sea">⛵ By Sea — Standard</option>
-              <option value="air">✈ By Air — Express</option>
-            </select>
-          </div>
-          <div>
-            <div class="field-lbl">ETA</div>
-            <input type="text" class="field-input" id="etaInput" placeholder="e.g. May 15 – May 30" style="margin-bottom:0">
-          </div>
-        </div>
-        <div>
-          <div class="field-lbl">Supplier email</div>
-          <input type="email" class="field-input" id="supplierEmailInput" placeholder="supplier@example.com" style="margin-bottom:0">
-        </div>
-        <div style="margin-top:10px">
-          <div class="field-lbl">Notes (optional)</div>
-          <input type="text" class="field-input" id="orderNotes" placeholder="Any special instructions…" style="margin-bottom:0">
-        </div>
-      </div>
-      <div id="orderDivider" style="display:none"></div>
-    </div>
-    <div class="modal-ftr">
-      <button class="btn-out" onclick="closeRestock()">Cancel</button>
-      <button class="btn-sol gold" id="confirmOrderBtn" onclick="placeOrder()" disabled>Place Order</button>
-    </div>
-  </div>
-</div>
-
-<!-- DELIVERY CONFIRM MODAL -->
-<div class="modal-overlay" id="deliveryModalOverlay" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(26,26,24,.45);z-index:300">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <div class="modal-title">CONFIRM DELIVERY</div>
-      <button class="modal-close" onclick="closeDeliveryModal()">×</button>
-    </div>
-    <div class="modal-body" id="deliveryModalBody"></div>
-    <div class="modal-ftr">
-      <button class="btn-out" onclick="closeDeliveryModal()">Cancel</button>
-      <button class="btn-sol gold" onclick="submitDelivery()">Confirm & Update Shopify</button>
-    </div>
-  </div>
-</div>
-
-<!-- CART FAB -->
-<button class="cart-fab" id="cartFab" onclick="toggleCart()" title="Restock cart">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
-  </svg>
-  <div class="cart-fab-badge" id="fabBadge">0</div>
-</button>
-
-<!-- CART PANEL -->
-<div class="cart-panel" id="cartPanel">
-  <div class="cart-hdr">
-    <div>
-      <div class="cart-title">RESTOCK CART</div>
-      <div class="cart-count" id="cartCount">0 items</div>
-    </div>
-    <button class="btn-out" style="font-size:11px;padding:5px 10px" onclick="checkoutCart()">Create Order →</button>
-  </div>
-  <div class="cart-body" id="cartBody">
-    <div class="cart-empty">No items yet — hit + Restock on any product</div>
-  </div>
-  <div class="cart-ftr">
-    <button class="cart-checkout-btn" onclick="checkoutCart()">Create Restock Order →</button>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"><span id="tMsg"></span></div>
-
 </body>
 </html>

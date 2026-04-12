@@ -1549,6 +1549,48 @@ async function sendToSupplier(order){
 </table>
 </td></tr>
 </table>
+
+<script>
+// Receive email settings from parent combined app
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'FC_EMAIL_SETTINGS') return;
+  try{
+    if(e.data.usWarehouseEmail){
+      localStorage.setItem('fc_email_us_warehouse', e.data.usWarehouseEmail);
+      // Update the usWarehouseEmail input if visible
+      var usInput = document.getElementById('usWarehouseEmail');
+      if(usInput && !usInput.value) usInput.value = e.data.usWarehouseEmail;
+    }
+    if(e.data.supplierEmail){
+      localStorage.setItem('fc_email_supplier', e.data.supplierEmail);
+      // Pre-fill default supplier email fields
+      var spInput = document.getElementById('defaultSupplierEmail');
+      if(spInput && !spInput.value) spInput.value = e.data.supplierEmail;
+      var spInput2 = document.getElementById('supplierEmail');
+      if(spInput2 && !spInput2.value) spInput2.value = e.data.supplierEmail;
+      // Also update the localStorage key the restock app uses
+      localStorage.setItem('fc_default_supplier_email', e.data.supplierEmail);
+    }
+    console.log('[FC] Email settings synced from parent:', e.data);
+  }catch(err){ console.warn('[FC] Email sync error:', err); }
+});
+// On load: apply any previously saved settings
+window.addEventListener('load', function(){
+  try{
+    const usEmail = localStorage.getItem('fc_email_us_warehouse');
+    const supEmail = localStorage.getItem('fc_email_supplier') || localStorage.getItem('fc_default_supplier_email');
+    if(usEmail){
+      var usInput = document.getElementById('usWarehouseEmail');
+      if(usInput && !usInput.value) usInput.value = usEmail;
+    }
+    if(supEmail){
+      var spInput = document.getElementById('defaultSupplierEmail');
+      if(spInput && !spInput.value) spInput.value = supEmail;
+    }
+  }catch(e){}
+});
+</script>
+
 </body></html>`;
 
   try{
@@ -1913,6 +1955,48 @@ async function emailWarehouse(orderId){
 
 </table>
 </td></tr></table>
+
+<script>
+// Receive email settings from parent combined app
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'FC_EMAIL_SETTINGS') return;
+  try{
+    if(e.data.usWarehouseEmail){
+      localStorage.setItem('fc_email_us_warehouse', e.data.usWarehouseEmail);
+      // Update the usWarehouseEmail input if visible
+      var usInput = document.getElementById('usWarehouseEmail');
+      if(usInput && !usInput.value) usInput.value = e.data.usWarehouseEmail;
+    }
+    if(e.data.supplierEmail){
+      localStorage.setItem('fc_email_supplier', e.data.supplierEmail);
+      // Pre-fill default supplier email fields
+      var spInput = document.getElementById('defaultSupplierEmail');
+      if(spInput && !spInput.value) spInput.value = e.data.supplierEmail;
+      var spInput2 = document.getElementById('supplierEmail');
+      if(spInput2 && !spInput2.value) spInput2.value = e.data.supplierEmail;
+      // Also update the localStorage key the restock app uses
+      localStorage.setItem('fc_default_supplier_email', e.data.supplierEmail);
+    }
+    console.log('[FC] Email settings synced from parent:', e.data);
+  }catch(err){ console.warn('[FC] Email sync error:', err); }
+});
+// On load: apply any previously saved settings
+window.addEventListener('load', function(){
+  try{
+    const usEmail = localStorage.getItem('fc_email_us_warehouse');
+    const supEmail = localStorage.getItem('fc_email_supplier') || localStorage.getItem('fc_default_supplier_email');
+    if(usEmail){
+      var usInput = document.getElementById('usWarehouseEmail');
+      if(usInput && !usInput.value) usInput.value = usEmail;
+    }
+    if(supEmail){
+      var spInput = document.getElementById('defaultSupplierEmail');
+      if(spInput && !spInput.value) spInput.value = supEmail;
+    }
+  }catch(e){}
+});
+</script>
+
 </body></html>`;
 
   try{
@@ -3285,6 +3369,48 @@ function generatePrintableHTML(order){
   </table>
   <div class="footer-note">FOLDIFYCASE — Please verify all items upon arrival and update inventory in Shopify.</div>
 </div>
+
+<script>
+// Receive email settings from parent combined app
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'FC_EMAIL_SETTINGS') return;
+  try{
+    if(e.data.usWarehouseEmail){
+      localStorage.setItem('fc_email_us_warehouse', e.data.usWarehouseEmail);
+      // Update the usWarehouseEmail input if visible
+      var usInput = document.getElementById('usWarehouseEmail');
+      if(usInput && !usInput.value) usInput.value = e.data.usWarehouseEmail;
+    }
+    if(e.data.supplierEmail){
+      localStorage.setItem('fc_email_supplier', e.data.supplierEmail);
+      // Pre-fill default supplier email fields
+      var spInput = document.getElementById('defaultSupplierEmail');
+      if(spInput && !spInput.value) spInput.value = e.data.supplierEmail;
+      var spInput2 = document.getElementById('supplierEmail');
+      if(spInput2 && !spInput2.value) spInput2.value = e.data.supplierEmail;
+      // Also update the localStorage key the restock app uses
+      localStorage.setItem('fc_default_supplier_email', e.data.supplierEmail);
+    }
+    console.log('[FC] Email settings synced from parent:', e.data);
+  }catch(err){ console.warn('[FC] Email sync error:', err); }
+});
+// On load: apply any previously saved settings
+window.addEventListener('load', function(){
+  try{
+    const usEmail = localStorage.getItem('fc_email_us_warehouse');
+    const supEmail = localStorage.getItem('fc_email_supplier') || localStorage.getItem('fc_default_supplier_email');
+    if(usEmail){
+      var usInput = document.getElementById('usWarehouseEmail');
+      if(usInput && !usInput.value) usInput.value = usEmail;
+    }
+    if(supEmail){
+      var spInput = document.getElementById('defaultSupplierEmail');
+      if(spInput && !spInput.value) spInput.value = supEmail;
+    }
+  }catch(e){}
+});
+</script>
+
 </body></html>`;
 }
 
@@ -3297,5 +3423,47 @@ startLoad();
 
 
 </script>
+
+<script>
+// Receive email settings from parent combined app
+window.addEventListener('message', function(e){
+  if(!e.data || e.data.type !== 'FC_EMAIL_SETTINGS') return;
+  try{
+    if(e.data.usWarehouseEmail){
+      localStorage.setItem('fc_email_us_warehouse', e.data.usWarehouseEmail);
+      // Update the usWarehouseEmail input if visible
+      var usInput = document.getElementById('usWarehouseEmail');
+      if(usInput && !usInput.value) usInput.value = e.data.usWarehouseEmail;
+    }
+    if(e.data.supplierEmail){
+      localStorage.setItem('fc_email_supplier', e.data.supplierEmail);
+      // Pre-fill default supplier email fields
+      var spInput = document.getElementById('defaultSupplierEmail');
+      if(spInput && !spInput.value) spInput.value = e.data.supplierEmail;
+      var spInput2 = document.getElementById('supplierEmail');
+      if(spInput2 && !spInput2.value) spInput2.value = e.data.supplierEmail;
+      // Also update the localStorage key the restock app uses
+      localStorage.setItem('fc_default_supplier_email', e.data.supplierEmail);
+    }
+    console.log('[FC] Email settings synced from parent:', e.data);
+  }catch(err){ console.warn('[FC] Email sync error:', err); }
+});
+// On load: apply any previously saved settings
+window.addEventListener('load', function(){
+  try{
+    const usEmail = localStorage.getItem('fc_email_us_warehouse');
+    const supEmail = localStorage.getItem('fc_email_supplier') || localStorage.getItem('fc_default_supplier_email');
+    if(usEmail){
+      var usInput = document.getElementById('usWarehouseEmail');
+      if(usInput && !usInput.value) usInput.value = usEmail;
+    }
+    if(supEmail){
+      var spInput = document.getElementById('defaultSupplierEmail');
+      if(spInput && !spInput.value) spInput.value = supEmail;
+    }
+  }catch(e){}
+});
+</script>
+
 </body>
 </html>

@@ -1052,7 +1052,7 @@ window.onload = function(){
   // User can narrow by selecting a date range
 
   updateUI();
-  loadSentOrdersFromBlob(); // Load sent history fro
+  loadSentOrdersFromBlob(); // Load sent history from blob first
   // Pre-fill email from settings panel if saved
   try{
     var savedEmail = localStorage.getItem('fc_email_us_warehouse') || '';
@@ -1063,7 +1063,6 @@ window.onload = function(){
       updateUI();
     }
   }catch(e){}
-m blob first
   loadOrders();
 };
 

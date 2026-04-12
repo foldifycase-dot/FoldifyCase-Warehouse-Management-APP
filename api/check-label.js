@@ -42,10 +42,19 @@ module.exports = async (req, res) => {
   if (!orderName) return res.status(400).json({ exists: false, error: 'No orderName' });
 
   const nameClean = orderName.replace(/#/g, '').trim();
-  const prefix = 'Shipping Labels/Order_' + nameClean.replace(/\s+/g,'_');
+  // Search by order number only - matches both old format (Order 2186.pdf) 
+  // and new format (Order_2186_DD_MM_YYYY.pdf)
+  const prefix = 'Shipping Labels/Order' + (nameClean ? ' ' + nameClean : '');
+  // Also try underscore format
+  const prefixAlt = 'Shipping Labels/Order_' + nameClean.replace(/\s+/g,'_');
 
-  console.log('Checking blob prefix:', prefix);
-  const blobs = await listBlob(prefix);
+  console.log('Checking blob prefix:', prefix, 'and alt:', prefixAlt);
+  // Try both formats - old files use space, new files use underscore
+  let blobs = await listBlob(prefix);
+  if (blobs.length === 0) {
+    blobs = await listBlob(prefixAlt);
+    console.log('Tried alt prefix, found:', blobs.length);
+  }
   console.log('Blobs found:', blobs.length, blobs.map(b => b.pathname || b.url));
 
   const exists = blobs.length > 0;

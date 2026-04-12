@@ -1,4 +1,4 @@
-import { put, list, head } from '@vercel/blob';
+const { put, list, head } = require('@vercel/blob');
 
 const STORE = process.env.SHOPIFY_STORE;
 const TOKEN = process.env.SHOPIFY_TOKEN;
@@ -13,17 +13,13 @@ const shopifyHeaders = {
 };
 
 const ALLOWED_ORIGINS = [
-  'https://warehouse-stock-management-app.vercel.app',
+  process.env.APP_URL,
   'http://localhost:3000',
-];
+].filter(Boolean);
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const origin = req.headers.origin || '';
-  if (ALLOWED_ORIGINS.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
+  res.setHeader('Access-Control-Allow-Origin', origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -345,7 +341,7 @@ function buildEmailHTML({ type, warehouse, products, from_name }) {
 </html>`;
 }
 
-export const config = {
+module.exports.config = {
   api: {
     bodyParser: {
       sizeLimit: '4mb',

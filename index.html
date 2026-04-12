@@ -17,8 +17,8 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
 .tab.active{background:rgba(200,169,110,.15);border-color:rgba(200,169,110,.3);color:#C8A96E;font-weight:600;}
 .tab svg{opacity:.6;flex-shrink:0;}
 .tab.active svg{opacity:1;}
-.app-wrap{position:fixed;top:48px;left:0;right:0;bottom:0;}
-.app-frame{width:100%;height:100%;border:none;display:none;}
+.app-wrap{position:fixed;top:48px;left:0;right:0;bottom:0;overflow:hidden;}
+.app-frame{width:100%;height:calc(100% + 63px);margin-top:-63px;border:none;display:none;}
 .app-frame.active{display:block;}
 </style>
 </head>

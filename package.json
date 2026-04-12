@@ -1,7 +1,6 @@
 {
-  "name": "warehouse-stock-management-app",
+  "name": "foldifycase-warehouse",
   "version": "1.0.0",
-  "type": "module",
   "engines": {
     "node": "20.x"
   },

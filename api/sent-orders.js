@@ -50,13 +50,14 @@ function writeSentOrders(ids) {
     const body = JSON.stringify(ids);
     const req = https.request({
       hostname: 'blob.vercel-storage.com',
-      path: '/' + SENT_FILE.split('/').map(encodeURIComponent).join('/'),
+      path: '/' + SENT_FILE.split('/').map(encodeURIComponent).join('/') + '?allowOverwrite=1',
       method: 'PUT',
       headers: {
         'Authorization': 'Bearer ' + BLOB_TOKEN,
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(body),
-        'x-vercel-blob-access': 'public'
+        'x-vercel-blob-access': 'public',
+        'x-vercel-blob-add-random-suffix': '0'
       }
     }, (res) => {
       let d = '';

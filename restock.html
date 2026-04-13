@@ -2245,6 +2245,49 @@ function trendHTML(productId, variantId){
   </div>`;
 }
 
+async function saveCost(input){
+  const newCost=parseFloat(input.value);
+  const origCost=parseFloat(input.dataset.orig||'0');
+  const iid=input.dataset.iid;
+  if(isNaN(newCost)||newCost<0){showToast('Invalid cost','err');return;}
+  if(newCost===origCost){showToast('No change','ok');return;}
+  if(!iid){showToast('Inventory item ID missing — re-sync first','err');return;}
+  const btn=input.nextElementSibling;
+  btn.disabled=true;btn.textContent='Saving…';
+  input.style.borderColor='var(--gold)';
+  try{
+    const r=await fetch(`${PROXY}?service=shopify&action=set_cost`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({inventory_item_id:parseInt(iid),cost:newCost})
+    });
+    const d=await r.json();
+    if(r.ok&&d.success){
+      input.dataset.orig=newCost.toFixed(2);
+      input.value=parseFloat(d.cost||newCost).toFixed(2);
+      input.style.borderColor='var(--green)';
+      btn.textContent='Saved ✓';btn.style.background='var(--green)';btn.style.color='#fff';
+      // Update local data
+      allProducts.forEach(p=>{
+        (p.variantData||[]).forEach(v=>{
+          if(String(v.inventoryItemId)===String(iid)||String(v.id)===String(iid)){
+            v.cost=d.cost||newCost.toFixed(2);
+          }
+        });
+      });
+      showToast('Cost updated in Shopify','ok');
+      setTimeout(()=>{
+        input.style.borderColor='';btn.textContent='Save';
+        btn.style.background='';btn.style.color='';btn.disabled=true;
+      },2000);
+    }else{throw new Error(d.error||'Shopify rejected the update');}
+  }catch(e){
+    input.style.borderColor='var(--red)';btn.textContent='Error';
+    btn.style.background='';btn.disabled=false;
+    showToast('Cost update failed: '+e.message,'err');
+    console.error('[saveCost]',e);
+  }
+}
+
 async function saveQty(input){
   const newQty=parseInt(input.value);
   const origQty=parseInt(input.dataset.orig);
@@ -2315,6 +2358,36 @@ async function saveQty(input){
   }
 }
 
+// ── FETCH COSTS FROM SHOPIFY ──────────────────────────────────────────────
+// Costs are fetched in batches after initial render (non-blocking)
+async function fetchAllCosts(){
+  const allVariants=[];
+  allProducts.forEach(p=>(p.variantData||[]).forEach(v=>{
+    if(v.inventoryItemId)allVariants.push({pid:String(p.id),vid:String(v.id),iid:String(v.inventoryItemId)});
+  }));
+  if(!allVariants.length)return;
+  // Fetch in batches of 50 (Shopify limit per request)
+  const BATCH=50;
+  for(let i=0;i<allVariants.length;i+=BATCH){
+    const batch=allVariants.slice(i,i+BATCH);
+    const ids=batch.map(v=>v.iid).join(',');
+    try{
+      const r=await fetch(`${PROXY}?service=shopify&action=inventory_items_cost&ids=${ids}`);
+      const d=await r.json();
+      if(d.inventory_items){
+        d.inventory_items.forEach(item=>{
+          const cost=item.cost||null;
+          allProducts.forEach(p=>(p.variantData||[]).forEach(v=>{
+            if(String(v.inventoryItemId)===String(item.id))v.cost=cost;
+          }));
+        });
+        // Re-render tables to show costs
+        renderAll();
+      }
+    }catch(e){console.warn('[fetchAllCosts] batch failed:',e.message);}
+  }
+}
+
 async function startLoad(){
   // Check if this is a printable order view request
   if(checkOrderViewParam())return;
@@ -2361,6 +2434,7 @@ async function startLoad(){
     showToast('Shopify synced successfully','ok');
     initETA();
     renderAll();
+    fetchAllCosts();
   }catch(e){
     dot.className='dot-err';
     document.getElementById('syncInfo').textContent='Connection failed';
@@ -2483,7 +2557,7 @@ function processProducts(raw){
               qty:q,status:status(q),price:parseFloat(x.price||0).toFixed(2),
               tracked:x.inventory_management==='shopify',
               image:x.image_id&&imgById[x.image_id]?imgById[x.image_id]:(p.image?p.image.src:null),
-              soldN:salesDataVariant[String(x.id)]||0,warehouses:[wh]
+              soldN:salesDataVariant[String(x.id)]||0,warehouses:[wh],cost:null
             });
             whQty[wh]+=q;
           }
@@ -2538,7 +2612,7 @@ function processProducts(raw){
         price:parseFloat(x.price||0).toFixed(2),
         tracked:x.inventory_management==='shopify',
         image:x.image_id&&imgById[x.image_id]?imgById[x.image_id]:(p.image?p.image.src:null),
-        soldN:salesDataVariant[String(x.id)]||0,warehouses:wh
+        soldN:salesDataVariant[String(x.id)]||0,warehouses:wh,cost:null
       }));
       return{
         id:p.id,title:p.title,handle:p.handle||'',
@@ -2612,6 +2686,7 @@ function tblHTML(prods,showWh,prefix){
     <th style="width:${showWh?'34%':'42%'}">Product</th>
     ${showWh?'<th style="width:9%">Markets</th>':''}
     <th style="width:7%">Units</th>
+    <th style="width:9%">Cost/Unit</th>
     <th style="width:11%">Status</th>
     <th style="width:14%">Trend</th>
     <th style="width:10%">Restock</th>
@@ -2646,6 +2721,26 @@ function tblHTML(prods,showWh,prefix){
             <button class="qty-save-btn" disabled onclick="saveQty(this.previousElementSibling)" title="Save to Shopify">Save</button>
           </div>
         </td>
+
+        <td>
+          <div class="qty-edit-wrap">
+            <input type="number" class="qty-edit-input" value="${v.cost||''}" placeholder="0.00"
+              data-iid="${piid}" data-orig="${v.cost||''}" step="0.01" min="0"
+              onkeydown="if(event.key==='Enter')saveCost(this)"
+              oninput="this.nextElementSibling.disabled=false"
+              style="width:62px">
+            <button class="qty-save-btn" disabled onclick="saveCost(this.previousElementSibling)" title="Save cost to Shopify">Save</button>
+          </div>
+        </td>        <td>
+          <div class="qty-edit-wrap">
+            <input type="number" class="qty-edit-input" value="${v.cost||''}" placeholder="0.00"
+              data-iid="${iid}" data-orig="${v.cost||''}" step="0.01" min="0"
+              onkeydown="if(event.key==='Enter')saveCost(this)"
+              oninput="this.nextElementSibling.disabled=false"
+              style="width:62px">
+            <button class="qty-save-btn" disabled onclick="saveCost(this.previousElementSibling)" title="Save cost to Shopify">Save</button>
+          </div>
+        </td>
         <td><span class="badge ${vs}" style="font-size:9px;padding:2px 7px"><div class="bdot"></div>${v.status==='critical'?'Critical':v.status==='low'?'Low':'OK'}</span></td>
         <td>${trendHTML(String(p.id),String(v.id))}</td>
         <td><button class="btn-restock" data-pid="${p.id}" data-vid="${v.id}" data-ptitle="${p.title.replace(/"/g,'&quot;')}" data-vtitle="${v.title.replace(/"/g,'&quot;')}" data-img="${(v.image||p.image||'').replace(/"/g,'&quot;')}" onclick="event.stopPropagation();quickRestockBtn(this)">
@@ -2668,6 +2763,7 @@ function tblHTML(prods,showWh,prefix){
       </td>
       ${showWh?`<td>${whDots(p.warehouses)}</td>`:''}
       <td><span class="qty-num">${p.qty}</span></td>
+      <td><span style="font-size:11px;color:rgba(26,26,24,.35);font-family:'DM Mono',monospace">${p.variantData&&p.variantData[0]&&p.variantData[0].cost?'$'+parseFloat(p.variantData[0].cost).toFixed(2):'—'}</span></td>
       <td>${bdg}</td>
       <td>${trendHTML(String(p.id),'')}</td>
       <td><button class="btn-restock" data-pid="${p.id}" data-ptitle="${p.title.replace(/"/g,'&quot;')}" data-img="${(p.image||'').replace(/"/g,'&quot;')}" onclick="event.stopPropagation();quickRestockBtn(this)">
@@ -2854,7 +2950,8 @@ function renderPopularWithData(p,days){
     <th style="width:5%">Rank</th>
     <th style="width:34%">Product</th>
     <th style="width:10%">Sold ${days}d</th>
-    <th style="width:7%">Stock</th>
+    <th style="width:7%">Units</th>
+    <th style="width:9%">Cost/Unit</th>
     <th style="width:11%">Status</th>
     <th style="width:14%">Trend</th>
     <th style="width:11%">Action</th>
@@ -2886,7 +2983,17 @@ function renderPopularWithData(p,days){
             <button class="qty-save-btn" disabled onclick="saveQty(this.previousElementSibling)" title="Save to Shopify">Save</button>
           </div>
         </td>
-        <td><span class="badge ${vs}" style="font-size:9px;padding:2px 7px"><div class="bdot"></div>${v.status==='critical'?'Critical':v.status==='low'?'Low':'OK'}</span></td>
+
+        <td>
+          <div class="qty-edit-wrap">
+            <input type="number" class="qty-edit-input" value="${v.cost||''}" placeholder="0.00"
+              data-iid="${piid}" data-orig="${v.cost||''}" step="0.01" min="0"
+              onkeydown="if(event.key==='Enter')saveCost(this)"
+              oninput="this.nextElementSibling.disabled=false"
+              style="width:62px">
+            <button class="qty-save-btn" disabled onclick="saveCost(this.previousElementSibling)" title="Save cost to Shopify">Save</button>
+          </div>
+        </td>        <td><span class="badge ${vs}" style="font-size:9px;padding:2px 7px"><div class="bdot"></div>${v.status==='critical'?'Critical':v.status==='low'?'Low':'OK'}</span></td>
         <td>${trendHTML(x.id,String(v.id))}</td>
         <td></td>
       </tr>`;
@@ -2906,6 +3013,7 @@ function renderPopularWithData(p,days){
       </td>
       <td><span class="sales-chip">${x.soldN}</span></td>
       <td><span class="qty-num">${x.qty}</span></td>
+      <td><span style="font-size:11px;color:rgba(26,26,24,.35);font-family:'DM Mono',monospace">${x.variantData&&x.variantData[0]&&x.variantData[0].cost?'$'+parseFloat(x.variantData[0].cost).toFixed(2):'—'}</span></td>
       <td>${bdg}</td>
       <td>${trendHTML(x.id,'')}</td>
       <td>${act}</td>

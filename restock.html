@@ -1486,6 +1486,7 @@ async function sendToSupplier(order){
       </td>
     </tr>`).join('');
 
+  const fromEmail = (document.getElementById('fromEmail')?.value || 'warehouse@foldifycase.com.au').trim();
   const emailBody=`<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -1586,7 +1587,6 @@ async function sendToSupplier(order){
 </body></html>`;
 
   try{
-    const fromEmail=document.getElementById('fromEmail')?.value||'warehouse@foldifycase.com.au';
     const payload={
       to:[order.supplierEmail],
       from_name:'FoldifyCase Warehouse',

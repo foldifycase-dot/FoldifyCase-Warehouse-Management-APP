@@ -2869,27 +2869,40 @@ function openStockCountForProduct(productId){
 }
 
 async function deleteStockCount(sessionId){
-  if(!confirm(`Delete stock count ${sessionId}?\n\nThis cannot be undone.`)) return;
-  // Remove from Blob
+  if(!confirm('Delete stock count ' + sessionId + '?\n\nThis cannot be undone.')) return;
+
+  // Step 1: Delete from Blob (server side)
+  let blobOk = false;
   try{
     const r = await fetch('/api/stock-count?action=delete', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({sessionId})
+      body: JSON.stringify({sessionId: sessionId})
     });
     const d = await r.json();
-    if(!r.ok) throw new Error(d.error||'Delete failed');
-  }catch(e){ console.warn('[deleteStockCount] Blob delete failed:', e.message); }
-  // Remove from localStorage cache
-  try{
-    let stored = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]');
-    stored = stored.filter(s => s.sessionId !== sessionId);
-    localStorage.setItem('fc_stock_counts', JSON.stringify(stored));
-  }catch(e){}
-  // Remove from in-memory cache and re-render
-  _allStockCounts = _allStockCounts.filter(s => s.sessionId !== sessionId);
-  filterStockCountResults();
-  showToast('Stock count ' + sessionId + ' deleted', 'ok');
+    if(r.ok && d.success){
+      blobOk = true;
+      console.log('[deleteStockCount] Blob deleted:', sessionId, d);
+    } else {
+      throw new Error(d.error || 'Server returned error');
+    }
+  } catch(e){
+    console.error('[deleteStockCount] Blob delete failed:', e.message);
+    showToast('Could not delete from server: ' + e.message, 'err');
+    return; // Stop — don't remove from UI if server failed
+  }
+
+  // Step 2: Only remove from UI + cache after confirmed server delete
+  if(blobOk){
+    try{
+      let stored = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]');
+      stored = stored.filter(function(s){ return s.sessionId !== sessionId; });
+      localStorage.setItem('fc_stock_counts', JSON.stringify(stored));
+    }catch(e){}
+    _allStockCounts = _allStockCounts.filter(function(s){ return s.sessionId !== sessionId; });
+    filterStockCountResults();
+    showToast('Stock count ' + sessionId + ' deleted', 'ok');
+  }
 }
 
 async function sendStockCount(){

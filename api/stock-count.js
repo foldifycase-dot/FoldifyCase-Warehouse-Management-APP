@@ -77,14 +77,30 @@ export default async function handler(req, res) {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
       const sessionId = body.sessionId;
       if (!sessionId) return res.status(400).json({ error: 'sessionId required' });
+      if (!BLOB_TOKEN) return res.status(500).json({ error: 'BLOB_TOKEN not set' });
+
       const key = `${BLOB_PREFIX}${sessionId}.json`;
+      console.log('[stock-count delete] looking for key:', key);
+
       const listRes = await list({ prefix: key, token: BLOB_TOKEN });
-      if (listRes.blobs && listRes.blobs.length > 0) {
-        await del(listRes.blobs[0].url, { token: BLOB_TOKEN });
+      console.log('[stock-count delete] blobs found:', listRes.blobs?.length ?? 0);
+
+      if (!listRes.blobs || listRes.blobs.length === 0) {
+        // Nothing in blob — still return success (already gone)
+        console.log('[stock-count delete] blob not found, treating as already deleted');
+        return res.status(200).json({ success: true, note: 'blob not found' });
       }
-      return res.status(200).json({ success: true });
+
+      // Delete all matching blobs (should only be one)
+      for (const blob of listRes.blobs) {
+        console.log('[stock-count delete] deleting:', blob.url);
+        await del(blob.url, { token: BLOB_TOKEN });
+      }
+
+      console.log('[stock-count delete] done');
+      return res.status(200).json({ success: true, deleted: listRes.blobs.length });
     } catch (e) {
-      console.error('[stock-count delete]', e);
+      console.error('[stock-count delete] ERROR:', e.message);
       return res.status(500).json({ error: e.message });
     }
   }

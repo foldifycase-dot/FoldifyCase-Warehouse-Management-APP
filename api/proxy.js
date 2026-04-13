@@ -276,6 +276,70 @@ module.exports = async function handler(req, res) {
       }
 
       // Save a standalone HTML file to Blob (for printable order pages)
+      if (action === 'list_restock') {
+        // List all blobs and find one matching orderId
+        if (!BLOB_TOKEN) return res.status(500).json({ error: 'BLOB_TOKEN not configured' });
+        const orderId = req.query.orderId || (req.body && req.body.orderId) || '';
+        if (!orderId) return res.status(400).json({ error: 'orderId required' });
+        try {
+          // List everything — no prefix filter so we find regardless of folder name
+          let allBlobs = [];
+          let cursor;
+          let pages = 0;
+          do {
+            const result = await list({ token: BLOB_TOKEN, cursor, limit: 1000 });
+            allBlobs = allBlobs.concat(result.blobs || []);
+            cursor = result.cursor;
+            pages++;
+            console.log('[list_restock] page', pages, 'total so far:', allBlobs.length);
+            if (pages > 10) break;
+          } while (cursor);
+
+          console.log('[list_restock] all pathnames:', allBlobs.map(b => b.pathname));
+
+          // Filter by orderId (case-insensitive)
+          const matched = allBlobs.filter(b =>
+            b.pathname && b.pathname.toLowerCase().includes(orderId.toLowerCase())
+          );
+          console.log('[list_restock] matched for', orderId, ':', matched.map(b => b.pathname));
+
+          if (matched.length > 0) {
+            matched.sort((a, b) => new Date(b.uploadedAt || 0) - new Date(a.uploadedAt || 0));
+            const blob = matched[0];
+            return res.status(200).json({ url: blob.url, uploadedAt: blob.uploadedAt, pathname: blob.pathname });
+          }
+
+          // Also try with public token if private found nothing
+          const PUBLIC_TOKEN = process.env.PUBLIC_BLOB_READ_WRITE_TOKEN;
+          if (PUBLIC_TOKEN && PUBLIC_TOKEN !== BLOB_TOKEN) {
+            let pubBlobs = [];
+            let pubCursor;
+            do {
+              const r = await list({ token: PUBLIC_TOKEN, cursor: pubCursor, limit: 1000 });
+              pubBlobs = pubBlobs.concat(r.blobs || []);
+              pubCursor = r.cursor;
+            } while (pubCursor);
+            console.log('[list_restock] public store blobs:', pubBlobs.length);
+            const pubMatched = pubBlobs.filter(b =>
+              b.pathname && b.pathname.toLowerCase().includes(orderId.toLowerCase())
+            );
+            if (pubMatched.length > 0) {
+              pubMatched.sort((a, b) => new Date(b.uploadedAt || 0) - new Date(a.uploadedAt || 0));
+              const blob = pubMatched[0];
+              return res.status(200).json({ url: blob.url, uploadedAt: blob.uploadedAt, pathname: blob.pathname, store: 'public' });
+            }
+          }
+
+          return res.status(200).json({
+            url: null,
+            debug: { total: allBlobs.length, pathnames: allBlobs.map(b => b.pathname) }
+          });
+        } catch(e) {
+          console.error('[list_restock] error:', e.message);
+          return res.status(500).json({ error: e.message });
+        }
+      }
+
       if (action === 'save_html') {
         if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;

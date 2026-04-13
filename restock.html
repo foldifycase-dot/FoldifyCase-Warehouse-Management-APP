@@ -719,6 +719,11 @@ html.in-iframe .layout{height:100vh;}
         </select>
         <div class="filter-divider"></div>
         <button class="filter-clear" onclick="clearStockFilters()" title="Clear all filters">✕ Clear</button>
+        <div class="filter-divider"></div>
+        <button class="btn-sol gold" onclick="openStockCountModal()" style="display:flex;align-items:center;gap:6px;padding:7px 13px;font-size:11px;white-space:nowrap;">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h8l4 4v8a1 1 0 01-1 1H2a1 1 0 01-1-1V3a1 1 0 011-1zm0 0v1M6 1v4h4"/><path d="M4 9h8M4 12h5"/></svg>
+          Send Stock Count
+        </button>
       </div>
       <div id="stockFilterTags" style="display:none;margin-bottom:6px;display:flex;gap:4px;flex-wrap:wrap"></div>
       <div class="card"><div id="fullTable"><div class="empty-state"><div class="spinner"></div></div></div></div>
@@ -784,6 +789,59 @@ html.in-iframe .layout{height:100vh;}
         </div>
       </div>
       <div class="card"><div class="po-log" id="poLog"><div class="empty-state" style="color:rgba(26,26,24,.3)">No restock orders placed yet — click Create Restock Order to get started.</div></div></div>
+    </div>
+
+    <!-- STOCK COUNT MODAL -->
+    <div class="modal-overlay" id="stockCountModal" style="display:none;z-index:300;">
+      <div class="modal" style="width:480px;max-width:96vw;">
+        <div class="modal-hdr">
+          <div class="modal-title">Send Stock Count Sheet</div>
+          <button class="modal-close" onclick="closeStockCountModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div style="background:rgba(200,169,110,.08);border:1px solid rgba(200,169,110,.2);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:11px;color:rgba(26,26,24,.6);line-height:1.6;">
+            📋 Sends a printable stock count sheet to your warehouse team. The sheet lists all product variants with a blank <strong>Count</strong> column for staff to fill in during a stocktake.
+          </div>
+          <div class="modal-section">
+            <div class="modal-label">Warehouse</div>
+            <select class="modal-search" id="scWarehouse" style="margin-bottom:12px;">
+              <option value="us">🇺🇸 US Warehouse</option>
+              <option value="uk">🇬🇧 UK Warehouse</option>
+              <option value="au">🇦🇺 AU Warehouse</option>
+              <option value="all">All Warehouses</option>
+            </select>
+            <div class="modal-label">Send to email</div>
+            <input type="email" class="modal-search" id="scEmail" placeholder="warehouse@company.com" style="margin-bottom:12px;">
+            <div class="modal-label">Include columns</div>
+            <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:#F5F3EE;border-radius:7px;margin-bottom:4px;">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;">
+                <input type="checkbox" id="scIncludeImage" checked style="accent-color:#C8A96E;width:14px;height:14px;"> Product image
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;">
+                <input type="checkbox" id="scIncludeSKU" checked style="accent-color:#C8A96E;width:14px;height:14px;"> Current stock level
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;">
+                <input type="checkbox" id="scIncludeStatus" checked style="accent-color:#C8A96E;width:14px;height:14px;"> Status (Critical / Low / OK)
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;">
+                <input type="checkbox" id="scIncludeCost" style="accent-color:#C8A96E;width:14px;height:14px;"> Cost per unit
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="gap:8px;">
+          <button class="btn-out" onclick="closeStockCountModal()">Cancel</button>
+          <button class="btn-sol" id="scPreviewBtn" onclick="previewStockCount()" style="background:rgba(26,26,24,.08);color:var(--ink);border:1.5px solid var(--border2);">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" style="margin-right:4px"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2.5"/></svg>
+            Preview
+          </button>
+          <button class="btn-sol gold" id="scSendBtn" onclick="sendStockCount()">
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" style="margin-right:4px"><path d="M1 1l14 7-14 7V9l10-1L1 7V1z"/></svg>
+            Send Email
+          </button>
+        </div>
+        <div id="scStatus" style="padding:0 20px 14px;font-size:11px;text-align:center;"></div>
+      </div>
     </div>
 
     <!-- TOP SELLERS -->
@@ -2360,6 +2418,245 @@ async function saveQty(input){
 
 // ── FETCH COSTS FROM SHOPIFY ──────────────────────────────────────────────
 // Costs are fetched in batches after initial render (non-blocking)
+// ── STOCK COUNT SHEET ─────────────────────────────────────────────────────
+
+function openStockCountModal(){
+  // Pre-fill email from saved settings
+  const saved = localStorage.getItem('fc_email_us_warehouse') || localStorage.getItem('fc_delivery_notify') || '';
+  document.getElementById('scEmail').value = saved;
+  // Match warehouse to active tab
+  const wh = activeWarehouse === 'all' ? 'us' : activeWarehouse;
+  document.getElementById('scWarehouse').value = wh;
+  document.getElementById('scStatus').textContent = '';
+  document.getElementById('scSendBtn').disabled = false;
+  document.getElementById('scSendBtn').textContent = 'Send Email';
+  document.getElementById('stockCountModal').style.display = 'flex';
+}
+
+function closeStockCountModal(){
+  document.getElementById('stockCountModal').style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape' && document.getElementById('stockCountModal').style.display !== 'none') closeStockCountModal();
+});
+
+function buildStockCountHTML(prods, whLabel, opts){
+  const now = new Date().toLocaleDateString('en-AU', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const showImg = opts.image;
+  const showQty = opts.qty;
+  const showStatus = opts.status;
+  const showCost = opts.cost;
+
+  // Group by product, each variant is a row
+  let rows = '';
+  let rowNum = 0;
+
+  prods.forEach(p => {
+    const variants = p.variantData && p.variantData.length > 1 ? p.variantData : null;
+    
+    if(variants){
+      // Multi-variant: one row per variant with product image on first row
+      variants.forEach((v, vi) => {
+        rowNum++;
+        const isFirst = vi === 0;
+        const statusColor = v.status==='critical' ? '#C94040' : v.status==='low' ? '#B87D2A' : '#3D7A5A';
+        const statusLabel = v.status==='critical' ? 'Critical' : v.status==='low' ? 'Low' : 'OK';
+        const bgColor = rowNum % 2 === 0 ? '#FAFAF7' : '#FFFFFF';
+        const imgCell = showImg ? `<td style="padding:10px 12px;vertical-align:middle;width:56px;border-bottom:1px solid #EDEAE0;">
+          ${isFirst && p.image ? `<img src="${p.image}" width="40" height="40" style="border-radius:5px;object-fit:cover;border:1px solid #E0DDD4;display:block;">` : (isFirst ? '<div style="width:40px;height:40px;border-radius:5px;background:#F0EDE8;"></div>' : '')}
+        </td>` : '';
+        const nameCell = `<td style="padding:10px 12px;vertical-align:middle;border-bottom:1px solid #EDEAE0;">
+          ${isFirst ? `<div style="font-size:12px;font-weight:700;color:#1A1A18;margin-bottom:2px;">${p.title}</div>` : ''}
+          <div style="font-size:11px;color:rgba(26,26,24,.55);">${v.title}</div>
+        </td>`;
+        const qtyCell = showQty ? `<td style="padding:10px 16px;text-align:center;vertical-align:middle;border-bottom:1px solid #EDEAE0;font-family:'Courier New',monospace;font-weight:700;font-size:13px;">${v.qty}</td>` : '';
+        const statusCell = showStatus ? `<td style="padding:10px 12px;text-align:center;vertical-align:middle;border-bottom:1px solid #EDEAE0;"><span style="display:inline-block;background:${statusColor}18;color:${statusColor};font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid ${statusColor}33;">${statusLabel}</span></td>` : '';
+        const costCell = showCost ? `<td style="padding:10px 12px;text-align:center;vertical-align:middle;border-bottom:1px solid #EDEAE0;font-family:'Courier New',monospace;font-size:11px;color:rgba(26,26,24,.5);">${v.cost ? '$'+parseFloat(v.cost).toFixed(2) : '—'}</td>` : '';
+        const countCell = `<td style="padding:10px 12px;border-bottom:1px solid #EDEAE0;"><div style="width:80px;height:28px;border:1.5px solid #CCC;border-radius:5px;"></div></td>`;
+        
+        rows += `<tr style="background:${bgColor};">${imgCell}${nameCell}${qtyCell}${statusCell}${costCell}${countCell}</tr>`;
+      });
+    } else {
+      // Single variant
+      rowNum++;
+      const v = p.variantData ? p.variantData[0] : {qty:p.qty, status:p.status, cost:null};
+      const statusColor = (v||p).status==='critical' ? '#C94040' : (v||p).status==='low' ? '#B87D2A' : '#3D7A5A';
+      const statusLabel = (v||p).status==='critical' ? 'Critical' : (v||p).status==='low' ? 'Low' : 'OK';
+      const bgColor = rowNum % 2 === 0 ? '#FAFAF7' : '#FFFFFF';
+      const iid = v ? (v.inventoryItemId||v.id) : '';
+      const imgCell = showImg ? `<td style="padding:10px 12px;vertical-align:middle;width:56px;border-bottom:1px solid #EDEAE0;">
+        ${p.image ? `<img src="${p.image}" width="40" height="40" style="border-radius:5px;object-fit:cover;border:1px solid #E0DDD4;display:block;">` : '<div style="width:40px;height:40px;border-radius:5px;background:#F0EDE8;"></div>'}
+      </td>` : '';
+      const nameCell = `<td style="padding:10px 12px;vertical-align:middle;border-bottom:1px solid #EDEAE0;">
+        <div style="font-size:12px;font-weight:700;color:#1A1A18;">${p.title}</div>
+      </td>`;
+      const qtyCell = showQty ? `<td style="padding:10px 16px;text-align:center;vertical-align:middle;border-bottom:1px solid #EDEAE0;font-family:'Courier New',monospace;font-weight:700;font-size:13px;">${p.qty}</td>` : '';
+      const statusCell = showStatus ? `<td style="padding:10px 12px;text-align:center;vertical-align:middle;border-bottom:1px solid #EDEAE0;"><span style="display:inline-block;background:${statusColor}18;color:${statusColor};font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid ${statusColor}33;">${statusLabel}</span></td>` : '';
+      const costCell = showCost ? `<td style="padding:10px 12px;text-align:center;vertical-align:middle;border-bottom:1px solid #EDEAE0;font-family:'Courier New',monospace;font-size:11px;color:rgba(26,26,24,.5);">${v&&v.cost ? '$'+parseFloat(v.cost).toFixed(2) : '—'}</td>` : '';
+      const countCell = `<td style="padding:10px 12px;border-bottom:1px solid #EDEAE0;"><div style="width:80px;height:28px;border:1.5px solid #CCC;border-radius:5px;"></div></td>`;
+      
+      rows += `<tr style="background:${bgColor};">${imgCell}${nameCell}${qtyCell}${statusCell}${costCell}${countCell}</tr>`;
+    }
+  });
+
+  // Build header cells
+  const imgH = showImg ? '<th style="padding:10px 12px;text-align:left;width:56px;"></th>' : '';
+  const qtyH = showQty ? '<th style="padding:10px 16px;text-align:center;white-space:nowrap;">SYSTEM QTY</th>' : '';
+  const statusH = showStatus ? '<th style="padding:10px 12px;text-align:center;">STATUS</th>' : '';
+  const costH = showCost ? '<th style="padding:10px 12px;text-align:center;">COST/UNIT</th>' : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stock Count Sheet — FoldifyCase — ${now}</title>
+<style>
+  @media print {
+    body { margin: 0; }
+    .no-print { display: none !important; }
+    table { page-break-inside: auto; }
+    tr { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#F0EDE8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F0EDE8;padding:24px 0;">
+<tr><td align="center">
+<table width="700" cellpadding="0" cellspacing="0" style="max-width:700px;width:100%;">
+
+  <!-- HEADER -->
+  <tr><td style="background:#1A1A18;border-radius:10px 10px 0 0;padding:20px 28px 18px;border-bottom:3px solid #C8A96E;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td>
+        <div style="color:#fff;font-size:20px;font-weight:800;letter-spacing:.08em;font-family:Arial,sans-serif;">FOLDIFYCASE</div>
+        <div style="color:#C8A96E;font-size:9px;letter-spacing:.22em;text-transform:uppercase;margin-top:3px;">STOCK COUNT SHEET — ${whLabel.toUpperCase()}</div>
+      </td>
+      <td align="right">
+        <div style="color:rgba(255,255,255,.4);font-size:10px;">${now}</div>
+        <div style="color:rgba(255,255,255,.25);font-size:9px;margin-top:3px;">${prods.length} products · ${rowNum} variants</div>
+      </td>
+    </tr></table>
+  </td></tr>
+
+  <!-- INSTRUCTIONS BANNER -->
+  <tr><td style="background:#FFF8E8;border:1px solid #EDD98A;padding:12px 20px;">
+    <div style="font-size:11px;color:#7A5A00;line-height:1.6;">
+      <strong>Instructions:</strong> Walk through the warehouse and count each item. Write the actual quantity in the <strong>Count</strong> column. Circle any items where Count differs from System Qty. Return this sheet to management after the count.
+    </div>
+  </td></tr>
+
+  <!-- TABLE -->
+  <tr><td style="background:#fff;border-radius:0 0 10px 10px;overflow:hidden;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+      <thead>
+        <tr style="background:#EAE7D8;">
+          ${imgH}
+          <th style="padding:10px 12px;text-align:left;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#888;font-weight:600;">PRODUCT / VARIANT</th>
+          ${qtyH}
+          ${statusH}
+          ${costH}
+          <th style="padding:10px 12px;text-align:left;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#888;font-weight:600;">COUNT <span style="font-size:8px;color:#AAA;font-weight:400;">(write here)</span></th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </td></tr>
+
+  <!-- FOOTER -->
+  <tr><td style="padding:16px 0 0;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td style="font-size:10px;color:rgba(26,26,24,.35);">FoldifyCase Warehouse — Stock Count Sheet</td>
+      <td align="right" style="font-size:10px;color:rgba(26,26,24,.35);">Generated ${now}</td>
+    </tr></table>
+  </td></tr>
+
+</table>
+</td></tr></table>
+</body></html>`;
+}
+
+function previewStockCount(){
+  const wh = document.getElementById('scWarehouse').value;
+  const whLabel = wh === 'all' ? 'All Warehouses' : wh.toUpperCase() + ' Warehouse';
+  const prods = wh === 'all' ? allProducts : allProducts.filter(p => p.warehouses.includes(wh));
+  const opts = {
+    image: document.getElementById('scIncludeImage').checked,
+    qty:   document.getElementById('scIncludeSKU').checked,
+    status:document.getElementById('scIncludeStatus').checked,
+    cost:  document.getElementById('scIncludeCost').checked
+  };
+  const html = buildStockCountHTML(prods, whLabel, opts);
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
+
+async function sendStockCount(){
+  const email = document.getElementById('scEmail').value.trim();
+  if(!email || !email.includes('@')){
+    document.getElementById('scStatus').innerHTML = '<span style="color:var(--red)">⚠ Enter a valid email address</span>';
+    return;
+  }
+  const wh = document.getElementById('scWarehouse').value;
+  const whLabel = wh === 'all' ? 'All Warehouses' : (wh.toUpperCase() + ' Warehouse');
+  const prods = wh === 'all' ? allProducts : allProducts.filter(p => p.warehouses.includes(wh));
+  if(!prods.length){
+    document.getElementById('scStatus').innerHTML = '<span style="color:var(--red)">⚠ No products found for this warehouse</span>';
+    return;
+  }
+  const opts = {
+    image: document.getElementById('scIncludeImage').checked,
+    qty:   document.getElementById('scIncludeSKU').checked,
+    status:document.getElementById('scIncludeStatus').checked,
+    cost:  document.getElementById('scIncludeCost').checked
+  };
+
+  const btn = document.getElementById('scSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  document.getElementById('scStatus').innerHTML = '<span style="color:rgba(26,26,24,.5)">Building stock count sheet…</span>';
+
+  const html = buildStockCountHTML(prods, whLabel, opts);
+  const now = new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  const totalVariants = prods.reduce((s,p) => s + (p.variantData && p.variantData.length > 1 ? p.variantData.length : 1), 0);
+
+  try{
+    const r = await fetch(`${PROXY}?service=alert`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        to: [email],
+        from_name: 'FoldifyCase Warehouse',
+        from_email: 'warehouse@foldifycase.com.au',
+        subject: `Stock Count Sheet — ${whLabel} — ${now}`,
+        custom_html: html,
+        type: 'stock_count',
+        warehouse: whLabel,
+        products: []
+      })
+    });
+    const d = await r.json();
+    if(r.ok && d.success){
+      document.getElementById('scStatus').innerHTML = `<span style="color:var(--green)">✓ Sent to ${email} — ${prods.length} products, ${totalVariants} variants</span>`;
+      btn.textContent = '✓ Sent';
+      btn.style.background = 'var(--green)';
+      btn.style.color = '#fff';
+      showToast('Stock count sheet sent to ' + email, 'ok');
+      setTimeout(() => closeStockCountModal(), 2500);
+    } else {
+      throw new Error(d.error || 'Send failed');
+    }
+  } catch(e){
+    document.getElementById('scStatus').innerHTML = `<span style="color:var(--red)">✗ Failed: ${e.message}</span>`;
+    btn.disabled = false;
+    btn.textContent = 'Send Email';
+    btn.style.background = '';
+    btn.style.color = '';
+    showToast('Send failed: ' + e.message, 'err');
+    console.error('[sendStockCount]', e);
+  }
+}
+
 async function fetchAllCosts(){
   const allVariants=[];
   allProducts.forEach(p=>(p.variantData||[]).forEach(v=>{

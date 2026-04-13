@@ -2789,7 +2789,7 @@ async function sendStockCount(){
 
   // Save session to Blob via API
   try{
-    const saveRes = await fetch(`${PROXY.replace('/api/proxy','/api/stock-count')}?action=save`, {
+    const saveRes = await fetch(`/api/stock-count?action=save`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
@@ -2872,7 +2872,7 @@ async function sendStockCount(){
         stored.unshift({sessionId, warehouse:wh, whLabel, email, createdAt:new Date().toISOString(), status:'pending', totalProducts:prods.length, totalVariants, sheetUrl});
         localStorage.setItem('fc_stock_counts', JSON.stringify(stored.slice(0,20)));
       }catch(e){}
-      renderStockCountResults();
+      loadStockCountResults();
       setTimeout(() => closeStockCountModal(), 3000);
     } else { throw new Error(d.error || 'Email send failed'); }
   }catch(e){
@@ -2930,19 +2930,6 @@ function clearScFilters(){
   renderStockCountResults(_allStockCounts);
 }
 
-async function loadStockCountResultsOriginal(){
-  // Try Blob first, fall back to localStorage
-  try{
-    const r = await fetch(`/api/stock-count?action=list`);
-    const d = await r.json();
-    if(d.sessions && d.sessions.length > 0){
-      renderStockCountResults(d.sessions);
-      return;
-    }
-  }catch(e){}
-  // Fall back to localStorage index
-  renderStockCountResults();
-}
 
 function renderStockCountResults(sessions){
   const el = document.getElementById('stockCountResults');

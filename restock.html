@@ -533,6 +533,10 @@ td:first-child{padding-left:16px;}
 .po-group-warehouse-sent{font-size:10px;color:rgba(26,26,24,.35);font-weight:500;margin-left:4px;font-style:italic;}
 .po-group-restock-view{font-size:10px;padding:3px 9px;border:1px solid rgba(200,169,110,.4);border-radius:5px;background:rgba(200,169,110,.1);cursor:pointer;color:#A6873A;font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:4px;}
 .po-group-restock-view:hover{background:#C8A96E;color:#1A1A18;border-color:#C8A96E;}
+.po-group-restock-done{font-size:10px;padding:3px 9px;border:1px solid rgba(61,122,90,.35);border-radius:5px;background:rgba(61,122,90,.08);cursor:pointer;color:#3D7A5A;font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:4px;}
+.po-group-restock-done:hover{background:#3D7A5A;color:#fff;border-color:#3D7A5A;}
+/* PO search bar */
+.po-search-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
 
 /* EMPTY / LOADING */
 .empty-state{padding:28px;text-align:center;font-size:12px;color:rgba(26,26,24,.4);}
@@ -869,6 +873,28 @@ html.in-iframe .layout{height:100vh;}
           <div class="page-title" style="font-size:16px">PURCHASE <em>ORDERS</em></div>
           <div class="page-sub">History of restock orders placed</div>
         </div>
+      </div>
+      <div class="po-search-bar">
+        <div class="search-wrap" style="flex:1;min-width:200px;margin-bottom:0;">
+          <span class="search-icon">⌕</span>
+          <input type="text" class="search-input" id="poSearch" placeholder="Search by order ID, supplier, notes…" oninput="applyPOFilters()">
+        </div>
+        <input type="date" class="filter-select" id="poDateFrom" onchange="applyPOFilters()" style="font-size:11px;" title="From date">
+        <span style="font-size:11px;color:rgba(26,26,24,.4);">→</span>
+        <input type="date" class="filter-select" id="poDateTo" onchange="applyPOFilters()" style="font-size:11px;" title="To date">
+        <select class="filter-select" id="poStatusFilter" onchange="applyPOFilters()" style="font-size:11px;">
+          <option value="">All status</option>
+          <option value="pending">⏳ Pending delivery</option>
+          <option value="delivered">✅ Delivered</option>
+          <option value="sent">✉ Sent to supplier</option>
+        </select>
+        <select class="filter-select" id="poUploadFilter" onchange="applyPOFilters()" style="font-size:11px;">
+          <option value="">All uploads</option>
+          <option value="uploaded">✅ List uploaded</option>
+          <option value="pending">📋 Awaiting upload</option>
+        </select>
+        <span class="badge" id="poFilterCount" style="display:none;background:rgba(200,169,110,.15);color:#A6873A;border:1px solid rgba(200,169,110,.3);font-size:10px;padding:2px 8px;border-radius:10px;"></span>
+        <button class="filter-clear" onclick="clearPOFilters()">✕ Clear</button>
       </div>
       <div class="card"><div class="po-log" id="poLog"><div class="empty-state" style="color:rgba(26,26,24,.3)">No restock orders placed yet — click Create Restock Order to get started.</div></div></div>
     </div>
@@ -1743,13 +1769,16 @@ async function submitDelivery(){
 }
 
 
-function renderPOLog(){
+function renderPOLog(filtered){
   const el=document.getElementById('poLog');
-  if(!poOrders.length){
-    el.innerHTML='<div class="empty-state" style="color:rgba(26,26,24,.3)">No restock orders placed yet — click Create Restock Order to get started.</div>';
+  const orders = filtered || poOrders;
+  if(!orders.length){
+    el.innerHTML = poOrders.length
+      ? '<div class="empty-state" style="color:rgba(26,26,24,.3)">No orders match your filters.</div>'
+      : '<div class="empty-state" style="color:rgba(26,26,24,.3)">No restock orders placed yet — click Create Restock Order to get started.</div>';
     return;
   }
-  el.innerHTML=poOrders.map(o=>{
+  el.innerHTML=orders.map(o=>{
     const sendBtn=o.sent
       ?`<button class="po-group-send" onclick="resendToSupplier('${o.id}')" title="Resend to supplier">↺ Resend to Supplier</button>`
       :`<button class="po-group-send" onclick="resendToSupplier('${o.id}')">✉ Send to Supplier</button>`;
@@ -1802,7 +1831,10 @@ function renderPOLog(){
         ${sendBtn}
         ${warehouseBtn}
         ${deliverBtn}
-        <button class=\"po-group-restock-view\" onclick=\"viewRestockList('${o.id}')\" title=\"View supplier restock list\">📋 Restock List</button>
+        ${o.restockListUrl
+          ? `<button class="po-group-restock-done" onclick="viewRestockList('${o.id}')" title="View uploaded restock list">✅ Supplier Uploaded</button>`
+          : `<button class="po-group-restock-view" onclick="viewRestockList('${o.id}')" title="Awaiting supplier upload">📋 Require Supplier</button>`
+        }
         <button class="po-group-delete" onclick="deletePOOrder('${o.id}')" title="Delete this order">×</button>
       </div>
       ${trackingRow}
@@ -1811,6 +1843,60 @@ function renderPOLog(){
   }).join('');
 }
 
+
+function applyPOFilters(){
+  var q      = (document.getElementById('poSearch')?.value||'').toLowerCase().trim();
+  var from   = document.getElementById('poDateFrom')?.value;
+  var to     = document.getElementById('poDateTo')?.value;
+  var status = document.getElementById('poStatusFilter')?.value||'';
+  var upload = document.getElementById('poUploadFilter')?.value||'';
+
+  var filtered = poOrders.filter(function(o){
+    // Search: ID, supplier email, notes, supplier name
+    if(q && !( 
+      (o.id||'').toLowerCase().includes(q) ||
+      (o.supplierEmail||'').toLowerCase().includes(q) ||
+      (o.supplierName||'').toLowerCase().includes(q) ||
+      (o.notes||'').toLowerCase().includes(q)
+    )) return false;
+    // Status
+    if(status === 'delivered' && !o.delivered) return false;
+    if(status === 'pending'   &&  o.delivered) return false;
+    if(status === 'sent'      && !o.sent)      return false;
+    // Upload
+    if(upload === 'uploaded'   && !o.restockListUrl) return false;
+    if(upload === 'pending'    &&  o.restockListUrl) return false;
+    // Date range — compare against orderDate string (parsed)
+    if(from || to){
+      // o.orderDate is like "13 Apr 2026" — parse it
+      var d = new Date(o.orderDate);
+      if(from && d < new Date(from)) return false;
+      if(to   && d > new Date(to+'T23:59:59')) return false;
+    }
+    return true;
+  });
+
+  renderPOLog(filtered);
+
+  // Update count badge
+  var badge = document.getElementById('poFilterCount');
+  if(badge){
+    badge.textContent = filtered.length + ' / ' + poOrders.length;
+    badge.style.display = filtered.length < poOrders.length ? 'inline-block' : 'none';
+  }
+}
+
+function clearPOFilters(){
+  ['poSearch','poDateFrom','poDateTo'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  ['poStatusFilter','poUploadFilter'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  renderPOLog();
+  var badge = document.getElementById('poFilterCount');
+  if(badge) badge.style.display='none';
+}
 
 function deletePOOrder(orderId){
   const order=poOrders.find(o=>o.id===orderId);
@@ -2906,6 +2992,7 @@ async function viewRestockList(orderId){
     sub.textContent = 'Uploaded by supplier · ' + uploaded;
     footer.textContent = 'Supplier restock list for ' + orderId;
     if(order){ order.restockListUrl = imageUrl; order.restockListUploadedAt = uploadedAt; }
+    applyPOFilters(); // Re-render so button turns green
   } else {
     var debugInfo = (d && d.debug) ? (' — ' + d.debug.totalBlobs + ' total blobs, related: ' + (d.debug.relatedBlobs||[]).join(', ')) : '';
     empty.innerHTML = '<div style="font-size:32px;margin-bottom:12px;">&#128203;</div>'

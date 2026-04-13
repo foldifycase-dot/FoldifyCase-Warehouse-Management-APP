@@ -105,6 +105,39 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── FIND restock list image for a PO order ──────────────────────────────
+  if (action === 'find-restock' && req.method === 'GET') {
+    try {
+      const orderId = req.query.orderId;
+      if (!orderId) return res.status(400).json({ error: 'orderId required' });
+      // Search Blob for files matching this orderId in Supplier Restock Lists folder
+      const prefix = 'Supplier Restock Lists/' + orderId;
+      console.log('[find-restock] searching prefix:', prefix);
+      let allBlobs = [];
+      let cursor;
+      do {
+        const listRes = await list({ prefix, token: BLOB_TOKEN, cursor });
+        allBlobs = allBlobs.concat(listRes.blobs || []);
+        cursor = listRes.cursor;
+      } while (cursor);
+      console.log('[find-restock] blobs found:', allBlobs.length);
+      if (allBlobs.length > 0) {
+        // Sort by uploadedAt desc, take the latest
+        allBlobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        const blob = allBlobs[0];
+        return res.status(200).json({
+          url: blob.url,
+          uploadedAt: blob.uploadedAt,
+          pathname: blob.pathname
+        });
+      }
+      return res.status(200).json({ url: null });
+    } catch (e) {
+      console.error('[find-restock] ERROR:', e.message);
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
   // ── LOAD all sessions (called from app to show results) ─────────────────
   if (action === 'list' && req.method === 'GET') {
     try {

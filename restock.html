@@ -726,7 +726,18 @@ html.in-iframe .layout{height:100vh;}
         </button>
       </div>
       <div id="stockFilterTags" style="display:none;margin-bottom:6px;display:flex;gap:4px;flex-wrap:wrap"></div>
-      <div class="card"><div id="fullTable"><div class="empty-state"><div class="spinner"></div></div></div></div>
+      <div class="card" style="overflow:visible;">
+        <div class="card-hdr" onclick="toggleStockTable()" style="cursor:pointer;user-select:none;">
+          <div>
+            <div class="card-title">PRODUCT STOCK LEVELS <span id="stockTableCount" style="font-size:10px;background:rgba(26,26,24,.08);padding:1px 7px;border-radius:10px;font-weight:400;letter-spacing:0;text-transform:none;margin-left:6px;">—</span></div>
+            <div class="card-sub">Click to show / hide the stock list</div>
+          </div>
+          <span id="stockTableArrow" style="font-size:11px;color:rgba(26,26,24,.35);transition:transform .18s;display:inline-block;transform:rotate(90deg);">▶</span>
+        </div>
+        <div id="stockTableWrap">
+          <div id="fullTable"><div class="empty-state"><div class="spinner"></div></div></div>
+        </div>
+      </div>
 
       <!-- STOCK COUNT RESULTS PANEL -->
       <div class="page-hdr" style="margin-top:24px;">
@@ -739,9 +750,27 @@ html.in-iframe .layout{height:100vh;}
           Refresh
         </button>
       </div>
-      <div class="card" style="overflow:visible;"><div id="stockCountResults">
-        <div class="empty-state" style="color:rgba(26,26,24,.3);">Loading stock count history…</div>
-      </div></div>
+      <div class="card" style="overflow:visible;">
+        <!-- Search + filter bar -->
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+          <div class="search-wrap" style="flex:1;min-width:180px;margin-bottom:0;">
+            <span class="search-icon">⌕</span>
+            <input type="text" class="search-input" id="scSearch" placeholder="Search by ID, warehouse, email…" oninput="filterStockCountResults()">
+          </div>
+          <input type="date" class="filter-select" id="scDateFrom" onchange="filterStockCountResults()" style="font-size:11px;" title="From date">
+          <span style="font-size:11px;color:rgba(26,26,24,.4);">→</span>
+          <input type="date" class="filter-select" id="scDateTo" onchange="filterStockCountResults()" style="font-size:11px;" title="To date">
+          <select class="filter-select" id="scStatusFilter" onchange="filterStockCountResults()" style="font-size:11px;">
+            <option value="">All status</option>
+            <option value="submitted">✓ Submitted</option>
+            <option value="pending">⏳ Pending</option>
+          </select>
+          <button class="filter-clear" onclick="clearScFilters()">✕ Clear</button>
+        </div>
+        <div id="stockCountResults">
+          <div class="empty-state" style="color:rgba(26,26,24,.3);">Loading stock count history…</div>
+        </div>
+      </div>
     </div>
 
     <!-- REORDER -->
@@ -2618,6 +2647,26 @@ function renderStockCountResults(sessions){
     return;
   }
 
+  // Populate Stock Count column cells in All Stock table
+  data.forEach(s=>{
+    if(s.status==='submitted'&&s.counts){
+      Object.entries(s.counts).forEach(([vid,cnt])=>{
+        const cell=document.getElementById('sc-cell-'+vid);
+        if(cell){
+          const sys=allProducts.flatMap(p=>p.variantData||[]).find(v=>String(v.id)===String(vid));
+          const sysQty=sys?sys.qty:null;
+          const diff=sysQty!==null?cnt-sysQty:null;
+          const col=diff===null?'rgba(26,26,24,.5)':diff<0?'#C94040':diff>0?'#2D5FA6':'#3D7A5A';
+          const diffTxt=diff===null?'':diff===0?' ✓':diff>0?' +'+diff:' '+diff;
+          cell.textContent=cnt+diffTxt;
+          cell.style.color=col;
+          cell.style.fontWeight=diff===0?'400':'700';
+          cell.title=`Last count: ${cnt}${sysQty!==null?' (System: '+sysQty+')':''}`;
+        }
+      });
+    }
+  });
+
   el.innerHTML = data.map(s => {
     const date = new Date(s.createdAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
     const isSubmitted = s.status === 'submitted';
@@ -2633,7 +2682,12 @@ function renderStockCountResults(sessions){
           <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2.5"/></svg>
           View Sheet
         </a>` : '';
-    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+    const deleteBtn = `<button onclick="deleteStockCount('${s.sessionId}')"
+      title="Delete this stock count"
+      style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1px solid rgba(201,64,64,.25);background:rgba(201,64,64,.06);border-radius:6px;cursor:pointer;color:rgba(201,64,64,.6);font-size:16px;line-height:1;transition:all .15s;flex-shrink:0;"
+      onmouseover="this.style.background='rgba(201,64,64,.15)';this.style.color='#C94040'"
+      onmouseout="this.style.background='rgba(201,64,64,.06)';this.style.color='rgba(201,64,64,.6)'">×</button>`;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
       <div style="flex:1;min-width:0;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap;">
           <span style="font-size:12px;font-weight:600;color:var(--ink);">${s.whLabel||((s.warehouse||'?').toUpperCase()+' Warehouse')}</span>
@@ -2643,9 +2697,44 @@ function renderStockCountResults(sessions){
         <div style="font-size:11px;color:rgba(26,26,24,.4);">${date} · ${s.totalProducts||'?'} products · ${s.totalVariants||'?'} variants</div>
         ${countInfo}
       </div>
-      <div style="flex-shrink:0;">${viewBtn}</div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">${viewBtn}${deleteBtn}</div>
     </div>`;
   }).join('');
+}
+
+function openStockCountForProduct(productId){
+  // Pre-select warehouse and open modal, auto-filter to show only this product
+  openStockCountModal();
+  // Override the send to only include this product
+  const prod = allProducts.find(p=>String(p.id)===String(productId));
+  if(prod){
+    const wh = prod.warehouses && prod.warehouses.length ? prod.warehouses[0] : activeWarehouse;
+    document.getElementById('scWarehouse').value = wh;
+  }
+}
+
+async function deleteStockCount(sessionId){
+  if(!confirm(`Delete stock count ${sessionId}?\n\nThis cannot be undone.`)) return;
+  // Remove from Blob
+  try{
+    const r = await fetch('/api/stock-count?action=delete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({sessionId})
+    });
+    const d = await r.json();
+    if(!r.ok) throw new Error(d.error||'Delete failed');
+  }catch(e){ console.warn('[deleteStockCount] Blob delete failed:', e.message); }
+  // Remove from localStorage cache
+  try{
+    let stored = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]');
+    stored = stored.filter(s => s.sessionId !== sessionId);
+    localStorage.setItem('fc_stock_counts', JSON.stringify(stored));
+  }catch(e){}
+  // Remove from in-memory cache and re-render
+  _allStockCounts = _allStockCounts.filter(s => s.sessionId !== sessionId);
+  filterStockCountResults();
+  showToast('Stock count ' + sessionId + ' deleted', 'ok');
 }
 
 async function sendStockCount(){
@@ -2672,7 +2761,10 @@ async function sendStockCount(){
   document.getElementById('scStatus').innerHTML = '<span style="color:rgba(26,26,24,.5)">Saving session…</span>';
 
   // Generate session ID
-  const sessionId = 'SC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,5).toUpperCase();
+  const _now = new Date();
+  const _ymd = _now.getFullYear().toString() + String(_now.getMonth()+1).padStart(2,'0') + String(_now.getDate()).padStart(2,'0');
+  const _rand = Math.random().toString(36).slice(2,6).toUpperCase();
+  const sessionId = 'SC-' + _ymd + '-' + _rand;
   const now = new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
   const baseUrl = window.location.origin;
   const sheetUrl = `${baseUrl}/api/stock-count?id=${sessionId}`;
@@ -2774,7 +2866,53 @@ async function sendStockCount(){
 }
 
 // ── STOCK COUNT RESULTS PANEL ─────────────────────────────────────────────
+let _allStockCounts = [];  // global cache for filtering
+
 async function loadStockCountResults(){
+  const el = document.getElementById('stockCountResults');
+  if(el) el.innerHTML = '<div class="empty-state"><div class="spinner"></div>Loading…</div>';
+  try{
+    const r = await fetch('/api/stock-count?action=list');
+    const d = await r.json();
+    if(d.sessions && d.sessions.length > 0){
+      _allStockCounts = d.sessions;
+      filterStockCountResults();
+      return;
+    }
+  }catch(e){}
+  // Fall back to localStorage
+  try{ _allStockCounts = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]'); }catch(e){ _allStockCounts=[]; }
+  filterStockCountResults();
+}
+
+function filterStockCountResults(){
+  const q = (document.getElementById('scSearch')?.value||'').toLowerCase().trim();
+  const from = document.getElementById('scDateFrom')?.value;
+  const to = document.getElementById('scDateTo')?.value;
+  const status = document.getElementById('scStatusFilter')?.value||'';
+
+  let data = _allStockCounts.slice();
+
+  if(q) data = data.filter(s =>
+    (s.sessionId||'').toLowerCase().includes(q) ||
+    (s.whLabel||'').toLowerCase().includes(q) ||
+    (s.email||s.createdBy||'').toLowerCase().includes(q) ||
+    (s.warehouse||'').toLowerCase().includes(q)
+  );
+  if(status) data = data.filter(s => s.status === status);
+  if(from) data = data.filter(s => new Date(s.createdAt) >= new Date(from));
+  if(to) data = data.filter(s => new Date(s.createdAt) <= new Date(to+'T23:59:59'));
+
+  renderStockCountResults(data);
+}
+
+function clearScFilters(){
+  const fields = ['scSearch','scDateFrom','scDateTo','scStatusFilter'];
+  fields.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  renderStockCountResults(_allStockCounts);
+}
+
+async function loadStockCountResultsOriginal(){
   // Try Blob first, fall back to localStorage
   try{
     const r = await fetch(`/api/stock-count?action=list`);
@@ -2801,6 +2939,26 @@ function renderStockCountResults(sessions){
     el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);padding:20px;">No stock counts sent yet — use the <strong>Send Stock Count</strong> button in All Stock.</div>';
     return;
   }
+
+  // Populate Stock Count column cells in All Stock table
+  data.forEach(s=>{
+    if(s.status==='submitted'&&s.counts){
+      Object.entries(s.counts).forEach(([vid,cnt])=>{
+        const cell=document.getElementById('sc-cell-'+vid);
+        if(cell){
+          const sys=allProducts.flatMap(p=>p.variantData||[]).find(v=>String(v.id)===String(vid));
+          const sysQty=sys?sys.qty:null;
+          const diff=sysQty!==null?cnt-sysQty:null;
+          const col=diff===null?'rgba(26,26,24,.5)':diff<0?'#C94040':diff>0?'#2D5FA6':'#3D7A5A';
+          const diffTxt=diff===null?'':diff===0?' ✓':diff>0?' +'+diff:' '+diff;
+          cell.textContent=cnt+diffTxt;
+          cell.style.color=col;
+          cell.style.fontWeight=diff===0?'400':'700';
+          cell.title=`Last count: ${cnt}${sysQty!==null?' (System: '+sysQty+')':''}`;
+        }
+      });
+    }
+  });
 
   el.innerHTML = data.map(s => {
     const date = new Date(s.createdAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -3152,21 +3310,23 @@ function renderAll(){
   var _aDot=document.getElementById('alertNavDot');if(_aDot)_aDot.style.display=crit>0?'inline-block':'none';
   document.getElementById('tableSub').textContent=wh.label+' · '+p.length+' products';
   renderMainTable(p);renderPriority(p);renderFullTable(p);renderReorder(p);renderPopular(p);
+  var stc=document.getElementById('stockTableCount');if(stc)stc.textContent=p.length+' product'+(p.length!==1?'s':'');
 }
 
 function whDots(whs){return`<div class="mkt-dots">${whs.map(w=>`<div class="mkt-d" style="background:${WH[w].color}" title="${WH[w].label}"></div>`).join('')}</div>`;}
 
-function tblHTML(prods,showWh,prefix){
+function tblHTML(prods,showWh,prefix,showSC){
   if(!prods.length)return'<div class="empty-state">No products match this filter.</div>';
   const mx=maxQ(prods);
   return`<div class="tbl-wrap"><table><thead><tr>
-    <th style="width:${showWh?'34%':'42%'}">Product</th>
+    <th style="width:${showWh?'30%':'37%'}">Product</th>
     ${showWh?'<th style="width:9%">Markets</th>':''}
     <th style="width:7%">Units</th>
     <th style="width:9%">Cost/Unit</th>
     <th style="width:11%">Status</th>
-    <th style="width:14%">Trend</th>
-    <th style="width:10%">Restock</th>
+    <th style="width:13%">Trend</th>
+    <th style="width:9%">Restock</th>
+    ${showSC?'<th style="width:10%">Stock Count</th>':''}
   </tr></thead><tbody>${prods.map((p,pi)=>{
     const bdg=p.status==='critical'
       ?'<span class="badge b-crit"><div class="bdot"></div>Critical</span>'
@@ -3215,6 +3375,7 @@ function tblHTML(prods,showWh,prefix){
           <svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
           + Restock
         </button></td>
+        ${showSC?`<td style="text-align:center;vertical-align:middle;"><span id="sc-cell-${v.id}" style="font-size:11px;color:rgba(26,26,24,.3);font-family:'DM Mono',monospace;">—</span></td>`:''}
       </tr>`;
     }).join('')}</tbody>`:'';
     return`<tbody><tr>
@@ -3238,6 +3399,7 @@ function tblHTML(prods,showWh,prefix){
         <svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1v14M1 8h14"/></svg>
         + Restock
       </button></td>
+      ${showSC?`<td style="text-align:center;vertical-align:middle;"><button onclick="event.stopPropagation();openStockCountForProduct('${p.id}')" title="Stock count for this product" style="display:inline-flex;align-items:center;gap:4px;padding:4px 9px;background:rgba(200,169,110,.1);color:#B87D2A;border:1px solid rgba(200,169,110,.25);border-radius:5px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .15s;" onmouseover="this.style.background='rgba(200,169,110,.2)'" onmouseout="this.style.background='rgba(200,169,110,.1)'"><svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h8l4 4v8a1 1 0 01-1 1H2a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M4 9h8M4 12h5"/></svg>Count</button></td>`:''}
     </tr></tbody>${varRows}`;
   }).join('')}</table></div>`;
 }
@@ -3383,6 +3545,15 @@ function renderReorder(p){
   }).join('')}</div>`;
 }
 
+
+function toggleStockTable(){
+  const wrap=document.getElementById('stockTableWrap');
+  const arrow=document.getElementById('stockTableArrow');
+  if(!wrap)return;
+  const open=wrap.style.display==='none';
+  wrap.style.display=open?'block':'none';
+  if(arrow)arrow.style.transform=open?'rotate(90deg)':'';
+}
 
 function toggleReorderList(){
   const wrap=document.getElementById('reorderTableWrap');
@@ -3543,7 +3714,7 @@ function applyStockFilters(){
   else if(sort==='name_asc') prods=[...prods].sort((a,b)=>a.title.localeCompare(b.title));
   else if(sort==='name_desc') prods=[...prods].sort((a,b)=>b.title.localeCompare(a.title));
 
-  document.getElementById('fullTable').innerHTML=tblHTML(prods,activeWarehouse==='all','st');
+  document.getElementById('fullTable').innerHTML=tblHTML(prods,activeWarehouse==='all','st',true);
 }
 
 function clearStockFilters(){

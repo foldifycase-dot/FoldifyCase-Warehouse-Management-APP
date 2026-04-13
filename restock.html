@@ -2598,10 +2598,10 @@ async function sendStockCount(){
     return;
   }
   const wh = document.getElementById('scWarehouse').value;
-  const whLabel = wh === 'all' ? 'All Warehouses' : (wh.toUpperCase() + ' Warehouse');
+  const whLabel = wh === 'all' ? 'All Warehouses' : wh.toUpperCase() + ' Warehouse';
   const prods = wh === 'all' ? allProducts : allProducts.filter(p => p.warehouses.includes(wh));
   if(!prods.length){
-    document.getElementById('scStatus').innerHTML = '<span style="color:var(--red)">⚠ No products found for this warehouse</span>';
+    document.getElementById('scStatus').innerHTML = '<span style="color:var(--red)">⚠ No products for this warehouse</span>';
     return;
   }
   const opts = {
@@ -2610,16 +2610,77 @@ async function sendStockCount(){
     status:document.getElementById('scIncludeStatus').checked,
     cost:  document.getElementById('scIncludeCost').checked
   };
-
   const btn = document.getElementById('scSendBtn');
-  btn.disabled = true;
-  btn.textContent = 'Sending…';
-  document.getElementById('scStatus').innerHTML = '<span style="color:rgba(26,26,24,.5)">Building stock count sheet…</span>';
+  btn.disabled = true; btn.textContent = 'Sending…';
+  document.getElementById('scStatus').innerHTML = '<span style="color:rgba(26,26,24,.5)">Saving session…</span>';
 
-  const html = buildStockCountHTML(prods, whLabel, opts);
+  // Generate session ID
+  const sessionId = 'SC-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,5).toUpperCase();
   const now = new Date().toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+  const baseUrl = window.location.origin;
+  const sheetUrl = `${baseUrl}/api/stock-count?id=${sessionId}`;
   const totalVariants = prods.reduce((s,p) => s + (p.variantData && p.variantData.length > 1 ? p.variantData.length : 1), 0);
 
+  // Save session to Blob via API
+  try{
+    const saveRes = await fetch(`${PROXY.replace('/api/proxy','/api/stock-count')}?action=save`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        sessionId, warehouse: wh, whLabel, opts,
+        products: prods, createdAt: new Date().toISOString(),
+        createdBy: email, status: 'pending'
+      })
+    });
+    if(!saveRes.ok) throw new Error('Failed to save session');
+  }catch(e){
+    document.getElementById('scStatus').innerHTML = `<span style="color:var(--red)">✗ Failed to create session: ${e.message}</span>`;
+    btn.disabled = false; btn.textContent = 'Send Email'; return;
+  }
+
+  // Build notification email (not the full list — just a link)
+  const notifHtml = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F0EDE8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#F0EDE8;padding:32px 16px;">
+<tr><td align="center">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+  <tr><td style="background:#1A1A18;border-radius:10px 10px 0 0;padding:22px 28px;border-bottom:3px solid #C8A96E;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td><div style="color:#fff;font-size:20px;font-weight:800;letter-spacing:.08em;">FOLDIFYCASE</div>
+      <div style="color:#C8A96E;font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin-top:3px;">STOCK COUNT REQUEST</div></td>
+      <td align="right"><div style="color:rgba(255,255,255,.4);font-size:10px;">${now}</div></td>
+    </tr></table>
+  </td></tr>
+  <tr><td style="background:#fff;padding:28px;">
+    <div style="font-size:15px;font-weight:700;color:#1A1A18;margin-bottom:10px;">📋 Stock Count Required — ${whLabel}</div>
+    <div style="font-size:13px;color:rgba(26,26,24,.65);line-height:1.7;margin-bottom:20px;">
+      The FoldifyCase team has requested a stock count for <strong>${whLabel}</strong>.<br>
+      Please open the stock count sheet, physically count each item in the warehouse, enter the quantities, and submit the form.
+    </div>
+    <div style="background:#F5F3EE;border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:12px;color:rgba(26,26,24,.55);line-height:1.6;">
+      <strong>📦 ${prods.length} products</strong> &nbsp;·&nbsp; <strong>${totalVariants} variants</strong> to count
+    </div>
+    <div style="text-align:center;">
+      <a href="${sheetUrl}" style="display:inline-block;background:#C8A96E;color:#1A1A18;font-size:13px;font-weight:700;letter-spacing:.05em;padding:14px 36px;border-radius:8px;text-decoration:none;font-family:Arial,sans-serif;">
+        📋 &nbsp; Open Stock Count Sheet
+      </a>
+    </div>
+    <div style="text-align:center;margin-top:12px;font-size:10px;color:rgba(26,26,24,.35);">
+      Opens in your browser — no login required
+    </div>
+  </td></tr>
+  <tr><td style="background:#1A1A18;border-radius:0 0 10px 10px;padding:14px 28px;">
+    <table width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td style="font-size:10px;color:rgba(255,255,255,.3);">FoldifyCase Warehouse App</td>
+      <td align="right" style="font-size:10px;color:rgba(200,169,110,.5);">${sessionId}</td>
+    </tr></table>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>`;
+
+  // Send the notification email
   try{
     const r = await fetch(`${PROXY}?service=alert`, {
       method: 'POST',
@@ -2628,34 +2689,96 @@ async function sendStockCount(){
         to: [email],
         from_name: 'FoldifyCase Warehouse',
         from_email: 'warehouse@foldifycase.com.au',
-        subject: `Stock Count Sheet — ${whLabel} — ${now}`,
-        custom_html: html,
-        type: 'stock_count',
-        warehouse: whLabel,
-        products: []
+        subject: `Stock Count Required — ${whLabel} — ${now}`,
+        custom_html: notifHtml,
+        type: 'stock_count', warehouse: whLabel, products: []
       })
     });
     const d = await r.json();
     if(r.ok && d.success){
-      document.getElementById('scStatus').innerHTML = `<span style="color:var(--green)">✓ Sent to ${email} — ${prods.length} products, ${totalVariants} variants</span>`;
+      document.getElementById('scStatus').innerHTML = `<span style="color:var(--green)">✓ Email sent to ${email} — <a href="${sheetUrl}" target="_blank" style="color:var(--gold);">Preview sheet ↗</a></span>`;
       btn.textContent = '✓ Sent';
-      btn.style.background = 'var(--green)';
-      btn.style.color = '#fff';
-      showToast('Stock count sheet sent to ' + email, 'ok');
-      setTimeout(() => closeStockCountModal(), 2500);
-    } else {
-      throw new Error(d.error || 'Send failed');
-    }
-  } catch(e){
-    document.getElementById('scStatus').innerHTML = `<span style="color:var(--red)">✗ Failed: ${e.message}</span>`;
-    btn.disabled = false;
-    btn.textContent = 'Send Email';
-    btn.style.background = '';
-    btn.style.color = '';
-    showToast('Send failed: ' + e.message, 'err');
-    console.error('[sendStockCount]', e);
+      btn.style.background = 'var(--green)'; btn.style.color = '#fff';
+      showToast('Stock count email sent — ' + sessionId, 'ok');
+      // Store session locally for results panel
+      try{
+        const stored = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]');
+        stored.unshift({sessionId, warehouse:wh, whLabel, email, createdAt:new Date().toISOString(), status:'pending', totalProducts:prods.length, totalVariants, sheetUrl});
+        localStorage.setItem('fc_stock_counts', JSON.stringify(stored.slice(0,20)));
+      }catch(e){}
+      renderStockCountResults();
+      setTimeout(() => closeStockCountModal(), 3000);
+    } else { throw new Error(d.error || 'Email send failed'); }
+  }catch(e){
+    document.getElementById('scStatus').innerHTML = `<span style="color:var(--red)">✗ ${e.message}</span>`;
+    btn.disabled = false; btn.textContent = 'Send Email';
+    btn.style.background = ''; btn.style.color = '';
   }
 }
+
+// ── STOCK COUNT RESULTS PANEL ─────────────────────────────────────────────
+async function loadStockCountResults(){
+  // Try Blob first, fall back to localStorage
+  try{
+    const r = await fetch(`/api/stock-count?action=list`);
+    const d = await r.json();
+    if(d.sessions && d.sessions.length > 0){
+      renderStockCountResults(d.sessions);
+      return;
+    }
+  }catch(e){}
+  // Fall back to localStorage index
+  renderStockCountResults();
+}
+
+function renderStockCountResults(sessions){
+  const el = document.getElementById('stockCountResults');
+  if(!el) return;
+
+  // Get local index
+  let local = [];
+  try{ local = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]'); }catch(e){}
+  const data = sessions || local;
+
+  if(!data.length){
+    el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);padding:20px;">No stock counts sent yet — use the <strong>Send Stock Count</strong> button in All Stock.</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(s => {
+    const date = new Date(s.createdAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const isPending = s.status === 'pending';
+    const isSubmitted = s.status === 'submitted';
+    const statusBadge = isSubmitted
+      ? '<span style="background:#EAF3DE;color:#2A5C0A;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid #C5DFA8;">✓ Submitted</span>'
+      : '<span style="background:#FFF8E8;color:#7A5A00;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid #EDD98A;">⏳ Pending</span>';
+
+    // Count variances if submitted
+    let varianceSummary = '';
+    if(isSubmitted && s.counts){
+      const counts = Object.values(s.counts);
+      varianceSummary = `<div style="font-size:11px;color:rgba(26,26,24,.5);margin-top:4px;">${counts.length} items counted · Submitted by ${s.submittedBy||'Team'}</div>`;
+    }
+
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+          <span style="font-size:12px;font-weight:600;color:var(--ink);">${s.whLabel || s.warehouse?.toUpperCase() + ' Warehouse'}</span>
+          ${statusBadge}
+        </div>
+        <div style="font-size:11px;color:rgba(26,26,24,.4);">${date} · ${s.totalProducts||'?'} products · ${s.totalVariants||'?'} variants · Sent to ${s.email||s.createdBy||'?'}</div>
+        ${varianceSummary}
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        ${s.sheetUrl ? `<a href="${s.sheetUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:rgba(200,169,110,.12);color:#B87D2A;border:1px solid rgba(200,169,110,.3);border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Inter',sans-serif;">
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2.5"/></svg>
+          View Sheet
+        </a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
 
 async function fetchAllCosts(){
   const allVariants=[];
@@ -3326,6 +3449,7 @@ function setView(v,el){
   document.getElementById('view-'+v).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
   el.classList.add('active');
+  if(v==='stock') loadStockCountResults();
 }
 
 function setChip(f,el){
@@ -3589,6 +3713,7 @@ function showPrintableOrder(order){
 
 
 startLoad();
+loadStockCountResults();
 
 
 </script>

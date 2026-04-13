@@ -787,26 +787,25 @@ html.in-iframe .layout{height:100vh;}
           Refresh
         </button>
       </div>
-      <div class="card" style="overflow:visible;">
-        <!-- Search + filter bar -->
-        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
-          <div class="search-wrap" style="flex:1;min-width:180px;margin-bottom:0;">
-            <span class="search-icon">⌕</span>
-            <input type="text" class="search-input" id="scSearch" placeholder="Search by ID, warehouse, email…" oninput="filterStockCountResults()">
-          </div>
-          <input type="date" class="filter-select" id="scDateFrom" onchange="filterStockCountResults()" style="font-size:11px;" title="From date">
-          <span style="font-size:11px;color:rgba(26,26,24,.4);">→</span>
-          <input type="date" class="filter-select" id="scDateTo" onchange="filterStockCountResults()" style="font-size:11px;" title="To date">
-          <select class="filter-select" id="scStatusFilter" onchange="filterStockCountResults()" style="font-size:11px;">
-            <option value="">All status</option>
-            <option value="submitted">✓ Submitted</option>
-            <option value="pending">⏳ Pending</option>
-          </select>
-          <button class="filter-clear" onclick="clearScFilters()">✕ Clear</button>
+      <!-- Search + filter bar -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <div class="search-wrap" style="flex:1;min-width:180px;margin-bottom:0;">
+          <span class="search-icon">⌕</span>
+          <input type="text" class="search-input" id="scSearch" placeholder="Search by ID, warehouse, email…" oninput="filterStockCountResults()">
         </div>
-        <div id="stockCountResults">
-          <div class="empty-state" style="color:rgba(26,26,24,.3);">Loading stock count history…</div>
-        </div>
+        <input type="date" class="filter-select" id="scDateFrom" onchange="filterStockCountResults()" style="font-size:11px;" title="From date">
+        <span style="font-size:11px;color:rgba(26,26,24,.4);">→</span>
+        <input type="date" class="filter-select" id="scDateTo" onchange="filterStockCountResults()" style="font-size:11px;" title="To date">
+        <select class="filter-select" id="scStatusFilter" onchange="filterStockCountResults()" style="font-size:11px;">
+          <option value="">All status</option>
+          <option value="submitted">✓ Submitted</option>
+          <option value="pending">⏳ Pending</option>
+        </select>
+        <button class="filter-clear" onclick="clearScFilters()">✕ Clear</button>
+      </div>
+      <!-- Results render directly here — each sc-group is its own card -->
+      <div id="stockCountResults">
+        <div class="empty-state" style="color:rgba(26,26,24,.3);background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:24px;">Loading stock count history…</div>
       </div>
     </div>
 
@@ -2686,7 +2685,7 @@ function renderStockCountResults(sessions){
   var data = sessions || local;
 
   if(!data.length){
-    el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);padding:20px 16px;">No stock counts yet — use <strong>Send Stock Count</strong> above.</div>';
+    el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:24px;">No stock counts yet — click <strong>Send Stock Count</strong> in All Stock above to get started.</div>';
     return;
   }
 

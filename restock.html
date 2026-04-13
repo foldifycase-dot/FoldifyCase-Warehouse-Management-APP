@@ -1802,7 +1802,7 @@ function renderPOLog(){
         ${sendBtn}
         ${warehouseBtn}
         ${deliverBtn}
-        ${o.restockListUrl?`<button class="po-group-restock-view" onclick="viewRestockList('${o.id}')" title="View supplier restock list">📋 Restock List</button>`:''}
+        <button class=\"po-group-restock-view\" onclick=\"viewRestockList('${o.id}')\" title=\"View supplier restock list\">📋 Restock List</button>
         <button class="po-group-delete" onclick="deletePOOrder('${o.id}')" title="Delete this order">×</button>
       </div>
       ${trackingRow}
@@ -2858,32 +2858,60 @@ function buildScViewerRow(name, sysQty, cnt, diff, isVariant){
     +'</tr>';
 }
 
-function viewRestockList(orderId){
-  var order = poOrders.find(function(o){ return o.id === orderId; });
-  document.getElementById('restockListTitle').textContent = 'Restock List — ' + orderId;
+async function viewRestockList(orderId){
+  var overlay = document.getElementById('restockListOverlay');
   var img = document.getElementById('restockListImg');
   var empty = document.getElementById('restockListEmpty');
   var dl = document.getElementById('restockListDownload');
   var footer = document.getElementById('restockListFooter');
-  if(order && order.restockListUrl){
-    img.src = order.restockListUrl;
+  var sub = document.getElementById('restockListSub');
+
+  // Open panel immediately with loading state
+  document.getElementById('restockListTitle').textContent = 'Restock List — ' + orderId;
+  img.style.display = 'none';
+  dl.style.display = 'none';
+  empty.style.display = 'block';
+  empty.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">&#9203;</div><div style="font-size:13px;color:rgba(26,26,24,.5);">Checking for uploaded restock list…</div>';
+  sub.textContent = 'Loading…';
+  footer.textContent = orderId;
+  overlay.classList.add('open');
+
+  // Step 1: Check in-memory poOrders
+  var order = poOrders.find(function(o){ return o.id === orderId; });
+  var imageUrl = order && order.restockListUrl ? order.restockListUrl : null;
+  var uploadedAt = order && order.restockListUploadedAt ? order.restockListUploadedAt : null;
+
+  // Step 2: If not cached, fetch from Blob by searching for orderId prefix
+  if(!imageUrl){
+    try{
+      var r = await fetch('/api/stock-count?action=find-restock&orderId=' + encodeURIComponent(orderId));
+      if(r.ok){
+        var d = await r.json();
+        if(d.url){ imageUrl = d.url; uploadedAt = d.uploadedAt; }
+      }
+    }catch(e){ console.warn('[viewRestockList] Blob lookup failed:', e.message); }
+  }
+
+  // Step 3: Render result
+  if(imageUrl){
+    img.src = imageUrl;
     img.style.display = 'block';
     empty.style.display = 'none';
-    dl.href = order.restockListUrl;
+    dl.href = imageUrl;
     dl.style.display = 'inline-block';
-    var uploaded = order.restockListUploadedAt
-      ? new Date(order.restockListUploadedAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+    var uploaded = uploadedAt
+      ? new Date(uploadedAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
       : 'recently';
-    document.getElementById('restockListSub').textContent = 'Uploaded ' + uploaded;
-    footer.textContent = 'Uploaded by supplier · ' + order.id;
+    sub.textContent = 'Uploaded by supplier · ' + uploaded;
+    footer.textContent = 'Supplier restock list for ' + orderId;
+    if(order){ order.restockListUrl = imageUrl; order.restockListUploadedAt = uploadedAt; }
   } else {
-    img.style.display = 'none';
-    empty.style.display = 'block';
-    dl.style.display = 'none';
-    document.getElementById('restockListSub').textContent = 'Awaiting upload from supplier';
+    empty.innerHTML = '<div style="font-size:32px;margin-bottom:12px;">&#128203;</div>'
+      + '<div style="font-size:13px;font-weight:600;color:rgba(26,26,24,.5);">No restock list uploaded yet</div>'
+      + '<div style="font-size:11px;margin-top:8px;color:rgba(26,26,24,.35);">The supplier will upload it via the link in the purchase order email</div>';
+    sub.textContent = 'Awaiting supplier upload';
     footer.textContent = 'No file uploaded yet for ' + orderId;
   }
-  document.getElementById('restockListOverlay').classList.add('open');
 }
 
 function closeRestockListViewer(){

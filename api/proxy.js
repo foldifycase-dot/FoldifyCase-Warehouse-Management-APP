@@ -111,6 +111,51 @@ module.exports = async function handler(req, res) {
         return res.status(200).json(d);
       }
 
+      // ── SET COST (unit cost on inventory item) ────────────────────────────
+      if (action === 'set_cost') {
+        if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
+        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        const { inventory_item_id, cost } = body;
+        if (!inventory_item_id || cost === undefined) {
+          return res.status(400).json({ error: 'inventory_item_id and cost required' });
+        }
+        const r = await fetch(
+          `https://${STORE}/admin/api/${API_VERSION}/inventory_items/${inventory_item_id}.json`,
+          {
+            method: 'PUT',
+            headers: { ...shopifyHeaders, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inventory_item: { id: inventory_item_id, cost: parseFloat(cost).toFixed(2) } })
+          }
+        );
+        const d = await r.json();
+        if (!r.ok) return res.status(r.status).json({ error: d.errors || 'Shopify error' });
+        return res.status(200).json({ success: true, cost: d.inventory_item?.cost });
+      }
+
+      // ── GET COSTS BATCH (fetch costs for multiple inventory items) ──────────
+      if (action === 'inventory_items_cost') {
+        const ids = req.query.ids;
+        if (!ids) return res.status(400).json({ error: 'ids required' });
+        const r = await fetch(
+          `https://${STORE}/admin/api/${API_VERSION}/inventory_items.json?ids=${ids}&fields=id,cost`,
+          { headers: shopifyHeaders }
+        );
+        const d = await r.json();
+        return res.status(200).json({ inventory_items: d.inventory_items || [] });
+      }
+
+      // ── GET COST (fetch cost for an inventory item) ───────────────────────
+      if (action === 'get_cost') {
+        const iid = req.query.inventory_item_id;
+        if (!iid) return res.status(400).json({ error: 'inventory_item_id required' });
+        const r = await fetch(
+          `https://${STORE}/admin/api/${API_VERSION}/inventory_items/${iid}.json?fields=id,cost`,
+          { headers: shopifyHeaders }
+        );
+        const d = await r.json();
+        return res.status(200).json({ cost: d.inventory_item?.cost || null });
+      }
+
       return res.status(400).json({ error: `Unknown shopify action: ${action}` });
     }
 

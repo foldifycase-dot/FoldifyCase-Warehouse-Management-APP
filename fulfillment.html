@@ -169,6 +169,22 @@ td:first-child{padding-left:18px;}
 /* Hide topbar when embedded in combined app */
 html.in-iframe .topbar{display:none!important;}
 html.in-iframe .layout{min-height:calc(100vh);}
+
+/* Packing Image viewer */
+.btn-packing{width:100%;margin-top:4px;padding:5px 8px;background:#F0EDE8;border:1.5px solid rgba(26,26,24,.2);border-radius:5px;font-size:10px;font-weight:600;color:rgba(26,26,24,.6);cursor:pointer;transition:all .15s;}
+.btn-packing:hover{background:#1A1A18;color:#fff;border-color:#1A1A18;}
+.btn-packing.has-image{background:rgba(61,122,90,.08);border-color:rgba(61,122,90,.35);color:#3D7A5A;}
+.btn-packing.has-image:hover{background:#3D7A5A;color:#fff;border-color:#3D7A5A;}
+.pack-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center;pointer-events:none;visibility:hidden;}
+.pack-viewer-overlay.open{display:flex;pointer-events:auto;visibility:visible;}
+.pack-viewer-panel{background:#fff;border-radius:14px 14px 0 0;width:100%;max-width:700px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 -4px 32px rgba(0,0,0,.2);}
+.pack-viewer-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1.5px solid #EAE7D8;flex-shrink:0;background:#1A1A18;border-radius:14px 14px 0 0;}
+.pack-viewer-title{font-size:13px;font-weight:700;letter-spacing:.04em;color:#fff;}
+.pack-viewer-sub{font-size:10px;color:rgba(255,255,255,.45);margin-top:2px;}
+.pack-viewer-close{width:28px;height:28px;border:none;background:rgba(255,255,255,.1);border-radius:6px;cursor:pointer;font-size:16px;color:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;}
+.pack-viewer-close:hover{background:rgba(255,255,255,.2);color:#fff;}
+.pack-viewer-body{flex:1;overflow-y:auto;padding:20px;display:flex;align-items:center;justify-content:center;background:#F5F3EE;min-height:300px;}
+.pack-viewer-footer{padding:10px 18px;border-top:1px solid #EAE7D8;background:#EAE7D8;font-size:10px;color:rgba(26,26,24,.4);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 </style>
 
 <script>if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}</script>
@@ -857,7 +873,8 @@ function renderTable(){
       +"<td><span class='badge "+o.status+"'><span class='bdot'></span>"+statusLabel+"</span></td>"
       +"<td><div class='amt'>"+o.total.toFixed(2)+"<span class='amtc'> "+o.currency+"</span></div></td>"
       +"<td><button class='btn-send "+(isNotReady?"not-ready":isAliExpress?"no-label":alreadySent?"resend":"")+"' id='sendbtn-"+o.id+"' data-oid='"+o.id+"' "+(canSend?"":"disabled")+">"+(alreadySent?"Re-send ↺":isAliExpress?"No Label":isNotReady?"Not Ready":"Send Label")+"</button>"
-      +"<br><button id='lblbtn-"+o.id+"' data-oid='"+encodeURIComponent(o.shopifyOrderId||o.id)+"' data-oname='"+encodeURIComponent(o.num||'')+"' style='margin-top:5px;width:100%;padding:5px 8px;background:#F5F3E9;border:1.5px solid #C8A96E;border-radius:5px;font-size:10px;font-weight:600;color:#A6873A;cursor:pointer;' onclick='uploadLabelPDF(this,this.getAttribute(\"data-oid\"),this.getAttribute(\"data-oname\"))'>&#128206; Upload Label PDF</button></td>"
+      +"<br><button id='lblbtn-"+o.id+"' data-oid='"+encodeURIComponent(o.shopifyOrderId||o.id)+"' data-oname='"+encodeURIComponent(o.num||'')+"' style='margin-top:5px;width:100%;padding:5px 8px;background:#F5F3E9;border:1.5px solid #C8A96E;border-radius:5px;font-size:10px;font-weight:600;color:#A6873A;cursor:pointer;' onclick='uploadLabelPDF(this,this.getAttribute(\"data-oid\"),this.getAttribute(\"data-oname\"))'>&#128206; Upload Label PDF</button>"
+      +"<br><button class='btn-packing' id='packbtn-"+o.id+"' data-oname='"+encodeURIComponent(o.num||'')+"' onclick='viewPackingImage(this.getAttribute(\"data-oname\"),this)'>&#128247; Packing Image</button></td>"
       +"</tr>";
   }).join("");
   // Wire up send buttons via delegation - avoids inline onclick and Cloudflare issues
@@ -1067,6 +1084,59 @@ window.onload = function(){
 };
 
 // Inline label PDF upload - triggers file picker and uploads directly to blob
+function closePackViewer(){
+  document.getElementById('packViewerOverlay').classList.remove('open');
+}
+
+async function viewPackingImage(encodedOrderName, btn){
+  var orderName = decodeURIComponent(encodedOrderName).replace(/#/g,'').trim();
+  var overlay = document.getElementById('packViewerOverlay');
+  var img = document.getElementById('packViewerImg');
+  var empty = document.getElementById('packViewerEmpty');
+  var openLink = document.getElementById('packViewerOpen');
+  var footer = document.getElementById('packViewerFooter');
+  var pathEl = document.getElementById('packViewerPath');
+  document.getElementById('packViewerTitle').textContent = 'Packing Image — #' + orderName;
+  document.getElementById('packViewerSub').textContent = 'Loading from warehouse storage…';
+  img.style.display = 'none'; img.src = '';
+  openLink.style.display = 'none';
+  empty.style.display = 'block';
+  empty.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">&#9203;</div><div style="font-size:13px;color:rgba(26,26,24,.5);">Checking warehouse storage…</div>';
+  footer.textContent = 'Order #' + orderName;
+  pathEl.textContent = '';
+  overlay.classList.add('open');
+  try {
+    var r = await fetch('/api/proxy?service=blob&action=find_packing&orderName=' + encodeURIComponent(orderName));
+    var d = await r.json();
+    console.log('[viewPackingImage] response:', JSON.stringify(d));
+    if(d.url){
+      img.src = d.url;
+      img.style.display = 'block';
+      empty.style.display = 'none';
+      openLink.href = d.url;
+      openLink.style.display = 'inline-block';
+      var uploaded = d.uploadedAt
+        ? new Date(d.uploadedAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+        : 'recently';
+      document.getElementById('packViewerSub').textContent = 'Uploaded ' + uploaded;
+      footer.textContent = 'Packing image for order #' + orderName;
+      pathEl.textContent = d.pathname || '';
+      if(btn){ btn.className = 'btn-packing has-image'; btn.textContent = '\u2705 Packing Uploaded'; }
+    } else {
+      empty.innerHTML = '<div style="font-size:32px;margin-bottom:12px;">&#128247;</div>'
+        + '<div style="font-size:13px;font-weight:600;color:rgba(26,26,24,.5);">No packing image yet</div>'
+        + '<div style="font-size:11px;margin-top:8px;color:rgba(26,26,24,.35);">Warehouse uploads this when packing the order</div>'
+        + (d.debug ? '<div style="font-size:9px;margin-top:10px;color:rgba(26,26,24,.2);">Total blobs scanned: '+d.debug.total+'</div>' : '');
+      document.getElementById('packViewerSub').textContent = 'No image found';
+      footer.textContent = 'No packing image for order #' + orderName;
+    }
+  } catch(e) {
+    empty.innerHTML = '<div style="font-size:32px;margin-bottom:12px;">&#9888;&#65039;</div>'
+      + '<div style="font-size:13px;color:#C94040;">Error: ' + e.message + '</div>';
+    document.getElementById('packViewerSub').textContent = 'Load failed';
+  }
+}
+
 function uploadLabelPDF(btn, orderId, orderName) {
   var inp = document.createElement('input');
   inp.type = 'file';
@@ -1157,5 +1227,33 @@ window.addEventListener('load',function(){
   }catch(x){}
 });
 </script>
+<!-- PACKING IMAGE VIEWER -->
+<div class="pack-viewer-overlay" id="packViewerOverlay" onclick="if(event.target===this)closePackViewer()">
+  <div class="pack-viewer-panel">
+    <div class="pack-viewer-hdr">
+      <div>
+        <div class="pack-viewer-title" id="packViewerTitle">Packing Image</div>
+        <div class="pack-viewer-sub" id="packViewerSub">Uploaded by warehouse</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <a id="packViewerOpen" href="#" target="_blank" style="font-size:10px;color:#C8A96E;text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid rgba(200,169,110,.4);border-radius:5px;display:none;">↗ Full size</a>
+        <button class="pack-viewer-close" onclick="closePackViewer()">×</button>
+      </div>
+    </div>
+    <div class="pack-viewer-body" id="packViewerBody">
+      <div id="packViewerEmpty" style="text-align:center;color:rgba(26,26,24,.35);">
+        <div style="font-size:32px;margin-bottom:10px;">⏳</div>
+        <div style="font-size:13px;">Loading…</div>
+      </div>
+      <img id="packViewerImg" src="" alt="Packing Image"
+        style="max-width:100%;max-height:65vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.15);display:none;">
+    </div>
+    <div class="pack-viewer-footer">
+      <span id="packViewerFooter">—</span>
+      <span id="packViewerPath" style="font-family:monospace;font-size:9px;"></span>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

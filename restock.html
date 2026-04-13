@@ -2598,7 +2598,7 @@ function renderAll(){
   const ab=document.getElementById('alertBanner');
   if(crit>0){ab.style.display='flex';document.getElementById('alertMsg').textContent=crit+' product'+(crit>1?'s':'')+' critically low at '+wh.label+' — reorder immediately.';}
   else ab.style.display='none';
-  document.getElementById('alertNavDot').style.display=crit>0?'inline-block':'none';
+  var _aDot=document.getElementById('alertNavDot');if(_aDot)_aDot.style.display=crit>0?'inline-block':'none';
   document.getElementById('tableSub').textContent=wh.label+' · '+p.length+' products';
   renderMainTable(p);renderPriority(p);renderFullTable(p);renderReorder(p);renderPopular(p);
 }
@@ -3220,6 +3220,31 @@ window.addEventListener('message',function(e){
   // Sync trigger
   if(d.type==='FC_SYNC_TRIGGER'&&d.hub==='stock'){
     try{if(typeof startLoad==='function')startLoad();}catch(x){}
+  }
+
+  // Manual alert send from settings panel
+  if(d.type==='FC_SEND_ALERT'){
+    try{
+      var prevRecip=emailRecipients.slice();
+      if(d.recipients&&d.recipients.length)emailRecipients=d.recipients;
+      var alertType=d.alertType||'low';
+      var wh=d.warehouse||'us';
+      document.getElementById('alertType').value=alertType;
+      document.getElementById('alertWh').value=wh;
+      if(typeof sendAlert==='function')sendAlert();
+      emailRecipients=prevRecip;
+    }catch(x){console.error('[FC_SEND_ALERT]',x);}
+  }
+
+  // Alert settings sync
+  if(d.type==='FC_ALERT_SETTINGS'){
+    try{
+      if(d.recipients){emailRecipients=d.recipients;renderTags();}
+      if(d.weekly!==undefined){var tw=document.getElementById('togWeekly');if(tw)tw.checked=d.weekly;}
+      if(d.critical!==undefined){var tc=document.getElementById('togCritical');if(tc)tc.checked=d.critical;}
+      if(d.digestDay){var dd=document.getElementById('digestDay');if(dd)dd.value=d.digestDay;}
+      if(d.digestTime){var dt=document.getElementById('digestTime');if(dt)dt.value=d.digestTime;}
+    }catch(x){}
   }
 });
 

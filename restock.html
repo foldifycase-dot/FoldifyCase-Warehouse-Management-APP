@@ -289,7 +289,7 @@ td:first-child{padding-left:16px;}
 
 
 /* RESTOCK MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,24,.45);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,24,.45);z-index:600;align-items:center;justify-content:center;}
 .modal-overlay.open{display:flex;}
 .modal{background:#fff;border-radius:14px;width:560px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;border:1.5px solid var(--border);}
 .modal-box{background:#fff;border-radius:12px;box-shadow:0 8px 40px rgba(26,26,24,.22);display:flex;flex-direction:column;overflow:hidden;max-height:90vh;}
@@ -562,8 +562,8 @@ html.in-iframe .layout{height:100vh;}
 .sc-group-stat{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:rgba(26,26,24,.5);margin-right:14px;}
 .sc-group-stat strong{color:var(--ink);font-weight:600;}
 /* Stock Count Viewer Panel */
-.sc-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center;}
-.sc-viewer-overlay.open{display:flex;}
+.sc-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center;pointer-events:none;visibility:hidden;}
+.sc-viewer-overlay.open{display:flex;pointer-events:auto;visibility:visible;}
 .sc-viewer-panel{background:#fff;border-radius:14px 14px 0 0;width:100%;max-width:760px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 -4px 32px rgba(0,0,0,.18);}
 .sc-viewer-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1.5px solid var(--border);flex-shrink:0;}
 .sc-viewer-title{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;color:var(--ink);}
@@ -1161,7 +1161,7 @@ html.in-iframe .layout{height:100vh;}
     </div>
     <div class="modal-footer">
       <button class="btn-out" onclick="closeRestock()">Cancel</button>
-      <button class="btn-sol" id="confirmRestockBtn" onclick="confirmRestock()" style="opacity:.4;pointer-events:none">Place Order</button>
+      <button class="btn-sol" id="confirmRestockBtn" onclick="confirmRestock()">Place Order</button>
     </div>
   </div>
 </div>
@@ -1417,6 +1417,9 @@ function updateConfirmBtn(){
 
 async function confirmRestock(){
   if(!currentOrderLines.length)return;
+  const btn = document.getElementById('confirmRestockBtn');
+  if(btn){ btn.disabled=true; btn.textContent='Placing order…'; }
+  try{
   const ship=restockState.ship;
   const notes=document.getElementById('restockNotes').value.trim();
   const orderDate=document.getElementById('restockOrderDate').value;
@@ -1453,6 +1456,11 @@ async function confirmRestock(){
   cartItems=[];
   renderCart();
   showToast(`Order ${orderId} placed — ${currentOrderLines.length} item${currentOrderLines.length!==1?'s':''}${supplierEmail?' · Supplier notified':''}`,'ok');
+  }catch(err){
+    console.error('[confirmRestock]', err);
+    showToast('Order failed: ' + err.message, 'err');
+    if(btn){ btn.disabled=false; updateConfirmBtn(); }
+  }
 }
 
 async function sendToSupplier(order){

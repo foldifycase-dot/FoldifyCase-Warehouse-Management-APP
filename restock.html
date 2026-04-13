@@ -2871,11 +2871,21 @@ function renderPopularWithData(p,days){
       const vImg=v.image?`<img src="${v.image}" class="var-img" alt="" onerror="this.style.display='none'">`:'<div class="var-img-ph"></div>';
       const vSold=v.soldN||0;
       const vMx=Math.max(...(x.variantData||[]).map(vv=>vv.soldN||0),1);
+      const piid=v.inventoryItemId||v.id;
+      const plocId=locationMap[activeWarehouse]||(Object.values(locationMap)[0]||'');
       return`<tr class="variant-row">
         <td></td>
         <td style="padding-left:10px"><div style="display:flex;align-items:center;gap:8px">${vImg}<span class="variant-name">${v.title}</span></div></td>
         <td><span class="sales-chip" style="${vSold>0?'background:rgba(45,95,166,.1);color:#2D5FA6':''}">${vSold}</span></td>
-        <td><span class="variant-qty">${v.qty}</span></td>
+        <td>
+          <div class="qty-edit-wrap">
+            <input type="number" class="qty-edit-input" value="${v.qty}"
+              data-iid="${piid}" data-loc="${plocId}" data-orig="${v.qty}"
+              onkeydown="if(event.key==='Enter')saveQty(this)"
+              oninput="this.nextElementSibling.disabled=false">
+            <button class="qty-save-btn" disabled onclick="saveQty(this.previousElementSibling)" title="Save to Shopify">Save</button>
+          </div>
+        </td>
         <td><span class="badge ${vs}" style="font-size:9px;padding:2px 7px"><div class="bdot"></div>${v.status==='critical'?'Critical':v.status==='low'?'Low':'OK'}</span></td>
         <td>${trendHTML(x.id,String(v.id))}</td>
         <td></td>

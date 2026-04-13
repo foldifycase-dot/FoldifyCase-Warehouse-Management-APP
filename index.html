@@ -201,6 +201,16 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
         </div>
         <div class="sp-menu-arrow">›</div>
       </div>
+      <div class="sp-menu-item" onclick="openSubPanel('spAlerts')">
+        <div class="sp-menu-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <div class="sp-menu-text">
+          <div class="sp-menu-name">Email Alerts</div>
+          <div class="sp-menu-desc">Recipients, triggers & weekly digest schedule</div>
+        </div>
+        <div class="sp-menu-arrow">›</div>
+      </div>
     </div>
 
     <div class="sp-divider" style="margin:0 0 4px;"></div>
@@ -353,6 +363,92 @@ html,body{height:100%;overflow:hidden;background:#1A1A18;font-family:"Inter",san
     </div>
   </div>
 
+  <!-- ── EMAIL ALERTS ── -->
+  <div id="spAlerts" class="sp-sub-panel">
+    <div class="sp-back" onclick="backToMain()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span>Settings</span>
+      <div class="sp-sub-title">Email Alerts</div>
+    </div>
+    <div class="sp-form">
+
+      <!-- Recipients -->
+      <div class="sp-field">
+        <label class="sp-label">📬 Recipients</label>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 10px;margin-bottom:6px;min-height:36px;cursor:text;" id="sp-emailTagWrap" onclick="document.getElementById('sp-emailTagInput').focus()">
+          <input type="text" id="sp-emailTagInput" placeholder="name@company.com — press Enter" onkeydown="spHandleEmailKey(event)"
+            style="background:none;border:none;outline:none;font-size:11px;color:rgba(255,255,255,.7);width:100%;font-family:'Inter',sans-serif;">
+        </div>
+        <div class="sp-input-hint">Press Enter after each email. These receive all stock alert emails.</div>
+      </div>
+
+      <div class="sp-divider" style="margin:0 0 14px;"></div>
+
+      <!-- Weekly Digest -->
+      <div class="sp-field">
+        <label class="sp-label">📅 Weekly Digest</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <span style="font-size:11px;color:rgba(255,255,255,.6);">Send weekly summary</span>
+          <label class="sp-toggle">
+            <input type="checkbox" id="sp-togWeekly" checked onchange="spSyncAlertToFrame()">
+            <span class="sp-toggle-sl"></span>
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <select class="sp-input" id="sp-digestDay" style="flex:1;" onchange="spSyncAlertToFrame()">
+            <option value="1" selected>Monday</option><option value="2">Tuesday</option>
+            <option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option>
+          </select>
+          <select class="sp-input" id="sp-digestTime" style="flex:1;" onchange="spSyncAlertToFrame()">
+            <option value="07:00">7:00 AM</option><option value="08:00" selected>8:00 AM</option>
+            <option value="09:00">9:00 AM</option><option value="10:00">10:00 AM</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sp-divider" style="margin:0 0 14px;"></div>
+
+      <!-- Critical Alerts -->
+      <div class="sp-field">
+        <label class="sp-label">🔴 Critical Stock Alerts</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;color:rgba(255,255,255,.6);">Instant alert when stock hits critical level</span>
+          <label class="sp-toggle">
+            <input type="checkbox" id="sp-togCritical" checked onchange="spSyncAlertToFrame()">
+            <span class="sp-toggle-sl"></span>
+          </label>
+        </div>
+        <div class="sp-input-hint" style="margin-top:6px;">Sends immediately when any product drops to or below the Critical threshold.</div>
+      </div>
+
+      <div class="sp-divider" style="margin:0 0 14px;"></div>
+
+      <!-- Manual Send -->
+      <div class="sp-field">
+        <label class="sp-label">⚡ Send Alert Now</label>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <select class="sp-input" id="sp-alertType" style="flex:1;">
+            <option value="critical">Critical only</option>
+            <option value="low" selected>Low + Critical</option>
+            <option value="full">Full report</option>
+          </select>
+          <select class="sp-input" id="sp-alertWh" style="flex:1;">
+            <option value="us">US Warehouse</option>
+            <option value="uk">UK Warehouse</option>
+            <option value="au">AU Warehouse</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+        <button class="sp-save-btn" onclick="spSendAlert()" style="background:rgba(200,169,110,.15);color:#C8A96E;border:1px solid rgba(200,169,110,.3);">
+          Send Alert to Recipients
+        </button>
+      </div>
+
+      <button class="sp-save-btn" onclick="spSaveAlertSettings()" style="margin-top:4px;">Save Alert Settings</button>
+      <div class="sp-save-status" id="sp-alertStatus"></div>
+    </div>
+  </div>
+
   <!-- ── ABOUT ── -->
   <div id="spAbout" class="sp-sub-panel">
     <div class="sp-back" onclick="backToMain()">
@@ -465,6 +561,7 @@ function loadAllSettings(){
     document.getElementById('sp-critT').value=crit;
     document.getElementById('sp-lowT').value=low;
   }catch(e){}
+  spLoadAlertSettings();
 }
 
 // ── EMAIL SETTINGS ─────────────────────────────────────────────────────────
@@ -534,6 +631,100 @@ function broadcastToFrames(msg){
 }
 
 // ── SHOW STATUS MESSAGE ────────────────────────────────────────────────────
+// ── ALERT SETTINGS ────────────────────────────────────────────────────────
+var spEmailRecipients = [];
+
+function spHandleEmailKey(e){
+  if(e.key==='Enter'||e.key===','||e.key==='	'){
+    e.preventDefault();
+    var v=e.target.value.trim();
+    if(v&&v.includes('@')&&!spEmailRecipients.includes(v)){
+      spEmailRecipients.push(v);
+      spRenderEmailTags();
+    }
+    e.target.value='';
+  }
+  if(e.key==='Backspace'&&e.target.value===''&&spEmailRecipients.length){
+    spEmailRecipients.pop();spRenderEmailTags();
+  }
+}
+
+function spRenderEmailTags(){
+  var wrap=document.getElementById('sp-emailTagWrap');
+  var input=document.getElementById('sp-emailTagInput');
+  wrap.innerHTML='';
+  spEmailRecipients.forEach(function(e,i){
+    var t=document.createElement('span');
+    t.style.cssText='display:inline-flex;align-items:center;gap:4px;background:rgba(200,169,110,.2);color:#C8A96E;border-radius:4px;padding:2px 7px;font-size:10px;margin:2px 3px 2px 0;';
+    t.innerHTML=e+'<span onclick="spRemoveEmail('+i+')" style="cursor:pointer;opacity:.6;font-size:12px;">×</span>';
+    wrap.appendChild(t);
+  });
+  wrap.appendChild(input);
+}
+
+function spRemoveEmail(i){spEmailRecipients.splice(i,1);spRenderEmailTags();}
+
+function spSyncAlertToFrame(){
+  // Sync toggle states to the restock iframe
+  var weekly=document.getElementById('sp-togWeekly')?.checked;
+  var critical=document.getElementById('sp-togCritical')?.checked;
+  broadcastToFrames({type:'FC_ALERT_SETTINGS',weekly:weekly,critical:critical,
+    digestDay:document.getElementById('sp-digestDay')?.value,
+    digestTime:document.getElementById('sp-digestTime')?.value});
+}
+
+function spSaveAlertSettings(){
+  var pendingInput=document.getElementById('sp-emailTagInput');
+  if(pendingInput&&pendingInput.value.trim()){
+    var v=pendingInput.value.trim();
+    if(v.includes('@')&&!spEmailRecipients.includes(v)){spEmailRecipients.push(v);}
+    pendingInput.value='';spRenderEmailTags();
+  }
+  try{
+    localStorage.setItem('fc_alert_recipients',JSON.stringify(spEmailRecipients));
+    localStorage.setItem('fc_digest_day',document.getElementById('sp-digestDay').value);
+    localStorage.setItem('fc_digest_time',document.getElementById('sp-digestTime').value);
+    localStorage.setItem('fc_tog_weekly',document.getElementById('sp-togWeekly').checked);
+    localStorage.setItem('fc_tog_critical',document.getElementById('sp-togCritical').checked);
+  }catch(x){}
+  broadcastToFrames({type:'FC_ALERT_SETTINGS',
+    recipients:spEmailRecipients,
+    weekly:document.getElementById('sp-togWeekly').checked,
+    critical:document.getElementById('sp-togCritical').checked,
+    digestDay:document.getElementById('sp-digestDay').value,
+    digestTime:document.getElementById('sp-digestTime').value});
+  showStatus('sp-alertStatus','✓ Alert settings saved');
+}
+
+function spSendAlert(){
+  if(!spEmailRecipients.length){showStatus('sp-alertStatus','⚠ Add at least one recipient first');return;}
+  var frame=document.getElementById('frame-restock');
+  try{
+    frame.contentWindow.postMessage({
+      type:'FC_SEND_ALERT',
+      recipients:spEmailRecipients,
+      alertType:document.getElementById('sp-alertType').value,
+      warehouse:document.getElementById('sp-alertWh').value
+    },'*');
+    showStatus('sp-alertStatus','↗ Sending alert via Stock Hub…');
+  }catch(e){showStatus('sp-alertStatus','Error: '+e.message);}
+}
+
+function spLoadAlertSettings(){
+  try{
+    var r=localStorage.getItem('fc_alert_recipients');
+    if(r){spEmailRecipients=JSON.parse(r);spRenderEmailTags();}
+    var dd=localStorage.getItem('fc_digest_day');
+    var dt=localStorage.getItem('fc_digest_time');
+    var tw=localStorage.getItem('fc_tog_weekly');
+    var tc=localStorage.getItem('fc_tog_critical');
+    if(dd)document.getElementById('sp-digestDay').value=dd;
+    if(dt)document.getElementById('sp-digestTime').value=dt;
+    if(tw!==null)document.getElementById('sp-togWeekly').checked=tw==='true';
+    if(tc!==null)document.getElementById('sp-togCritical').checked=tc==='true';
+  }catch(x){}
+}
+
 function showStatus(id,msg){
   var el=document.getElementById(id);
   if(!el)return;

@@ -2884,9 +2884,10 @@ async function viewRestockList(orderId){
   // Step 2: If not cached, fetch from Blob by searching for orderId prefix
   if(!imageUrl){
     try{
-      var r = await fetch('/api/find-restock?orderId=' + encodeURIComponent(orderId));
+      var r = await fetch(PROXY + '?service=blob&action=list_restock&orderId=' + encodeURIComponent(orderId));
       if(r.ok){
         var d = await r.json();
+        console.log('[viewRestockList] response:', JSON.stringify(d));
         if(d.url){ imageUrl = d.url; uploadedAt = d.uploadedAt; }
       }
     }catch(e){ console.warn('[viewRestockList] Blob lookup failed:', e.message); }

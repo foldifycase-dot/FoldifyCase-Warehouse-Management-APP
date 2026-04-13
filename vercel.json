@@ -66,6 +66,10 @@
       "dest": "/stock-count.js"
     },
     {
+      "src": "/api/upload-restock",
+      "dest": "/upload-restock.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }

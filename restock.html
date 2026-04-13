@@ -531,6 +531,8 @@ td:first-child{padding-left:16px;}
 .po-group-warehouse{font-size:10px;padding:3px 9px;border:1px solid rgba(45,95,166,.35);border-radius:5px;background:rgba(45,95,166,.06);cursor:pointer;color:#2D5FA6;font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:4px;}
 .po-group-warehouse:hover{background:#2D5FA6;color:#fff;border-color:#2D5FA6;}
 .po-group-warehouse-sent{font-size:10px;color:rgba(26,26,24,.35);font-weight:500;margin-left:4px;font-style:italic;}
+.po-group-restock-view{font-size:10px;padding:3px 9px;border:1px solid rgba(200,169,110,.4);border-radius:5px;background:rgba(200,169,110,.1);cursor:pointer;color:#A6873A;font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;margin-left:4px;}
+.po-group-restock-view:hover{background:#C8A96E;color:#1A1A18;border-color:#C8A96E;}
 
 /* EMPTY / LOADING */
 .empty-state{padding:28px;text-align:center;font-size:12px;color:rgba(26,26,24,.4);}
@@ -1564,13 +1566,15 @@ async function sendToSupplier(order){
     </table>
   </td></tr>
 
-  <!-- CONFIRM ACTION BANNER — replaces "Upload Packing Image" -->
+  <!-- UPLOAD ACTION BANNER -->
   <tr><td style="background:#F5F3E9;padding:24px 32px;text-align:center;border-top:1px solid #EDEAE0">
-    <div style="font-size:13px;color:#555;margin-bottom:14px">📬 Please confirm you have received this order and can fulfil the quantities listed above.</div>
-    <a href="mailto:${fromEmail}?subject=RE: Purchase Order ${order.id} — Confirmed&body=Hi FoldifyCase team,%0A%0AI confirm receipt of Purchase Order ${order.id} and can fulfil all listed quantities.%0A%0AExpected dispatch: %0A%0ARegards," 
+    <div style="font-size:13px;color:#555;margin-bottom:6px">📋 Please upload your restock confirmation list for this purchase order.</div>
+    <div style="font-size:11px;color:#999;margin-bottom:18px;">Take a photo of your stock list or upload a document — it will be sent directly to FoldifyCase.</div>
+    <a href="${window.location.origin}/api/upload-restock?orderId=${order.id}" 
        style="display:inline-block;background:#1A1A18;color:#C8A96E;font-size:13px;font-weight:700;letter-spacing:.06em;padding:14px 32px;border-radius:8px;text-decoration:none;font-family:Arial,sans-serif">
-      ✅ &nbsp;CONFIRM THIS ORDER
+      📤 &nbsp;UPLOAD RESTOCK LIST
     </a>
+    <div style="font-size:10px;color:#bbb;margin-top:12px;">Opens in your browser — no login required</div>
   </td></tr>
 
   <!-- FOOTER -->
@@ -1798,6 +1802,7 @@ function renderPOLog(){
         ${sendBtn}
         ${warehouseBtn}
         ${deliverBtn}
+        ${o.restockListUrl?`<button class="po-group-restock-view" onclick="viewRestockList('${o.id}')" title="View supplier restock list">📋 Restock List</button>`:''}
         <button class="po-group-delete" onclick="deletePOOrder('${o.id}')" title="Delete this order">×</button>
       </div>
       ${trackingRow}
@@ -2851,6 +2856,38 @@ function buildScViewerRow(name, sysQty, cnt, diff, isVariant){
     +'<td style="text-align:right;font-family:monospace;font-size:12px;">'+(hasCnt?cnt:'<span style="color:rgba(26,26,24,.25);">—</span>')+'</td>'
     +'<td style="text-align:right;">'+diffHtml+'</td>'
     +'</tr>';
+}
+
+function viewRestockList(orderId){
+  var order = poOrders.find(function(o){ return o.id === orderId; });
+  document.getElementById('restockListTitle').textContent = 'Restock List — ' + orderId;
+  var img = document.getElementById('restockListImg');
+  var empty = document.getElementById('restockListEmpty');
+  var dl = document.getElementById('restockListDownload');
+  var footer = document.getElementById('restockListFooter');
+  if(order && order.restockListUrl){
+    img.src = order.restockListUrl;
+    img.style.display = 'block';
+    empty.style.display = 'none';
+    dl.href = order.restockListUrl;
+    dl.style.display = 'inline-block';
+    var uploaded = order.restockListUploadedAt
+      ? new Date(order.restockListUploadedAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      : 'recently';
+    document.getElementById('restockListSub').textContent = 'Uploaded ' + uploaded;
+    footer.textContent = 'Uploaded by supplier · ' + order.id;
+  } else {
+    img.style.display = 'none';
+    empty.style.display = 'block';
+    dl.style.display = 'none';
+    document.getElementById('restockListSub').textContent = 'Awaiting upload from supplier';
+    footer.textContent = 'No file uploaded yet for ' + orderId;
+  }
+  document.getElementById('restockListOverlay').classList.add('open');
+}
+
+function closeRestockListViewer(){
+  document.getElementById('restockListOverlay').classList.remove('open');
 }
 
 function closeScViewer(){
@@ -4135,6 +4172,31 @@ window.addEventListener('load',function(){
   }catch(x){}
 });
 </script>
+<!-- RESTOCK LIST VIEWER PANEL -->
+<div class="sc-viewer-overlay" id="restockListOverlay" onclick="if(event.target===this)closeRestockListViewer()" style="z-index:700;">
+  <div class="sc-viewer-panel" style="max-width:680px;">
+    <div class="sc-viewer-hdr">
+      <div>
+        <div class="sc-viewer-title" id="restockListTitle">Supplier Restock List</div>
+        <div class="sc-viewer-sub" id="restockListSub">Uploaded by supplier</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <a id="restockListDownload" href="#" target="_blank" style="font-size:11px;color:var(--gold);text-decoration:none;font-weight:600;padding:4px 10px;border:1px solid rgba(200,169,110,.3);border-radius:5px;">↗ Open full size</a>
+        <button class="sc-viewer-close" onclick="closeRestockListViewer()">×</button>
+      </div>
+    </div>
+    <div class="sc-viewer-body" style="padding:20px;display:flex;align-items:center;justify-content:center;background:#F5F3EE;min-height:300px;">
+      <img id="restockListImg" src="" alt="Restock List" style="max-width:100%;max-height:65vh;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.12);display:none;">
+      <div id="restockListEmpty" style="text-align:center;color:rgba(26,26,24,.35);">
+        <div style="font-size:32px;margin-bottom:12px;">📋</div>
+        <div style="font-size:13px;">No restock list uploaded yet</div>
+        <div style="font-size:11px;margin-top:6px;">The supplier will upload it via the link in the purchase order email</div>
+      </div>
+    </div>
+    <div class="sc-viewer-footer" id="restockListFooter">—</div>
+  </div>
+</div>
+
 <!-- STOCK COUNT VIEWER PANEL -->
 <div class="sc-viewer-overlay" id="scViewerOverlay" onclick="if(event.target===this)closeScViewer()">
   <div class="sc-viewer-panel" id="scViewerPanel">

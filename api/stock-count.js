@@ -110,20 +110,42 @@ export default async function handler(req, res) {
     try {
       const orderId = req.query.orderId;
       if (!orderId) return res.status(400).json({ error: 'orderId required' });
-      // Search Blob for files matching this orderId in Supplier Restock Lists folder
-      const prefix = 'Supplier Restock Lists/' + orderId;
-      console.log('[find-restock] searching prefix:', prefix);
+      if (!BLOB_TOKEN) return res.status(500).json({ error: 'BLOB_TOKEN not set' });
+
+      // Try two prefixes — with and without URL encoding of spaces
+      const prefix1 = 'Supplier Restock Lists/' + orderId;
+      const prefix2 = 'Supplier_Restock_Lists/' + orderId;
+      console.log('[find-restock] searching for orderId:', orderId);
+
       let allBlobs = [];
-      let cursor;
-      do {
-        const listRes = await list({ prefix, token: BLOB_TOKEN, cursor });
-        allBlobs = allBlobs.concat(listRes.blobs || []);
-        cursor = listRes.cursor;
-      } while (cursor);
-      console.log('[find-restock] blobs found:', allBlobs.length);
+      for (const prefix of [prefix1, prefix2]) {
+        let cursor;
+        do {
+          const listRes = await list({ prefix, token: BLOB_TOKEN, cursor });
+          allBlobs = allBlobs.concat(listRes.blobs || []);
+          cursor = listRes.cursor;
+        } while (cursor);
+        if (allBlobs.length > 0) break;
+      }
+
+      // Also try listing the whole folder and filtering manually
+      if (allBlobs.length === 0) {
+        console.log('[find-restock] prefix search empty, trying full folder list');
+        let cursor;
+        do {
+          const listRes = await list({ prefix: 'Supplier Restock Lists/', token: BLOB_TOKEN, cursor });
+          const matched = (listRes.blobs || []).filter(b =>
+            b.pathname && b.pathname.includes(orderId)
+          );
+          allBlobs = allBlobs.concat(matched);
+          cursor = listRes.cursor;
+        } while (cursor);
+      }
+
+      console.log('[find-restock] blobs found:', allBlobs.length, allBlobs.map(b => b.pathname));
+
       if (allBlobs.length > 0) {
-        // Sort by uploadedAt desc, take the latest
-        allBlobs.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        allBlobs.sort((a, b) => new Date(b.uploadedAt || 0) - new Date(a.uploadedAt || 0));
         const blob = allBlobs[0];
         return res.status(200).json({
           url: blob.url,
@@ -133,7 +155,7 @@ export default async function handler(req, res) {
       }
       return res.status(200).json({ url: null });
     } catch (e) {
-      console.error('[find-restock] ERROR:', e.message);
+      console.error('[find-restock] ERROR:', e.message, e.stack);
       return res.status(500).json({ error: e.message });
     }
   }

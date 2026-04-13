@@ -63,45 +63,57 @@ function uploadBlob(pathname, contentType, data, token) {
 async function saveRestockUrl(orderId, imageUrl, token) {
   try {
     const PO_KEY = 'History Of Restock/po_orders.json';
-    // Fetch current orders
+    // List blobs to find the current PO orders file URL
     const listRes = await fetch(
-      `https://blob.vercel-storage.com?prefix=${encodeURIComponent(PO_KEY)}&limit=1`,
+      'https://blob.vercel-storage.com?prefix=' + encodeURIComponent(PO_KEY) + '&limit=1',
       { headers: { Authorization: 'Bearer ' + token } }
     );
     const listJson = await listRes.json();
-    if (!listJson.blobs || !listJson.blobs.length) return;
+    console.log('[upload-restock] PO blob list:', JSON.stringify(listJson).substring(0, 200));
+    if (!listJson.blobs || !listJson.blobs.length) {
+      console.log('[upload-restock] PO orders file not found in blob');
+      return;
+    }
+    // Fetch current orders
     const ordersRes = await fetch(listJson.blobs[0].url);
     let orders = await ordersRes.json();
+    console.log('[upload-restock] loaded', orders.length, 'orders, looking for', orderId);
     // Update the matching order
     const order = orders.find(o => o.id === orderId);
-    if (order) {
-      order.restockListUrl = imageUrl;
-      order.restockListUploadedAt = new Date().toISOString();
-      // Save back
-      const putOpts = {
+    if (!order) {
+      console.log('[upload-restock] order', orderId, 'not found in PO list');
+      return;
+    }
+    order.restockListUrl = imageUrl;
+    order.restockListUploadedAt = new Date().toISOString();
+    // Save back using blob REST API with correct headers
+    const body = Buffer.from(JSON.stringify(orders));
+    const safePOKey = PO_KEY.replace(/ /g, '%20');
+    const putRes = await new Promise((resolve, reject) => {
+      const opts = {
         hostname: 'blob.vercel-storage.com',
-        path: '/' + PO_KEY.replace(/ /g, '%20'),
+        path: '/' + safePOKey,
         method: 'PUT',
         headers: {
           'Authorization': 'Bearer ' + token,
           'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(JSON.stringify(orders)),
+          'Content-Length': body.length,
           'x-vercel-blob-access': 'public',
           'x-vercel-blob-add-random-suffix': 'false',
-          'x-vercel-blob-allow-overwrite': 'true'
+          'x-vercel-blob-allow-overwrite': 'true',
+          'cache-control': 'no-cache'
         }
       };
-      await new Promise((resolve, reject) => {
-        const r = https.request(putOpts, res => {
-          res.on('data', () => {});
-          res.on('end', resolve);
-        });
-        r.on('error', reject);
-        r.write(JSON.stringify(orders));
-        r.end();
+      const r = https.request(opts, res => {
+        let d = '';
+        res.on('data', c => d += c);
+        res.on('end', () => resolve({ status: res.statusCode, body: d }));
       });
-      console.log('[upload-restock] PO order updated with restockListUrl');
-    }
+      r.on('error', reject);
+      r.write(body);
+      r.end();
+    });
+    console.log('[upload-restock] PO save result:', putRes.status, putRes.body.substring(0, 100));
   } catch(e) {
     console.error('[upload-restock] saveRestockUrl failed:', e.message);
   }

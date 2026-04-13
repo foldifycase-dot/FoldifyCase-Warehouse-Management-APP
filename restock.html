@@ -2731,15 +2731,6 @@ function tblHTML(prods,showWh,prefix){
               style="width:62px">
             <button class="qty-save-btn" disabled onclick="saveCost(this.previousElementSibling)" title="Save cost to Shopify">Save</button>
           </div>
-        </td>        <td>
-          <div class="qty-edit-wrap">
-            <input type="number" class="qty-edit-input" value="${v.cost||''}" placeholder="0.00"
-              data-iid="${iid}" data-orig="${v.cost||''}" step="0.01" min="0"
-              onkeydown="if(event.key==='Enter')saveCost(this)"
-              oninput="this.nextElementSibling.disabled=false"
-              style="width:62px">
-            <button class="qty-save-btn" disabled onclick="saveCost(this.previousElementSibling)" title="Save cost to Shopify">Save</button>
-          </div>
         </td>
         <td><span class="badge ${vs}" style="font-size:9px;padding:2px 7px"><div class="bdot"></div>${v.status==='critical'?'Critical':v.status==='low'?'Low':'OK'}</span></td>
         <td>${trendHTML(String(p.id),String(v.id))}</td>

@@ -727,6 +727,21 @@ html.in-iframe .layout{height:100vh;}
       </div>
       <div id="stockFilterTags" style="display:none;margin-bottom:6px;display:flex;gap:4px;flex-wrap:wrap"></div>
       <div class="card"><div id="fullTable"><div class="empty-state"><div class="spinner"></div></div></div></div>
+
+      <!-- STOCK COUNT RESULTS PANEL -->
+      <div class="page-hdr" style="margin-top:24px;">
+        <div>
+          <div class="page-title" style="font-size:16px;">STOCK <em>COUNT RESULTS</em></div>
+          <div class="page-sub">Submitted stocktakes from your warehouse team</div>
+        </div>
+        <button class="btn-sol" onclick="loadStockCountResults()" style="display:flex;align-items:center;gap:5px;padding:7px 13px;font-size:11px;">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M13 8A5 5 0 113 8h2L2 4 0 8h2a6 6 0 1010.9-3.5L14 3a8 8 0 01-1 5z"/></svg>
+          Refresh
+        </button>
+      </div>
+      <div class="card" style="overflow:visible;"><div id="stockCountResults">
+        <div class="empty-state" style="color:rgba(26,26,24,.3);">Loading stock count history…</div>
+      </div></div>
     </div>
 
     <!-- REORDER -->
@@ -2589,6 +2604,48 @@ function previewStockCount(){
   const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
+}
+
+function renderStockCountResults(sessions){
+  const el = document.getElementById('stockCountResults');
+  if(!el) return;
+  let local = [];
+  try{ local = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]'); }catch(e){}
+  const data = sessions || local;
+
+  if(!data.length){
+    el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);padding:20px 16px;">No stock counts sent yet — use the <strong>Send Stock Count</strong> button above to create one.</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(s => {
+    const date = new Date(s.createdAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const isSubmitted = s.status === 'submitted';
+    const statusBadge = isSubmitted
+      ? '<span style="background:#EAF3DE;color:#2A5C0A;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid #C5DFA8;">✓ Submitted</span>'
+      : '<span style="background:#FFF8E8;color:#7A5A00;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;border:1px solid #EDD98A;">⏳ Pending</span>';
+    const countInfo = isSubmitted && s.counts
+      ? `<div style="font-size:11px;color:rgba(26,26,24,.5);margin-top:3px;">${Object.keys(s.counts).length} items counted · Submitted by ${s.submittedBy||s.createdBy||'Warehouse Team'}</div>`
+      : `<div style="font-size:11px;color:rgba(26,26,24,.4);margin-top:3px;">Sent to ${s.email||s.createdBy||'—'}</div>`;
+    const viewBtn = (s.sheetUrl||s.sessionId)
+      ? `<a href="${s.sheetUrl||('/api/stock-count?id='+s.sessionId)}" target="_blank"
+           style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:rgba(200,169,110,.12);color:#B87D2A;border:1px solid rgba(200,169,110,.3);border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;font-family:'Inter',sans-serif;white-space:nowrap;">
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2.5"/></svg>
+          View Sheet
+        </a>` : '';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap;">
+          <span style="font-size:12px;font-weight:600;color:var(--ink);">${s.whLabel||((s.warehouse||'?').toUpperCase()+' Warehouse')}</span>
+          ${statusBadge}
+          <span style="font-size:10px;color:rgba(26,26,24,.35);font-family:'DM Mono',monospace;">${s.sessionId||''}</span>
+        </div>
+        <div style="font-size:11px;color:rgba(26,26,24,.4);">${date} · ${s.totalProducts||'?'} products · ${s.totalVariants||'?'} variants</div>
+        ${countInfo}
+      </div>
+      <div style="flex-shrink:0;">${viewBtn}</div>
+    </div>`;
+  }).join('');
 }
 
 async function sendStockCount(){

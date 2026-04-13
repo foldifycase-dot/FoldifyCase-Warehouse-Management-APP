@@ -340,6 +340,80 @@ module.exports = async function handler(req, res) {
         }
       }
 
+      if (action === 'find_packing') {
+        // Find packing image for a fulfillment order by orderName
+        if (!BLOB_TOKEN) return res.status(500).json({ error: 'BLOB_TOKEN not configured' });
+        const orderName = req.query.orderName || '';
+        if (!orderName) return res.status(400).json({ error: 'orderName required' });
+
+        // Clean the orderName the same way upload-image.js does
+        const nameClean = orderName.replace(/[^a-z0-9]/gi, '_').replace(/^_+|_+$/g, '');
+        console.log('[find_packing] searching for orderName:', orderName, '→ nameClean:', nameClean);
+
+        try {
+          // List ALL blobs and filter — same approach that works for restock list
+          let allBlobs = [];
+          let cursor;
+          let pages = 0;
+          do {
+            const result = await list({ token: BLOB_TOKEN, cursor, limit: 1000 });
+            allBlobs = allBlobs.concat(result.blobs || []);
+            cursor = result.cursor;
+            pages++;
+            if (pages > 10) break;
+          } while (cursor);
+
+          console.log('[find_packing] total blobs:', allBlobs.length);
+          console.log('[find_packing] all pathnames:', allBlobs.map(b => b.pathname));
+
+          // Match against Packing_Images/Order_XXXX_* — try exact nameClean first
+          // upload-image.js stores as: Packing_Images/Order_{nameClean}_{DD}_{MM}_{YYYY}.{ext}
+          const matched = allBlobs.filter(b => {
+            if (!b.pathname) return false;
+            const p = b.pathname.toLowerCase();
+            // Match by nameClean OR original orderName (both numeric/alphanumeric)
+            return (
+              p.includes('packing') &&
+              (p.includes(nameClean.toLowerCase()) || p.includes(orderName.toLowerCase().replace(/[^a-z0-9]/gi, '_')))
+            );
+          });
+
+          console.log('[find_packing] matched:', matched.map(b => b.pathname));
+
+          if (matched.length > 0) {
+            matched.sort((a, b) => new Date(b.uploadedAt || 0) - new Date(a.uploadedAt || 0));
+            const blob = matched[0];
+            return res.status(200).json({ url: blob.url, uploadedAt: blob.uploadedAt, pathname: blob.pathname });
+          }
+
+          // Also try public token if private returned nothing
+          const PUBLIC_TOKEN = process.env.PUBLIC_BLOB_READ_WRITE_TOKEN;
+          if (PUBLIC_TOKEN && PUBLIC_TOKEN !== BLOB_TOKEN) {
+            let pubBlobs = [];
+            let pubCursor;
+            do {
+              const r = await list({ token: PUBLIC_TOKEN, cursor: pubCursor, limit: 1000 });
+              pubBlobs = pubBlobs.concat(r.blobs || []);
+              pubCursor = r.cursor;
+            } while (pubCursor);
+            const pubMatched = pubBlobs.filter(b =>
+              b.pathname && b.pathname.toLowerCase().includes('packing') &&
+              b.pathname.toLowerCase().includes(nameClean.toLowerCase())
+            );
+            if (pubMatched.length > 0) {
+              pubMatched.sort((a, b) => new Date(b.uploadedAt || 0) - new Date(a.uploadedAt || 0));
+              const blob = pubMatched[0];
+              return res.status(200).json({ url: blob.url, uploadedAt: blob.uploadedAt, pathname: blob.pathname, store: 'public' });
+            }
+          }
+
+          return res.status(200).json({ url: null, debug: { total: allBlobs.length } });
+        } catch(e) {
+          console.error('[find_packing] error:', e.message);
+          return res.status(500).json({ error: e.message });
+        }
+      }
+
       if (action === 'save_html') {
         if (req.method !== 'POST') return res.status(405).json({ error: 'POST required' });
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;

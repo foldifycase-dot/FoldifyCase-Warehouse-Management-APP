@@ -30,7 +30,7 @@ function parseMultipart(body, boundary) {
 
 function uploadBlob(pathname, contentType, data, token) {
   return new Promise((resolve, reject) => {
-    const safePath = pathname.replace(/[^a-zA-Z0-9._\/\-]/g, '_');
+    const safePath = pathname.replace(/[^a-zA-Z0-9._\/ \-]/g, '_'); // spaces allowed
     const opts = {
       hostname: 'blob.vercel-storage.com',
       path: '/' + safePath,

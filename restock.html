@@ -545,6 +545,43 @@ td:first-child{padding-left:16px;}
 
 html.in-iframe .topbar{display:none!important;}
 html.in-iframe .layout{height:100vh;}
+
+/* STOCK COUNT RESULTS */
+.sc-group{background:#fff;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px;}
+.sc-group-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#EAE7D8;border-bottom:1px solid var(--border);}
+.sc-group-id{font-family:"DM Mono",monospace;font-weight:700;font-size:11px;color:var(--ink);}
+.sc-group-date{font-size:10px;color:rgba(26,26,24,.45);margin-top:2px;}
+.sc-group-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;}
+.sc-group-badge.submitted{background:#EAF3DE;color:#2A5C0A;}
+.sc-group-badge.pending{background:#FFF8E8;color:#7A5A00;}
+.sc-group-view{font-size:10px;padding:3px 9px;border:1px solid rgba(45,95,166,.35);border-radius:5px;background:rgba(45,95,166,.06);cursor:pointer;color:#2D5FA6;font-family:"Inter",sans-serif;font-weight:600;transition:all .15s;}
+.sc-group-view:hover{background:#2D5FA6;color:#fff;border-color:#2D5FA6;}
+.sc-group-delete{width:22px;height:22px;border:none;background:transparent;cursor:pointer;color:rgba(26,26,24,.2);font-size:15px;display:flex;align-items:center;justify-content:center;border-radius:4px;transition:all .15s;flex-shrink:0;padding:0;margin-left:2px;}
+.sc-group-delete:hover{background:rgba(201,64,64,.1);color:var(--red);}
+.sc-group-body{padding:12px 14px;}
+.sc-group-stat{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:rgba(26,26,24,.5);margin-right:14px;}
+.sc-group-stat strong{color:var(--ink);font-weight:600;}
+/* Stock Count Viewer Panel */
+.sc-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center;}
+.sc-viewer-overlay.open{display:flex;}
+.sc-viewer-panel{background:#fff;border-radius:14px 14px 0 0;width:100%;max-width:760px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 -4px 32px rgba(0,0,0,.18);}
+.sc-viewer-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1.5px solid var(--border);flex-shrink:0;}
+.sc-viewer-title{font-family:"Syne",sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;color:var(--ink);}
+.sc-viewer-sub{font-size:11px;color:rgba(26,26,24,.45);margin-top:2px;}
+.sc-viewer-close{width:28px;height:28px;border:none;background:rgba(26,26,24,.07);border-radius:6px;cursor:pointer;font-size:16px;color:rgba(26,26,24,.5);display:flex;align-items:center;justify-content:center;}
+.sc-viewer-body{flex:1;overflow-y:auto;padding:0;}
+.sc-viewer-table{width:100%;border-collapse:collapse;}
+.sc-viewer-table th{padding:8px 14px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#888;font-weight:600;background:#F5F3EE;border-bottom:1.5px solid var(--border);text-align:left;}
+.sc-viewer-table th.right{text-align:right;}
+.sc-viewer-table td{padding:10px 14px;font-size:12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.sc-viewer-table tr:last-child td{border-bottom:none;}
+.sc-viewer-table tr:hover td{background:#FAFAF7;}
+.sc-var{font-size:11px;color:rgba(26,26,24,.45);padding-left:24px;}
+.sc-diff-pos{color:#2D5FA6;font-weight:700;font-family:"DM Mono",monospace;}
+.sc-diff-neg{color:#C94040;font-weight:700;font-family:"DM Mono",monospace;}
+.sc-diff-ok{color:#3D7A5A;font-weight:600;font-family:"DM Mono",monospace;}
+.sc-diff-na{color:rgba(26,26,24,.25);font-family:"DM Mono",monospace;}
+.sc-viewer-footer{padding:12px 20px;border-top:1px solid var(--border);background:#F5F3EE;font-size:11px;color:rgba(26,26,24,.4);flex-shrink:0;}
 </style>
 <script>if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}</script>
 </head>
@@ -2644,94 +2681,173 @@ function previewStockCount(){
 function renderStockCountResults(sessions){
   var el = document.getElementById('stockCountResults');
   if(!el) return;
-
   var local = [];
   try{ local = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]'); }catch(e){}
   var data = sessions || local;
 
   if(!data.length){
-    el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);padding:20px 16px;">No stock counts yet — use the <strong>Send Stock Count</strong> button above.</div>';
+    el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);padding:20px 16px;">No stock counts yet — use <strong>Send Stock Count</strong> above.</div>';
     return;
   }
 
-  // Populate Stock Count column cells in All Stock table
+  // Populate sc-cell columns in All Stock table
   data.forEach(function(s){
-    if(s.status === 'submitted' && s.counts){
-      Object.entries(s.counts).forEach(function(entry){
-        var vid = entry[0], cnt = entry[1];
-        var cell = document.getElementById('sc-cell-' + vid);
+    if(s.status==='submitted' && s.counts){
+      Object.entries(s.counts).forEach(function(kv){
+        var vid=kv[0], cnt=kv[1];
+        var cell=document.getElementById('sc-cell-'+vid);
         if(cell){
-          var sys = allProducts.flatMap(function(p){ return p.variantData||[]; }).find(function(v){ return String(v.id)===String(vid); });
-          var sysQty = sys ? sys.qty : null;
-          var diff = sysQty !== null ? cnt - sysQty : null;
-          var col = diff === null ? 'rgba(26,26,24,.5)' : diff < 0 ? '#C94040' : diff > 0 ? '#2D5FA6' : '#3D7A5A';
-          var diffTxt = diff === null ? '' : diff === 0 ? ' ✓' : (diff > 0 ? ' +' : ' ') + diff;
-          cell.textContent = cnt + diffTxt;
-          cell.style.color = col;
-          cell.style.fontWeight = diff === 0 ? '400' : '700';
+          var sys=allProducts.flatMap(function(p){return p.variantData||[];}).find(function(v){return String(v.id)===String(vid);});
+          var sysQty=sys?sys.qty:null;
+          var diff=sysQty!==null?cnt-sysQty:null;
+          var col=diff===null?'rgba(26,26,24,.5)':diff<0?'#C94040':diff>0?'#2D5FA6':'#3D7A5A';
+          var diffTxt=diff===null?'':diff===0?' ✓':(diff>0?' +':' ')+diff;
+          cell.textContent=cnt+diffTxt;
+          cell.style.color=col;
+          cell.style.fontWeight=diff===0?'400':'700';
         }
       });
     }
   });
 
-  // Build HTML using DOM manipulation — no template literal nesting issues
+  // Build HTML matching po-group structure
   var html = '';
   data.forEach(function(s){
-    var totalProds = s.totalProducts || (s.products ? s.products.length : '?');
-    var totalVars  = s.totalVariants || (s.products
-      ? s.products.reduce(function(acc,p){ return acc + (p.variantData && p.variantData.length > 1 ? p.variantData.length : 1); }, 0)
+    var sid         = s.sessionId || '';
+    var totalProds  = s.totalProducts || (s.products ? s.products.length : '?');
+    var totalVars   = s.totalVariants || (s.products
+      ? s.products.reduce(function(a,p){return a+(p.variantData&&p.variantData.length>1?p.variantData.length:1);},0)
       : '?');
-    var sentTo   = s.email || s.createdBy || '—';
-    var sheetUrl = s.sheetUrl || ('/api/stock-count?id=' + (s.sessionId||''));
-    var sid      = s.sessionId || '';
-    var date     = new Date(s.createdAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    var isSubmit = s.status === 'submitted';
+    var sentTo      = s.email || s.createdBy || '—';
+    var sheetUrl    = s.sheetUrl || ('/api/stock-count?id='+sid);
+    var wh          = s.whLabel || ((s.warehouse||'?').toUpperCase()+' Warehouse');
+    var date        = new Date(s.createdAt).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+    var time        = new Date(s.createdAt).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
+    var isSubmit    = s.status==='submitted';
+    var badgeCls    = isSubmit ? 'submitted' : 'pending';
+    var badgeTxt    = isSubmit ? '✓ Submitted' : '⏳ Pending';
+    var countedInfo = isSubmit && s.counts
+      ? Object.keys(s.counts).length+' items counted'
+      : '0 items counted';
+    var submitter   = isSubmit ? (s.submittedBy||s.createdBy||'Warehouse Team') : '';
+    var submitTime  = isSubmit && s.submittedAt
+      ? new Date(s.submittedAt).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+      : '';
 
-    var badgeCss = isSubmit
-      ? 'background:#EAF3DE;color:#2A5C0A;border:1px solid #C5DFA8;'
-      : 'background:#FFF8E8;color:#7A5A00;border:1px solid #EDD98A;';
-    var badgeTxt = isSubmit ? '&#10003; Submitted' : '&#9203; Pending';
+    html += '<div class="sc-group">';
 
-    var countLine = isSubmit && s.counts
-      ? Object.keys(s.counts).length + ' items counted &middot; ' + (s.submittedBy || s.createdBy || 'Warehouse Team')
-      : 'Sent to ' + sentTo;
-
-    html += '<div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border);">';
-
-    // Left info block
-    html += '<div style="flex:1;min-width:0;">';
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">';
-    html += '<span style="font-size:12px;font-weight:600;color:var(--ink);">' + (s.whLabel || ((s.warehouse||'?').toUpperCase() + ' Warehouse')) + '</span>';
-    html += '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;' + badgeCss + '">' + badgeTxt + '</span>';
-    html += '<span style="font-size:10px;color:rgba(26,26,24,.35);font-family:monospace;">' + sid + '</span>';
+    // Header row — matches po-group-hdr
+    html += '<div class="sc-group-hdr">';
+    html +=   '<div style="flex:1;min-width:0;">';
+    html +=     '<div class="sc-group-id">'+sid+'</div>';
+    html +=     '<div class="sc-group-date">'+date+' at '+time+' · Sent to '+sentTo+'</div>';
+    html +=   '</div>';
+    html +=   '<span class="sc-group-badge '+badgeCls+'">'+badgeTxt+'</span>';
+    html +=   '<span style="font-size:11px;font-weight:600;color:rgba(26,26,24,.6);margin:0 6px;">'+wh+'</span>';
+    // View Results button
+    html +=   '<button class="sc-group-view" data-sc-view="'+sid+'" title="View count results">📋 View Results</button>';
+    // Delete button — matches po-group-delete exactly
+    html +=   '<button class="sc-group-delete" data-sc-del="'+sid+'" title="Delete this stock count">×</button>';
     html += '</div>';
-    html += '<div style="font-size:11px;color:rgba(26,26,24,.4);">' + date + ' &middot; ' + totalProds + ' products &middot; ' + totalVars + ' variants</div>';
-    html += '<div style="font-size:11px;color:rgba(26,26,24,.5);margin-top:2px;">' + countLine + '</div>';
+
+    // Body — summary info
+    html += '<div class="sc-group-body">';
+    html +=   '<span class="sc-group-stat"><strong>'+totalProds+'</strong> products</span>';
+    html +=   '<span class="sc-group-stat"><strong>'+totalVars+'</strong> variants</span>';
+    html +=   '<span class="sc-group-stat"><strong>'+countedInfo+'</strong></span>';
+    if(submitter) html += '<span class="sc-group-stat">by <strong>'+submitter+'</strong>'+(submitTime?' at '+submitTime:'')+'</span>';
     html += '</div>';
 
-    // Right buttons block
-    html += '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">';
-
-    // View Sheet button
-    html += '<a href="' + sheetUrl + '" target="_blank" ';
-    html += 'style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;';
-    html += 'background:rgba(200,169,110,.12);color:#B87D2A;border:1px solid rgba(200,169,110,.3);';
-    html += 'border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">';
-    html += '<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2.5"/></svg>';
-    html += 'View Sheet</a>';
-
-    // Delete button — data attribute, no onclick
-    html += '<button data-sc-del="' + sid + '" title="Delete this stock count" ';
-    html += 'style="display:inline-flex;align-items:center;justify-content:center;';
-    html += 'width:28px;height:28px;border:1.5px solid rgba(201,64,64,.3);';
-    html += 'background:rgba(201,64,64,.07);border-radius:6px;cursor:pointer;';
-    html += 'color:#C94040;font-size:18px;font-weight:300;line-height:1;">';
-    html += '&#215;</button>';
-
-    html += '</div></div>';
+    html += '</div>';
   });
 
   el.innerHTML = html;
+}
+
+// Open the floating viewer panel for a stock count
+function openScViewer(sessionId){
+  var session = _allStockCounts.find(function(s){ return s.sessionId===sessionId; });
+  if(!session){
+    showToast('Session data not loaded — click Refresh first','err');
+    return;
+  }
+  var wh     = session.whLabel || ((session.warehouse||'?').toUpperCase()+' Warehouse');
+  var date   = new Date(session.createdAt).toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+  var isSubmit = session.status==='submitted';
+
+  document.getElementById('scViewerTitle').textContent = 'Stock Count — '+wh;
+  document.getElementById('scViewerSub').textContent   = sessionId+' · '+date+(isSubmit?' · ✓ Submitted':'· ⏳ Pending');
+
+  var rows = '';
+  var counts = session.counts || {};
+  var products = session.products || [];
+
+  products.forEach(function(p){
+    var variants = p.variantData && p.variantData.length > 1 ? p.variantData : null;
+    if(variants){
+      // Product header row
+      rows += '<tr><td colspan="4" style="padding:8px 14px 4px;font-weight:700;font-size:12px;color:var(--ink);background:#FAFAF7;border-bottom:1px solid var(--border);">';
+      if(p.image) rows += '<img src="'+p.image+'" style="width:24px;height:24px;border-radius:4px;object-fit:cover;vertical-align:middle;margin-right:8px;">';
+      rows += p.title+'</td></tr>';
+      variants.forEach(function(v){
+        var cnt = counts[String(v.id)];
+        var hasCnt = cnt !== undefined && cnt !== null;
+        var sysQty = v.qty;
+        var diff = hasCnt ? cnt - sysQty : null;
+        rows += buildScViewerRow(v.title, sysQty, cnt, diff, true);
+      });
+    } else {
+      var v = p.variantData ? p.variantData[0] : null;
+      var vid = v ? v.id : p.id;
+      var cnt = counts[String(vid)];
+      var hasCnt = cnt !== undefined && cnt !== null;
+      var sysQty = v ? v.qty : p.qty;
+      var diff = hasCnt ? cnt - sysQty : null;
+      rows += buildScViewerRow(p.title, sysQty, cnt, diff, false);
+    }
+  });
+
+  if(!products.length && Object.keys(counts).length){
+    rows = '<tr><td colspan="4" style="padding:20px;text-align:center;color:rgba(26,26,24,.4);">Product details not available — <a href="/api/stock-count?id='+sessionId+'" target="_blank" style="color:var(--gold);">View full sheet ↗</a></td></tr>';
+  } else if(!products.length){
+    rows = '<tr><td colspan="4" style="padding:20px;text-align:center;color:rgba(26,26,24,.4);">No data available</td></tr>';
+  }
+
+  document.getElementById('scViewerRows').innerHTML = rows;
+
+  // Footer
+  var counted = Object.keys(counts).length;
+  var submitInfo = isSubmit && session.submittedAt
+    ? 'Submitted by '+(session.submittedBy||'Warehouse Team')+' · '+new Date(session.submittedAt).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+    : (isSubmit ? 'Submitted' : 'Not yet submitted — '+counted+' items pre-filled');
+  document.getElementById('scViewerFooter').textContent = submitInfo+' · '+counted+' items counted';
+
+  document.getElementById('scViewerOverlay').classList.add('open');
+}
+
+function buildScViewerRow(name, sysQty, cnt, diff, isVariant){
+  var hasCnt = cnt !== undefined && cnt !== null;
+  var diffHtml;
+  if(!hasCnt){
+    diffHtml = '<span class="sc-diff-na">—</span>';
+  } else if(diff === 0){
+    diffHtml = '<span class="sc-diff-ok">✓ 0</span>';
+  } else if(diff > 0){
+    diffHtml = '<span class="sc-diff-pos">+'+diff+'</span>';
+  } else {
+    diffHtml = '<span class="sc-diff-neg">'+diff+'</span>';
+  }
+  var nameStyle = isVariant ? 'class="sc-var"' : 'style="font-weight:600;font-size:12px;"';
+  return '<tr>'
+    +'<td '+nameStyle+'>'+name+'</td>'
+    +'<td style="text-align:right;font-family:monospace;font-size:12px;">'+sysQty+'</td>'
+    +'<td style="text-align:right;font-family:monospace;font-size:12px;">'+(hasCnt?cnt:'<span style="color:rgba(26,26,24,.25);">—</span>')+'</td>'
+    +'<td style="text-align:right;">'+diffHtml+'</td>'
+    +'</tr>';
+}
+
+function closeScViewer(){
+  document.getElementById('scViewerOverlay').classList.remove('open');
 }
 
 
@@ -2931,13 +3047,16 @@ async function loadStockCountResults(){
   filterStockCountResults();
 }
 
-// Event delegation for stock count delete buttons
+// Event delegation for stock count buttons
 document.addEventListener('click', function(e){
-  const btn = e.target.closest('[data-sc-del]');
-  if(btn){
-    const sid = btn.getAttribute('data-sc-del');
-    if(sid) deleteStockCount(sid);
-  }
+  var delBtn = e.target.closest('[data-sc-del]');
+  if(delBtn){ deleteStockCount(delBtn.getAttribute('data-sc-del')); return; }
+  var viewBtn = e.target.closest('[data-sc-view]');
+  if(viewBtn){ openScViewer(viewBtn.getAttribute('data-sc-view')); return; }
+});
+// Close viewer on Escape
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape') closeScViewer();
 });
 
 function filterStockCountResults(){
@@ -4064,5 +4183,32 @@ window.addEventListener('load',function(){
   }catch(x){}
 });
 </script>
+<!-- STOCK COUNT VIEWER PANEL -->
+<div class="sc-viewer-overlay" id="scViewerOverlay" onclick="if(event.target===this)closeScViewer()">
+  <div class="sc-viewer-panel" id="scViewerPanel">
+    <div class="sc-viewer-hdr">
+      <div>
+        <div class="sc-viewer-title" id="scViewerTitle">Stock Count Results</div>
+        <div class="sc-viewer-sub" id="scViewerSub">—</div>
+      </div>
+      <button class="sc-viewer-close" onclick="closeScViewer()">×</button>
+    </div>
+    <div class="sc-viewer-body">
+      <table class="sc-viewer-table">
+        <thead>
+          <tr>
+            <th>Product / Variant</th>
+            <th class="right">System Qty</th>
+            <th class="right">Counted</th>
+            <th class="right">Variance</th>
+          </tr>
+        </thead>
+        <tbody id="scViewerRows"></tbody>
+      </table>
+    </div>
+    <div class="sc-viewer-footer" id="scViewerFooter">—</div>
+  </div>
+</div>
+
 </body>
 </html>

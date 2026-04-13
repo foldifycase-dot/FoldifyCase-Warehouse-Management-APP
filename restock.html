@@ -2906,9 +2906,11 @@ async function viewRestockList(orderId){
     footer.textContent = 'Supplier restock list for ' + orderId;
     if(order){ order.restockListUrl = imageUrl; order.restockListUploadedAt = uploadedAt; }
   } else {
+    var debugInfo = (d && d.debug) ? (' — ' + d.debug.totalBlobs + ' total blobs, related: ' + (d.debug.relatedBlobs||[]).join(', ')) : '';
     empty.innerHTML = '<div style="font-size:32px;margin-bottom:12px;">&#128203;</div>'
       + '<div style="font-size:13px;font-weight:600;color:rgba(26,26,24,.5);">No restock list uploaded yet</div>'
-      + '<div style="font-size:11px;margin-top:8px;color:rgba(26,26,24,.35);">The supplier will upload it via the link in the purchase order email</div>';
+      + '<div style="font-size:11px;margin-top:8px;color:rgba(26,26,24,.35);">The supplier will upload it via the link in the purchase order email</div>'
+      + (debugInfo ? '<div style="font-size:10px;margin-top:12px;color:rgba(26,26,24,.25);word-break:break-all;">Debug: ' + debugInfo + '</div>' : '');
     sub.textContent = 'Awaiting supplier upload';
     footer.textContent = 'No file uploaded yet for ' + orderId;
   }

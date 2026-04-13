@@ -70,6 +70,10 @@
       "dest": "/upload-restock.js"
     },
     {
+      "src": "/api/find-restock",
+      "dest": "/find-restock.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }

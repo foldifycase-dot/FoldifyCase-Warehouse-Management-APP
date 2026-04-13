@@ -2725,7 +2725,7 @@ function tblHTML(prods,showWh,prefix){
         <td>
           <div class="qty-edit-wrap">
             <input type="number" class="qty-edit-input" value="${v.cost||''}" placeholder="0.00"
-              data-iid="${piid}" data-orig="${v.cost||''}" step="0.01" min="0"
+              data-iid="${iid}" data-orig="${v.cost||''}" step="0.01" min="0"
               onkeydown="if(event.key==='Enter')saveCost(this)"
               oninput="this.nextElementSibling.disabled=false"
               style="width:62px">

@@ -2642,29 +2642,30 @@ function previewStockCount(){
 }
 
 function renderStockCountResults(sessions){
-  const el = document.getElementById('stockCountResults');
+  var el = document.getElementById('stockCountResults');
   if(!el) return;
 
-  let local = [];
+  var local = [];
   try{ local = JSON.parse(localStorage.getItem('fc_stock_counts')||'[]'); }catch(e){}
-  const data = sessions || local;
+  var data = sessions || local;
 
   if(!data.length){
-    el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);padding:20px 16px;">No stock counts sent yet — use the <strong>Send Stock Count</strong> button above to create one.</div>';
+    el.innerHTML = '<div class="empty-state" style="color:rgba(26,26,24,.3);padding:20px 16px;">No stock counts yet — use the <strong>Send Stock Count</strong> button above.</div>';
     return;
   }
 
   // Populate Stock Count column cells in All Stock table
-  data.forEach(s => {
+  data.forEach(function(s){
     if(s.status === 'submitted' && s.counts){
-      Object.entries(s.counts).forEach(([vid, cnt]) => {
-        const cell = document.getElementById('sc-cell-' + vid);
+      Object.entries(s.counts).forEach(function(entry){
+        var vid = entry[0], cnt = entry[1];
+        var cell = document.getElementById('sc-cell-' + vid);
         if(cell){
-          const sys = allProducts.flatMap(p => p.variantData||[]).find(v => String(v.id) === String(vid));
-          const sysQty = sys ? sys.qty : null;
-          const diff = sysQty !== null ? cnt - sysQty : null;
-          const col = diff === null ? 'rgba(26,26,24,.5)' : diff < 0 ? '#C94040' : diff > 0 ? '#2D5FA6' : '#3D7A5A';
-          const diffTxt = diff === null ? '' : diff === 0 ? ' ✓' : (diff > 0 ? ' +' : ' ') + diff;
+          var sys = allProducts.flatMap(function(p){ return p.variantData||[]; }).find(function(v){ return String(v.id)===String(vid); });
+          var sysQty = sys ? sys.qty : null;
+          var diff = sysQty !== null ? cnt - sysQty : null;
+          var col = diff === null ? 'rgba(26,26,24,.5)' : diff < 0 ? '#C94040' : diff > 0 ? '#2D5FA6' : '#3D7A5A';
+          var diffTxt = diff === null ? '' : diff === 0 ? ' ✓' : (diff > 0 ? ' +' : ' ') + diff;
           cell.textContent = cnt + diffTxt;
           cell.style.color = col;
           cell.style.fontWeight = diff === 0 ? '400' : '700';
@@ -2673,54 +2674,64 @@ function renderStockCountResults(sessions){
     }
   });
 
-  // Build HTML rows using non-nested approach (avoid escaped quotes in templates)
-  const rows = data.map(s => {
-    // Compute missing fields from blob data
-    const totalProds = s.totalProducts || (s.products ? s.products.length : '?');
-    const totalVars = s.totalVariants || (s.products
-      ? s.products.reduce((acc, p) => acc + (p.variantData && p.variantData.length > 1 ? p.variantData.length : 1), 0)
+  // Build HTML using DOM manipulation — no template literal nesting issues
+  var html = '';
+  data.forEach(function(s){
+    var totalProds = s.totalProducts || (s.products ? s.products.length : '?');
+    var totalVars  = s.totalVariants || (s.products
+      ? s.products.reduce(function(acc,p){ return acc + (p.variantData && p.variantData.length > 1 ? p.variantData.length : 1); }, 0)
       : '?');
-    const sentTo = s.email || s.createdBy || '—';
-    const sheetUrl = s.sheetUrl || ('/api/stock-count?id=' + s.sessionId);
-    const date = new Date(s.createdAt).toLocaleString('en-AU', {
-      day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
-    });
-    const isSubmitted = s.status === 'submitted';
+    var sentTo   = s.email || s.createdBy || '—';
+    var sheetUrl = s.sheetUrl || ('/api/stock-count?id=' + (s.sessionId||''));
+    var sid      = s.sessionId || '';
+    var date     = new Date(s.createdAt).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    var isSubmit = s.status === 'submitted';
 
-    // Status badge
-    const badgeStyle = isSubmitted
+    var badgeCss = isSubmit
       ? 'background:#EAF3DE;color:#2A5C0A;border:1px solid #C5DFA8;'
       : 'background:#FFF8E8;color:#7A5A00;border:1px solid #EDD98A;';
-    const badgeText = isSubmitted ? '✓ Submitted' : '⏳ Pending';
+    var badgeTxt = isSubmit ? '&#10003; Submitted' : '&#9203; Pending';
 
-    // Count info
-    const countInfo = isSubmitted && s.counts
-      ? Object.keys(s.counts).length + ' items counted · Submitted by ' + (s.submittedBy || s.createdBy || 'Warehouse Team')
+    var countLine = isSubmit && s.counts
+      ? Object.keys(s.counts).length + ' items counted &middot; ' + (s.submittedBy || s.createdBy || 'Warehouse Team')
       : 'Sent to ' + sentTo;
 
-    return [
-      '<div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);">',
-        '<div style="flex:1;min-width:0;">',
-          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">',
-            '<span style="font-size:12px;font-weight:600;color:var(--ink);">' + (s.whLabel || ((s.warehouse||'?').toUpperCase() + ' Warehouse')) + '</span>',
-            '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;' + badgeStyle + '">' + badgeText + '</span>',
-            '<span style="font-size:10px;color:rgba(26,26,24,.35);font-family:monospace;">' + (s.sessionId||'') + '</span>',
-          '</div>',
-          '<div style="font-size:11px;color:rgba(26,26,24,.4);">' + date + ' · ' + totalProds + ' products · ' + totalVars + ' variants</div>',
-          '<div style="font-size:11px;color:rgba(26,26,24,.5);margin-top:2px;">' + countInfo + '</div>',
-        '</div>',
-        '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">',
-          '<a href="' + sheetUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:rgba(200,169,110,.12);color:#B87D2A;border:1px solid rgba(200,169,110,.3);border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">',
-            '<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2.5"/></svg>',
-            'View Sheet',
-          '</a>',
-          '<button data-sc-del="' + (s.sessionId||'') + '" title="Delete this stock count" style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border:1.5px solid rgba(201,64,64,.3);background:rgba(201,64,64,.07);border-radius:6px;cursor:pointer;color:#C94040;font-size:18px;font-weight:300;">&#215;</button>',
-        '</div>',
-      '</div>'
-    ].join('');
+    html += '<div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--border);">';
+
+    // Left info block
+    html += '<div style="flex:1;min-width:0;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">';
+    html += '<span style="font-size:12px;font-weight:600;color:var(--ink);">' + (s.whLabel || ((s.warehouse||'?').toUpperCase() + ' Warehouse')) + '</span>';
+    html += '<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;' + badgeCss + '">' + badgeTxt + '</span>';
+    html += '<span style="font-size:10px;color:rgba(26,26,24,.35);font-family:monospace;">' + sid + '</span>';
+    html += '</div>';
+    html += '<div style="font-size:11px;color:rgba(26,26,24,.4);">' + date + ' &middot; ' + totalProds + ' products &middot; ' + totalVars + ' variants</div>';
+    html += '<div style="font-size:11px;color:rgba(26,26,24,.5);margin-top:2px;">' + countLine + '</div>';
+    html += '</div>';
+
+    // Right buttons block
+    html += '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">';
+
+    // View Sheet button
+    html += '<a href="' + sheetUrl + '" target="_blank" ';
+    html += 'style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;';
+    html += 'background:rgba(200,169,110,.12);color:#B87D2A;border:1px solid rgba(200,169,110,.3);';
+    html += 'border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">';
+    html += '<svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8s3-5 7-5 7 5 7 5-3 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2.5"/></svg>';
+    html += 'View Sheet</a>';
+
+    // Delete button — data attribute, no onclick
+    html += '<button data-sc-del="' + sid + '" title="Delete this stock count" ';
+    html += 'style="display:inline-flex;align-items:center;justify-content:center;';
+    html += 'width:28px;height:28px;border:1.5px solid rgba(201,64,64,.3);';
+    html += 'background:rgba(201,64,64,.07);border-radius:6px;cursor:pointer;';
+    html += 'color:#C94040;font-size:18px;font-weight:300;line-height:1;">';
+    html += '&#215;</button>';
+
+    html += '</div></div>';
   });
 
-  el.innerHTML = rows.join('');
+  el.innerHTML = html;
 }
 
 
@@ -2920,11 +2931,11 @@ async function loadStockCountResults(){
   filterStockCountResults();
 }
 
-// Event delegation for delete buttons (avoids onclick quote issues)
+// Event delegation for stock count delete buttons
 document.addEventListener('click', function(e){
-  const btn = e.target.closest('[data-delete-sc]');
+  const btn = e.target.closest('[data-sc-del]');
   if(btn){
-    const sid = btn.getAttribute('data-delete-sc');
+    const sid = btn.getAttribute('data-sc-del');
     if(sid) deleteStockCount(sid);
   }
 });

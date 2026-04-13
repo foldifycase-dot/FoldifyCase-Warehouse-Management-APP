@@ -2479,6 +2479,12 @@ function openStockCountModal(){
 
 function closeStockCountModal(){
   document.getElementById('stockCountModal').style.display = 'none';
+  _scProductFilter = null;
+  // Reset modal title
+  const titleEl = document.querySelector('#stockCountModal .modal-title');
+  if(titleEl) titleEl.textContent = 'Send Stock Count Sheet';
+  const descEl = document.querySelector('#stockCountModal .modal-body > div:first-child');
+  if(descEl) descEl.innerHTML = '📋 Sends a printable stock count sheet to your warehouse team. The sheet lists all product variants with a blank <strong>Count</strong> column for staff to fill in during a stocktake.';
 }
 
 document.addEventListener('keydown', function(e){
@@ -2703,13 +2709,20 @@ function renderStockCountResults(sessions){
 }
 
 function openStockCountForProduct(productId){
-  // Pre-select warehouse and open modal, auto-filter to show only this product
-  openStockCountModal();
-  // Override the send to only include this product
   const prod = allProducts.find(p=>String(p.id)===String(productId));
-  if(prod){
-    const wh = prod.warehouses && prod.warehouses.length ? prod.warehouses[0] : activeWarehouse;
-    document.getElementById('scWarehouse').value = wh;
+  if(!prod) return;
+  _scProductFilter = productId;
+  openStockCountModal();
+  // Override warehouse to product's warehouse
+  const wh = prod.warehouses && prod.warehouses.length ? prod.warehouses[0] : activeWarehouse;
+  document.getElementById('scWarehouse').value = wh;
+  // Update modal title and description to show single-product mode
+  const titleEl = document.querySelector('#stockCountModal .modal-title');
+  if(titleEl) titleEl.textContent = 'Stock Count — ' + prod.title;
+  const descEl = document.querySelector('#stockCountModal .modal-body > div:first-child');
+  if(descEl){
+    const variants = prod.variantData && prod.variantData.length > 1 ? prod.variantData.length : 1;
+    descEl.innerHTML = '📦 Counting <strong>' + prod.title + '</strong> only — ' + variants + ' variant' + (variants!==1?'s':'') + '. The sheet will include only this product.';
   }
 }
 
@@ -2745,9 +2758,13 @@ async function sendStockCount(){
   }
   const wh = document.getElementById('scWarehouse').value;
   const whLabel = wh === 'all' ? 'All Warehouses' : wh.toUpperCase() + ' Warehouse';
-  const prods = wh === 'all' ? allProducts : allProducts.filter(p => p.warehouses.includes(wh));
+  let prods = wh === 'all' ? allProducts : allProducts.filter(p => p.warehouses.includes(wh));
+  // If single-product mode, filter to just that product
+  if(_scProductFilter){
+    prods = prods.filter(p => String(p.id) === String(_scProductFilter));
+  }
   if(!prods.length){
-    document.getElementById('scStatus').innerHTML = '<span style="color:var(--red)">⚠ No products for this warehouse</span>';
+    document.getElementById('scStatus').innerHTML = '<span style="color:var(--red)">⚠ No products found</span>';
     return;
   }
   const opts = {
@@ -2838,7 +2855,7 @@ async function sendStockCount(){
         to: [email],
         from_name: 'FoldifyCase Warehouse',
         from_email: 'warehouse@foldifycase.com.au',
-        subject: `Stock Count Required — ${whLabel} — ${now}`,
+        subject: `Stock Count — ${_scProductFilter ? (prods[0]&&prods[0].title||'Product') : whLabel} — ${now}`,
         custom_html: notifHtml,
         type: 'stock_count', warehouse: whLabel, products: []
       })
@@ -2867,6 +2884,7 @@ async function sendStockCount(){
 
 // ── STOCK COUNT RESULTS PANEL ─────────────────────────────────────────────
 let _allStockCounts = [];  // global cache for filtering
+let _scProductFilter = null; // null = whole warehouse, string = single product ID
 
 async function loadStockCountResults(){
   const el = document.getElementById('stockCountResults');

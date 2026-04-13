@@ -71,6 +71,25 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── DELETE a stock count session ─────────────────────────────────────────
+  if (action === 'delete' && req.method === 'POST') {
+    try {
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      const sessionId = body.sessionId;
+      if (!sessionId) return res.status(400).json({ error: 'sessionId required' });
+      const { del } = await import('@vercel/blob');
+      const key = `${BLOB_PREFIX}${sessionId}.json`;
+      const listRes = await list({ prefix: key, token: BLOB_TOKEN });
+      if (listRes.blobs && listRes.blobs.length > 0) {
+        await del(listRes.blobs[0].url, { token: BLOB_TOKEN });
+      }
+      return res.status(200).json({ success: true });
+    } catch (e) {
+      console.error('[stock-count delete]', e);
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
   // ── LOAD all sessions (called from app to show results) ─────────────────
   if (action === 'list' && req.method === 'GET') {
     try {

@@ -1,4 +1,4 @@
-import { put, list } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 
 const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN || process.env.PUBLIC_BLOB_READ_WRITE_TOKEN;
 const BLOB_PREFIX = 'Stock Counts/';
@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       await put(key, JSON.stringify(body), {
         access: 'public',
         token: BLOB_TOKEN,
-        allowOverwrite: true,
+        allowOverwrite: false,
         addRandomSuffix: false
       });
       return res.status(200).json({ success: true, sessionId });
@@ -77,7 +77,6 @@ export default async function handler(req, res) {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
       const sessionId = body.sessionId;
       if (!sessionId) return res.status(400).json({ error: 'sessionId required' });
-      const { del } = await import('@vercel/blob');
       const key = `${BLOB_PREFIX}${sessionId}.json`;
       const listRes = await list({ prefix: key, token: BLOB_TOKEN });
       if (listRes.blobs && listRes.blobs.length > 0) {
@@ -93,9 +92,16 @@ export default async function handler(req, res) {
   // ── LOAD all sessions (called from app to show results) ─────────────────
   if (action === 'list' && req.method === 'GET') {
     try {
-      const listRes = await list({ prefix: BLOB_PREFIX, token: BLOB_TOKEN });
+      // Paginate through all blobs
+      let allBlobs = [];
+      let cursor;
+      do {
+        const listRes = await list({ prefix: BLOB_PREFIX, token: BLOB_TOKEN, cursor });
+        allBlobs = allBlobs.concat(listRes.blobs || []);
+        cursor = listRes.cursor;
+      } while (cursor);
       const sessions = [];
-      for (const blob of (listRes.blobs || [])) {
+      for (const blob of allBlobs) {
         try {
           const r = await fetch(blob.url);
           const data = await r.json();

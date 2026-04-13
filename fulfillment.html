@@ -110,7 +110,8 @@ td:first-child{padding-left:18px;}
 .badge.cancelled .bdot{background:rgba(26,26,24,.3);}
 .amt{font-family:"Inter",sans-serif;font-weight:700;font-size:14px;letter-spacing:-.01em;}
 .amtc{font-size:10px;color:rgba(26,26,24,.38);font-weight:500;}
-.btn-send{width:100%;padding:5px 8px;background:var(--ink);color:var(--cream);border:none;border-radius:5px;font-family:"Inter",sans-serif;font-weight:600;font-size:10px;cursor:pointer;white-space:nowrap;transition:all .18s;box-sizing:border-box;}
+.btn-action-cell{width:100%;padding:5px 0;font-size:10px;font-weight:600;font-family:"Inter",sans-serif;border-radius:5px;cursor:pointer;text-align:center;white-space:nowrap;transition:all .18s;box-sizing:border-box;line-height:1.3;}
+.btn-send{background:var(--ink);color:var(--cream);border:none;}
 .btn-send:hover{background:var(--green);}
 .btn-send:disabled{opacity:.5;cursor:not-allowed;}
 .btn-send.not-ready{background:#B87D2A;color:#fff;}
@@ -171,9 +172,11 @@ html.in-iframe .topbar{display:none!important;}
 html.in-iframe .layout{min-height:calc(100vh);}
 
 /* Packing Image viewer */
-.btn-packing{width:100%;margin-top:5px;padding:5px 8px;background:#F0EDE8;border:1.5px solid rgba(26,26,24,.2);border-radius:5px;font-size:10px;font-weight:600;color:rgba(26,26,24,.6);cursor:pointer;transition:all .15s;box-sizing:border-box;}
+.btn-upload-lbl{background:#F5F3E9;border:1.5px solid #C8A96E;color:#A6873A;}
+.btn-upload-lbl:hover{background:#C8A96E;color:#1A1A18;}
+.btn-packing{background:#F0EDE8;border:1.5px solid rgba(26,26,24,.2);color:rgba(26,26,24,.6);}
 .btn-packing:hover{background:#1A1A18;color:#fff;border-color:#1A1A18;}
-.btn-packing.has-image{background:rgba(61,122,90,.08);border-color:rgba(61,122,90,.35);color:#3D7A5A;}
+.btn-packing.has-image{background:rgba(61,122,90,.08);border:1.5px solid rgba(61,122,90,.35);color:#3D7A5A;}
 .btn-packing.has-image:hover{background:#3D7A5A;color:#fff;border-color:#3D7A5A;}
 .pack-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center;pointer-events:none;visibility:hidden;}
 .pack-viewer-overlay.open{display:flex;pointer-events:auto;visibility:visible;}
@@ -872,9 +875,7 @@ function renderTable(){
       +"<td>"+items.slice(0,2).map(function(i){ return "<span class='chip'>"+(i.qty||1)+"x "+(i.title||"").split(" ").slice(-2).join(" ")+"</span>"; }).join("")+"</td>"
       +"<td><span class='badge "+o.status+"'><span class='bdot'></span>"+statusLabel+"</span></td>"
       +"<td><div class='amt'>"+o.total.toFixed(2)+"<span class='amtc'> "+o.currency+"</span></div></td>"
-      +"<td style='vertical-align:top;padding:8px 6px;'><button class='btn-send "+(isNotReady?"not-ready":isAliExpress?"no-label":alreadySent?"resend":"")+"' id='sendbtn-"+o.id+"' data-oid='"+o.id+"' "+(canSend?"":"disabled")+">"+(alreadySent?"Re-send ↺":isAliExpress?"No Label":isNotReady?"Not Ready":"Send Label")+"</button>"
-      +"<br><button id='lblbtn-"+o.id+"' data-oid='"+encodeURIComponent(o.shopifyOrderId||o.id)+"' data-oname='"+encodeURIComponent(o.num||'')+"' style='margin-top:5px;width:100%;padding:5px 8px;background:#F5F3E9;border:1.5px solid #C8A96E;border-radius:5px;font-size:10px;font-weight:600;color:#A6873A;cursor:pointer;box-sizing:border-box;' onclick='uploadLabelPDF(this,this.getAttribute(\"data-oid\"),this.getAttribute(\"data-oname\"))'>&#128206; Upload Label</button>"
-      +"<br><button class='btn-packing' id='packbtn-"+o.id+"' data-oname='"+encodeURIComponent(o.num||'')+"' onclick='viewPackingImage(this.getAttribute(\"data-oname\"),this)'>&#128247; Packing Image</button></td>"
+      +"<td style='vertical-align:middle;padding:6px 6px;'><div style='display:flex;flex-direction:column;gap:4px;width:120px;'><button class='btn-action-cell btn-send "+(isNotReady?"not-ready":isAliExpress?"no-label":alreadySent?"resend":"")+"' id='sendbtn-"+o.id+"' data-oid='"+o.id+"' "+(canSend?"":"disabled")+">"+(alreadySent?"Re-send ↺":isAliExpress?"No Label":isNotReady?"Not Ready":"Send Label")+"</button><button class='btn-action-cell btn-upload-lbl' id='lblbtn-"+o.id+"' data-oid='"+encodeURIComponent(o.shopifyOrderId||o.id)+"' data-oname='"+encodeURIComponent(o.num||'')+"' onclick='uploadLabelPDF(this,this.getAttribute(\"data-oid\"),this.getAttribute(\"data-oname\"))'> Upload Label</button><button class='btn-action-cell btn-packing' id='packbtn-"+o.id+"' data-oname='"+encodeURIComponent(o.num||'')+"' onclick='viewPackingImage(this.getAttribute(\"data-oname\"),this)'> Packing Image</button></div></td>"
       +"</tr>";
   }).join("");
   // Wire up send buttons via delegation - avoids inline onclick and Cloudflare issues

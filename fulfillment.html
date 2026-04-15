@@ -176,7 +176,7 @@ html.in-iframe .layout{min-height:calc(100vh);}
 .btn-upload-lbl:hover{background:#C8A96E;color:#1A1A18;}
 .btn-packing{background:#F0EDE8;border:1.5px solid rgba(26,26,24,.2);color:rgba(26,26,24,.6);}
 .btn-packing:hover{background:#1A1A18;color:#fff;border-color:#1A1A18;}
-.btn-packing.has-image{background:rgba(61,122,90,.08);border:1.5px solid rgba(61,122,90,.35);color:#3D7A5A;}
+.btn-packing.has-image{background:rgba(61,122,90,.08) !important;border:1.5px solid rgba(61,122,90,.35) !important;color:#3D7A5A !important;font-size:10px !important;font-weight:600 !important;font-family:"Inter",sans-serif !important;padding:5px 0 !important;width:100% !important;}
 .btn-packing.has-image:hover{background:#3D7A5A;color:#fff;border-color:#3D7A5A;}
 .pack-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:800;align-items:flex-end;justify-content:center;pointer-events:none;visibility:hidden;}
 .pack-viewer-overlay.open{display:flex;pointer-events:auto;visibility:visible;}
@@ -1136,7 +1136,7 @@ async function viewPackingImage(encodedOrderName, btn){
       document.getElementById('packViewerSub').textContent = 'Uploaded ' + uploaded;
       footer.textContent = 'Packing image for order #' + orderName;
       pathEl.textContent = d.pathname || '';
-      if(btn){ btn.className = 'btn-packing has-image'; btn.textContent = '\u2705 Packing Uploaded'; }
+      if(btn){ btn.className = 'btn-action-cell btn-packing has-image'; btn.textContent = 'Packing Uploaded'; }
     } else {
       empty.innerHTML = '<div style="font-size:32px;margin-bottom:12px;">&#128247;</div>'
         + '<div style="font-size:13px;font-weight:600;color:rgba(26,26,24,.5);">No packing image yet</div>'

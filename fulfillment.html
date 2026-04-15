@@ -881,6 +881,7 @@ function renderTable(){
   // Wire up send buttons via delegation - avoids inline onclick and Cloudflare issues
   // Check label upload status for visible orders
   setTimeout(function(){ checkLabelStatuses(rows); }, 300);
+  setTimeout(function(){ checkPackingStatuses(rows); }, 600);
   tbody.onclick = function(e){
     var b = e.target;
     if(b && b.className && b.className.indexOf("btn-send") >= 0 && !b.disabled){
@@ -1098,17 +1099,30 @@ async function viewPackingImage(encodedOrderName, btn){
   var footer = document.getElementById('packViewerFooter');
   var pathEl = document.getElementById('packViewerPath');
   document.getElementById('packViewerTitle').textContent = 'Packing Image — #' + orderName;
-  document.getElementById('packViewerSub').textContent = 'Loading from warehouse storage…';
   img.style.display = 'none'; img.src = '';
   openLink.style.display = 'none';
   empty.style.display = 'block';
-  empty.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">&#9203;</div><div style="font-size:13px;color:rgba(26,26,24,.5);">Checking warehouse storage…</div>';
   footer.textContent = 'Order #' + orderName;
   pathEl.textContent = '';
   overlay.classList.add('open');
+
+  // Use cached URL from checkPackingStatuses if available (skip fetch)
+  var cachedUrl = btn && btn.getAttribute('data-packing-url');
+  var cachedAt  = btn && btn.getAttribute('data-packing-at');
+
+  if (cachedUrl) {
+    document.getElementById('packViewerSub').textContent = 'Loading…';
+    var d = { url: cachedUrl, uploadedAt: cachedAt };
+  } else {
+    document.getElementById('packViewerSub').textContent = 'Checking warehouse storage…';
+    empty.innerHTML = '<div style="font-size:28px;margin-bottom:10px;">&#9203;</div><div style="font-size:13px;color:rgba(26,26,24,.5);">Checking warehouse storage…</div>';
+  }
+
   try {
-    var r = await fetch('/api/proxy?service=blob&action=find_packing&orderName=' + encodeURIComponent(orderName));
-    var d = await r.json();
+    if (!cachedUrl) {
+      var r = await fetch('/api/proxy?service=blob&action=find_packing&orderName=' + encodeURIComponent(orderName));
+      var d = await r.json();
+    }
     console.log('[viewPackingImage] response:', JSON.stringify(d));
     if(d.url){
       img.src = d.url;
@@ -1136,6 +1150,26 @@ async function viewPackingImage(encodedOrderName, btn){
       + '<div style="font-size:13px;color:#C94040;">Error: ' + e.message + '</div>';
     document.getElementById('packViewerSub').textContent = 'Load failed';
   }
+}
+
+function checkPackingStatuses(pageOrders) {
+  pageOrders.forEach(function(o) {
+    var btn = document.getElementById('packbtn-' + o.id);
+    if (!btn) return;
+    var name = (o.num || '').replace(/#/g, '').trim();
+    if (!name) return;
+    fetch('/api/proxy?service=blob&action=find_packing&orderName=' + encodeURIComponent(name))
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        if (data && data.url) {
+          btn.className = 'btn-action-cell btn-packing has-image';
+          btn.textContent = 'Packing Uploaded';
+          btn.setAttribute('data-packing-url', data.url);
+          btn.setAttribute('data-packing-at', data.uploadedAt || '');
+        }
+      })
+      .catch(function(){});
+  });
 }
 
 function uploadLabelPDF(btn, orderId, orderName) {

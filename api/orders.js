@@ -204,7 +204,17 @@ module.exports = async (req, res) => {
       else if (o.fulfillment_status === 'partial') status = 'partial';
       else if (o.financial_status === 'refunded' || o.financial_status === 'voided') status = 'cancelled';
 
-      const items = (o.line_items || []).map(i => {
+      const items = (o.line_items || []).filter(i => {
+        // Exclude removed/cancelled line items (Shopify sets current_quantity to 0)
+        if ((i.current_quantity !== undefined && i.current_quantity === 0) &&
+            (i.fulfillable_quantity !== undefined && i.fulfillable_quantity === 0)) return false;
+        // Exclude zero-quantity items
+        if (i.quantity === 0) return false;
+        // Exclude tips and gift cards
+        if (i.gift_card) return false;
+        if (i.title && (i.title.toLowerCase() === 'tip' || i.title.toLowerCase().includes('donation'))) return false;
+        return true;
+      }).map(i => {
         // Resolve product data - use variantToProductMap for items with null product_id
         const resolvedPid = i.product_id || variantToProductMap[i.variant_id];
         const pd = productDataMap[resolvedPid] || { images: [], firstImage: null, handle: '' };

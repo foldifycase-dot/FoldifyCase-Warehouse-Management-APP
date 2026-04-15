@@ -2867,54 +2867,109 @@ async function confirmAndUpdateStock(){
   var btn = document.getElementById('scConfirmBtn');
   var sessionId = btn ? btn.getAttribute('data-session') : null;
   if(!sessionId) return;
+
   var session = _allStockCounts.find(function(s){ return s.sessionId===sessionId; });
   if(!session || !session.counts){ showToast('No count data found','err'); return; }
-  var counts = session.counts;
+
+  var counts = session.counts; // { variantId: countedQty }
   var variantIds = Object.keys(counts);
   var total = variantIds.length;
-  if(!total){ showToast('No items counted','err'); return; }
-  var msg = 'Update Shopify inventory for ' + total + ' variant' + (total!==1?'s':'') + ' to warehouse-counted quantities?\n\nThis will overwrite current stock levels in Shopify.';
+  if(!total){ showToast('No items counted in this session','err'); return; }
+
+  // Resolve the location ID from locationMap using the session's warehouse
+  // locationMap = { us: 'SHOPIFY_LOC_ID', uk: '...', au: '...' }
+  var sessionWh = session.warehouse || 'us';
+  var locId = locationMap[sessionWh] || Object.values(locationMap)[0] || '';
+  if(!locId){
+    showToast('Location not found — please Sync Shopify first','err');
+    return;
+  }
+
+  var msg = 'Update Shopify inventory for ' + total + ' variant' + (total!==1?'s':'') + ' to warehouse-counted quantities?\n\nWarehouse: ' + (session.whLabel||sessionWh) + '\nLocation ID: ' + locId + '\n\nThis will overwrite current stock levels in Shopify.';
   if(!confirm(msg)) return;
+
   btn.disabled = true;
   btn.textContent = 'Updating 0/' + total + '…';
   btn.style.background = '#B87D2A';
+  btn.style.color = '#fff';
+  btn.style.borderColor = '#B87D2A';
+
   var done = 0, failed = 0, skipped = 0;
+
   for(var i = 0; i < variantIds.length; i++){
     var vid = variantIds[i];
     var cnt = parseInt(counts[vid]);
-    var variant = null, locId = null;
+
+    // Find the variant in allProducts to get inventoryItemId
+    var variant = null;
     allProducts.forEach(function(p){
       (p.variantData||[]).forEach(function(v){
-        if(String(v.id) === String(vid)){ variant = v; locId = v.locationId || v.loc; }
+        if(String(v.id) === String(vid)) variant = v;
       });
     });
-    if(!variant || !variant.inventoryItemId || !locId){ skipped++; continue; }
+
+    if(!variant){
+      console.warn('[confirmUpdate] variant not found in allProducts:', vid, '— try re-syncing');
+      skipped++;
+      btn.textContent = 'Updating ' + (done+failed+skipped) + '/' + total + '…';
+      continue;
+    }
+
+    var iid = variant.inventoryItemId || variant.id;
+    if(!iid){
+      console.warn('[confirmUpdate] no inventoryItemId for variant:', vid);
+      skipped++;
+      btn.textContent = 'Updating ' + (done+failed+skipped) + '/' + total + '…';
+      continue;
+    }
+
     try{
-      var r = await fetch(PROXY + '?service=shopify&action=set_inventory',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ inventory_item_id: parseInt(variant.inventoryItemId), location_id: parseInt(locId), available: cnt })
+      var r = await fetch(PROXY + '?service=shopify&action=set_inventory', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          inventory_item_id: parseInt(iid),
+          location_id: parseInt(locId),
+          available: cnt
+        })
       });
       var d = await r.json();
       if(r.ok && d.success){
         variant.qty = cnt;
         variant.status = cnt <= 0 ? 'critical' : cnt <= 5 ? 'low' : 'ok';
         done++;
-      } else { console.error('[confirmUpdate]', vid, d); failed++; }
-    } catch(e){ console.error('[confirmUpdate]', vid, e.message); failed++; }
+        console.log('[confirmUpdate] OK:', vid, '→', cnt);
+      } else {
+        console.error('[confirmUpdate] Shopify error for variant', vid, ':', JSON.stringify(d));
+        failed++;
+      }
+    } catch(e){
+      console.error('[confirmUpdate] fetch error for variant', vid, ':', e.message);
+      failed++;
+    }
     btn.textContent = 'Updating ' + (done+failed+skipped) + '/' + total + '…';
   }
+
+  // Show result
   if(failed === 0 && skipped === 0){
-    btn.textContent = '✅ Updated ' + done;
+    btn.textContent = '✅ Updated ' + done + ' variant' + (done!==1?'s':'');
     btn.style.background = 'var(--green)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--green)';
     showToast('Shopify stock updated — ' + done + ' variants','ok');
+  } else if(failed === 0 && skipped > 0){
+    btn.textContent = '⚠ ' + done + ' updated, ' + skipped + ' skipped (re-sync first)';
+    btn.style.background = '#B87D2A';
+    showToast(done + ' updated, ' + skipped + ' skipped — click Sync Shopify then retry','err');
   } else {
     btn.textContent = '⚠ ' + done + ' ok, ' + failed + ' failed' + (skipped?' '+skipped+' skipped':'');
     btn.style.background = '#B87D2A';
     showToast(done + ' updated, ' + failed + ' failed','err');
   }
   btn.disabled = false;
+
+  // Re-render stock table with updated quantities
   renderAll(allProducts);
 }
+
 
 function openScViewer(sessionId){
   var session = _allStockCounts.find(function(s){ return s.sessionId===sessionId; });

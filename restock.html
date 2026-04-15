@@ -1476,14 +1476,16 @@ async function confirmRestock(){
   savePOOrders();
 
   if(supplierEmail){
-    await sendToSupplier(order);
+    try{ await sendToSupplier(order); } catch(emailErr){ console.warn('[confirmRestock] Email error (order still placed):', emailErr.message); showToast('Order placed — email failed: '+emailErr.message,'err'); }
   }
 
   renderPOLog();
+  applyPOFilters();
   closeRestock();
   cartItems=[];
   renderCart();
   showToast(`Order ${orderId} placed — ${currentOrderLines.length} item${currentOrderLines.length!==1?'s':''}${supplierEmail?' · Supplier notified':''}`,'ok');
+  if(btn){ btn.disabled=false; btn.style.opacity=''; }
   }catch(err){
     console.error('[confirmRestock]', err);
     showToast('Order failed: ' + err.message, 'err');
@@ -1646,7 +1648,7 @@ async function sendToSupplier(order){
       const errMsg=result.error||result.message||result.raw||'Unknown error — check Vercel logs';
       console.error('[PO Email] Failed:',result);
       showToast('Email failed: '+errMsg,'err');
-      alert('Supplier email failed:\n\n'+errMsg+'\n\nCheck that:\n1. RESEND_API_KEY is set in Vercel env vars\n2. From email uses verified domain (foldifycase.com.au)\n3. Vercel function logs for details');
+      showToast('⚠ Supplier email failed — order was placed. Check Vercel logs for email error.', 'err')
     }
   }catch(e){
     console.error('[PO Email] Network error:',e);

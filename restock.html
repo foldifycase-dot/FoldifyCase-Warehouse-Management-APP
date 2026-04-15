@@ -587,7 +587,7 @@ html.in-iframe .layout{height:100vh;}
 .sc-diff-neg{color:#C94040;font-weight:700;font-family:"DM Mono",monospace;}
 .sc-diff-ok{color:#3D7A5A;font-weight:600;font-family:"DM Mono",monospace;}
 .sc-diff-na{color:rgba(26,26,24,.25);font-family:"DM Mono",monospace;}
-.sc-viewer-footer{padding:12px 20px;border-top:1px solid var(--border);background:#F5F3EE;font-size:11px;color:rgba(26,26,24,.4);flex-shrink:0;}
+.sc-viewer-footer{padding:10px 16px;border-top:1px solid var(--border);background:#F5F3EE;font-size:11px;color:rgba(26,26,24,.4);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;}
 </style>
 <script>if(window.self!==window.top){document.documentElement.classList.add('in-iframe');}</script>
 </head>
@@ -2863,6 +2863,59 @@ function renderStockCountResults(sessions){
 }
 
 // Open the floating viewer panel for a stock count
+async function confirmAndUpdateStock(){
+  var btn = document.getElementById('scConfirmBtn');
+  var sessionId = btn ? btn.getAttribute('data-session') : null;
+  if(!sessionId) return;
+  var session = _allStockCounts.find(function(s){ return s.sessionId===sessionId; });
+  if(!session || !session.counts){ showToast('No count data found','err'); return; }
+  var counts = session.counts;
+  var variantIds = Object.keys(counts);
+  var total = variantIds.length;
+  if(!total){ showToast('No items counted','err'); return; }
+  var msg = 'Update Shopify inventory for ' + total + ' variant' + (total!==1?'s':'') + ' to warehouse-counted quantities?\n\nThis will overwrite current stock levels in Shopify.';
+  if(!confirm(msg)) return;
+  btn.disabled = true;
+  btn.textContent = 'Updating 0/' + total + '…';
+  btn.style.background = '#B87D2A';
+  var done = 0, failed = 0, skipped = 0;
+  for(var i = 0; i < variantIds.length; i++){
+    var vid = variantIds[i];
+    var cnt = parseInt(counts[vid]);
+    var variant = null, locId = null;
+    allProducts.forEach(function(p){
+      (p.variantData||[]).forEach(function(v){
+        if(String(v.id) === String(vid)){ variant = v; locId = v.locationId || v.loc; }
+      });
+    });
+    if(!variant || !variant.inventoryItemId || !locId){ skipped++; continue; }
+    try{
+      var r = await fetch(PROXY + '?service=shopify&action=set_inventory',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ inventory_item_id: parseInt(variant.inventoryItemId), location_id: parseInt(locId), available: cnt })
+      });
+      var d = await r.json();
+      if(r.ok && d.success){
+        variant.qty = cnt;
+        variant.status = cnt <= 0 ? 'critical' : cnt <= 5 ? 'low' : 'ok';
+        done++;
+      } else { console.error('[confirmUpdate]', vid, d); failed++; }
+    } catch(e){ console.error('[confirmUpdate]', vid, e.message); failed++; }
+    btn.textContent = 'Updating ' + (done+failed+skipped) + '/' + total + '…';
+  }
+  if(failed === 0 && skipped === 0){
+    btn.textContent = '✅ Updated ' + done;
+    btn.style.background = 'var(--green)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--green)';
+    showToast('Shopify stock updated — ' + done + ' variants','ok');
+  } else {
+    btn.textContent = '⚠ ' + done + ' ok, ' + failed + ' failed' + (skipped?' '+skipped+' skipped':'');
+    btn.style.background = '#B87D2A';
+    showToast(done + ' updated, ' + failed + ' failed','err');
+  }
+  btn.disabled = false;
+  renderAll(allProducts);
+}
+
 function openScViewer(sessionId){
   var session = _allStockCounts.find(function(s){ return s.sessionId===sessionId; });
   if(!session){
@@ -2918,7 +2971,20 @@ function openScViewer(sessionId){
   var submitInfo = isSubmit && session.submittedAt
     ? 'Submitted by '+(session.submittedBy||'Warehouse Team')+' · '+new Date(session.submittedAt).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
     : (isSubmit ? 'Submitted' : 'Not yet submitted — '+counted+' items pre-filled');
-  document.getElementById('scViewerFooter').textContent = submitInfo+' · '+counted+' items counted';
+  document.getElementById('scViewerFooterText').textContent = submitInfo+' · '+counted+' items counted';
+  var confirmBtn = document.getElementById('scConfirmBtn');
+  if(confirmBtn){
+    if(isSubmit && counted > 0){
+      confirmBtn.style.display = 'inline-block';
+      confirmBtn.textContent = '\u2713 Confirm & Update Stock';
+      confirmBtn.disabled = false;
+      confirmBtn.style.background = '#1A1A18';
+      confirmBtn.style.color = '#C8A96E';
+      confirmBtn.setAttribute('data-session', sessionId);
+    } else {
+      confirmBtn.style.display = 'none';
+    }
+  }
 
   document.getElementById('scViewerOverlay').classList.add('open');
 }
@@ -4338,7 +4404,10 @@ window.addEventListener('load',function(){
         <tbody id="scViewerRows"></tbody>
       </table>
     </div>
-    <div class="sc-viewer-footer" id="scViewerFooter">—</div>
+    <div class="sc-viewer-footer" id="scViewerFooter">
+      <span id="scViewerFooterText">—</span>
+      <button id="scConfirmBtn" onclick="confirmAndUpdateStock()" style="display:none;padding:7px 16px;background:#1A1A18;color:#C8A96E;border:1.5px solid #C8A96E;border-radius:7px;font-size:11px;font-weight:700;font-family:'Syne',sans-serif;letter-spacing:.04em;cursor:pointer;white-space:nowrap;transition:all .18s;">&#10003; Confirm &amp; Update Stock</button>
+    </div>
   </div>
 </div>
 

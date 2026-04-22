@@ -140,11 +140,24 @@ function buildEmailHTML(order, labelURL, isTest, toEmail, packingSlipURL, items,
     let rawImg = i.imageUrl || i.image_url || '';
     if (!rawImg && i.image) rawImg = (typeof i.image === 'string') ? i.image : (i.image.src || '');
     // Ensure URL is absolute (starts with https)
-    if (rawImg && !rawImg.startsWith('http')) rawImg = 'https:' + rawImg;
-    // Strip size suffix only (e.g. _600x600) - keep ?v= param intact
-    // Strip _600x600 style suffixes but preserve ?v= cache busting
-    const fullImg = rawImg ? rawImg.replace(/_\d+x(\d+)?/g, '') : '';
-    const itemUrl = i.productUrl || '';
+    if (rawImg && rawImg.startsWith('//')) rawImg = 'https:' + rawImg;
+    else if (rawImg && !rawImg.startsWith('http')) rawImg = 'https://' + rawImg;
+    // Use Shopify CDN size suffix to request a specific size that works in email
+    // Replace any existing size suffix with _400x400 for reliable email display
+    let fullImg = '';
+    if (rawImg) {
+      // If URL has existing size suffix, replace with _400x400
+      if (/_\d+x(\d+)?/.test(rawImg)) {
+        fullImg = rawImg.replace(/_\d+x(\d+)?/, '_400x400');
+      } else if (rawImg.includes('.jpg') || rawImg.includes('.png') || rawImg.includes('.webp')) {
+        // No size suffix - insert before extension
+        fullImg = rawImg.replace(/\.(jpg|jpeg|png|webp)(\?|$)/i, '_400x400.$1$2');
+      } else {
+        fullImg = rawImg;
+      }
+    }
+    console.log('[buildEmailHTML] item:', i.title, 'rawImg:', rawImg.substring(0,80), 'fullImg:', fullImg.substring(0,80));
+    const itemUrl = i.productUrl || (i.title ? 'https://www.foldifycase.com.au/products/' + i.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') : '');
     const itemVariant = i.variant_title || i.variant || '';
     const itemQty = i.quantity || i.qty || 1;
 

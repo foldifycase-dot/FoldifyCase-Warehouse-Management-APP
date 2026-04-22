@@ -32,7 +32,7 @@ async function getProductData(productId) {
   try {
     const [imgResult, prodResult] = await Promise.all([
       shopifyGet(`/admin/api/2024-01/products/${productId}/images.json?fields=id,src,variant_ids,position`),
-      shopifyGet(`/admin/api/2024-01/products/${productId}.json?fields=id,handle,image,title`)
+      shopifyGet(`/admin/api/2024-01/products/${productId}.json?fields=id,handle,image,images,title`)
     ]);
     const prod = (prodResult.status === 200 && prodResult.data.product) ? prodResult.data.product : null;
     const handle = prod ? (prod.handle || '') : '';

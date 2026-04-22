@@ -41,11 +41,25 @@ module.exports = async (req, res) => {
       return res.status(200).json({
         count: blobs.length,
         searching: searchName,
-        blobs: blobs.map(b => ({ pathname: b.pathname, size: b.size }))
+        labelBlobs: blobs.filter(b => {
+          const p = (b.pathname||'').toLowerCase();
+          return p.endsWith('.pdf') || p.includes('shipping') || p.includes('label');
+        }).map(b => ({ pathname: b.pathname })),
+        allBlobs: blobs.map(b => ({ pathname: b.pathname, size: b.size }))
       });
     }
 
-    const match = blobs.find(b => (b.pathname || '').toLowerCase().includes(searchName));
+    // Only match label PDFs — exclude packing images and other file types
+    const labelBlobs = blobs.filter(b => {
+      const p = (b.pathname || '').toLowerCase();
+      return p.endsWith('.pdf') || p.includes('shipping') || p.includes('label');
+    });
+    // Prefer exact folder match first, then fallback to any blob containing the order name
+    const match = labelBlobs.find(b => (b.pathname || '').toLowerCase().includes(searchName))
+      || blobs.find(b => {
+          const p = (b.pathname || '').toLowerCase();
+          return p.includes(searchName) && (p.endsWith('.pdf') || p.includes('shipping') || p.includes('label'));
+        });
 
     if (!match) {
       console.log('No label found for:', searchName);
